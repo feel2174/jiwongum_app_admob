@@ -244,7 +244,6 @@ export const NEWS = ARTICLES.slice(0, 3).map((a) => ({
   id: 'nb-' + a.id,
   tag: '속보',
   title: a.title,
-  source: 'zucca100.com',
   url: a.url,
 }));
 // ───────────────────────────────────────────────────────

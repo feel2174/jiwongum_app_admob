@@ -48,7 +48,7 @@ export default function DetailScreen({ route, navigation }) {
         </View>
         <Text style={[styles.title, { color: t.ink }]}>{item.title}</Text>
         <Text style={[styles.meta, { color: t.faint }]}>
-          zucca100.com · {formatDate(item.date)}
+          {formatDate(item.date)}
         </Text>
 
         <Text style={[styles.summary, { color: t.muted }]}>{item.summary}</Text>
