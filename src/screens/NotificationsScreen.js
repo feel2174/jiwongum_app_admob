@@ -5,7 +5,11 @@ import { useTheme } from '../theme';
 import { useStore } from '../lib/store';
 import { requestPushPermission, sendBreakingDemo } from '../lib/push';
 import { NEWS } from '../data/mock';
+import * as WebBrowser from 'expo-web-browser';
 import Header from '../components/Header';
+
+const PRIVACY_URL =
+  'https://workable-crowberry-292.notion.site/3993761bd6b28049b341ffc4e1002044';
 
 function Toggle({ on, onPress }) {
   const t = useTheme();
@@ -59,6 +63,13 @@ export default function NotificationsScreen() {
         <Text style={[styles.hint, { color: t.faint }]}>
           잠시 후 도착하는 알림을 탭하면 → 앱으로 다시 들어와 해당 글로 연결됩니다.
         </Text>
+
+        <Pressable
+          onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)}
+          style={[styles.policy, { borderTopColor: t.line }]}
+        >
+          <Text style={[styles.policyText, { color: t.faint }]}>개인정보처리방침</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -91,4 +102,7 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     alignItems: 'center',
   },
+  policy: { marginTop: 20, paddingTop: 16, borderTopWidth: 1, alignItems: 'center' },
+  policyText: { fontSize: 12.5, textDecorationLine: 'underline' },
 });
+
