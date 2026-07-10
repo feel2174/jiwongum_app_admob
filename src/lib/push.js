@@ -23,7 +23,7 @@ export async function requestPushPermission() {
 export async function sendBreakingDemo(article) {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: '[새 글] 생활 꿀팁',
+      title: '[새 글] 지원금·정책',
       body: article.title,
       data: { articleId: article.id, url: article.url },
     },

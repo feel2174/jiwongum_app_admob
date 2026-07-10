@@ -21,7 +21,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>
-      <Header title="생활 꿀팁" />
+      <Header title="지원금·정책" />
       <ScrollView contentContainerStyle={styles.content}>
         <NewsSection onPressItem={(n) => openExternal(n.url)} />
         <Chips items={CATEGORIES} value={filter} onChange={setFilter} />

@@ -4,10 +4,11 @@ const K_BOOKMARKS = '@jiwongum/bookmarks';
 const K_SETTINGS = '@jiwongum/settings';
 
 export const DEFAULT_SETTINGS = {
-  'AI·툴': true,
-  'OTT·구독': true,
-  '정부·행정': false,
-  생활팁: false,
+  '지원금·수당': true,
+  청년: true,
+  '취업·일자리': false,
+  '주거·세금': false,
+  핫딜: false,
   '새 글 알림': true,
 };
 
