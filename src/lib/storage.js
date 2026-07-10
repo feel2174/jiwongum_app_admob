@@ -4,10 +4,11 @@ const K_BOOKMARKS = '@jiwongum/bookmarks';
 const K_SETTINGS = '@jiwongum/settings';
 
 export const DEFAULT_SETTINGS = {
-  주거: true,
-  청년: true,
-  '취업·창업': false,
-  '마감 임박 알림': true,
+  'AI·툴': true,
+  'OTT·구독': true,
+  '정부·행정': false,
+  생활팁: false,
+  '새 글 알림': true,
 };
 
 export async function loadBookmarks() {

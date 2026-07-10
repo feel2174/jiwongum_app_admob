@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { useTheme } from '../theme';
-import { SUBSIDIES, CATEGORIES } from '../data/mock';
+import { ARTICLES, CATEGORIES } from '../data/mock';
 import { BANNER_UNIT } from '../lib/adManager';
 import { openExternal } from '../lib/openLink';
 import { useStore } from '../lib/store';
@@ -17,13 +17,11 @@ export default function HomeScreen({ navigation }) {
   const { isBookmarked, toggleBookmark } = useStore();
   const [filter, setFilter] = useState('전체');
 
-  const list = SUBSIDIES.filter(
-    (x) => filter === '전체' || x.categories.includes(filter)
-  );
+  const list = ARTICLES.filter((x) => filter === '전체' || x.category === filter);
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>
-      <Header title="지원금" />
+      <Header title="생활 꿀팁" />
       <ScrollView contentContainerStyle={styles.content}>
         <NewsSection onPressItem={(n) => openExternal(n.url)} />
         <Chips items={CATEGORIES} value={filter} onChange={setFilter} />

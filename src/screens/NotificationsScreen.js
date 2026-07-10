@@ -26,11 +26,10 @@ export default function NotificationsScreen() {
   const onSendDemo = async () => {
     const granted = await requestPushPermission();
     if (!granted) {
-      Alert.alert('알림 권한 필요', '설정에서 알림을 허용하면 속보를 받아볼 수 있어요.');
+      Alert.alert('알림 권한 필요', '설정에서 알림을 허용하면 새 글 알림을 받아볼 수 있어요.');
       return;
     }
-    const breaking = NEWS.filter((n) => n.tag === '속보');
-    await sendBreakingDemo(breaking[Math.floor(Math.random() * breaking.length)]);
+    await sendBreakingDemo(NEWS[Math.floor(Math.random() * NEWS.length)]);
   };
 
   return (
@@ -45,8 +44,8 @@ export default function NotificationsScreen() {
         ))}
 
         <Text style={[styles.hint, { color: t.faint }]}>
-          관심 카테고리에 새 지원금이 올라오거나, 저장한 지원금의 마감이 다가오면 푸시로
-          알려줘요.{'\n\n'}※ iOS는 최초 1회 알림 권한 동의가 필요합니다.
+          관심 카테고리에 새 글이 올라오면 푸시로 알려줘요.{'\n\n'}※ iOS는 최초 1회 알림
+          권한 동의가 필요합니다.
         </Text>
 
         <Pressable
@@ -54,11 +53,11 @@ export default function NotificationsScreen() {
           style={[styles.demoBtn, { backgroundColor: t.dangerSoft, borderColor: t.danger }]}
         >
           <Text style={{ color: t.danger, fontWeight: '700', fontSize: 14 }}>
-            🔔 [속보] 테스트 푸시 보내기
+            🔔 [새 글] 테스트 푸시 보내기
           </Text>
         </Pressable>
         <Text style={[styles.hint, { color: t.faint }]}>
-          잠시 후 도착하는 알림을 탭하면 → 앱으로 다시 들어와 기사 원문으로 연결됩니다.
+          잠시 후 도착하는 알림을 탭하면 → 앱으로 다시 들어와 해당 글로 연결됩니다.
         </Text>
       </ScrollView>
     </SafeAreaView>
