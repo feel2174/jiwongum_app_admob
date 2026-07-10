@@ -1,19 +1,28 @@
 // AdManager — 모든 전면광고 노출의 단일 관문.
 // 밴 방지 캡(빈도/세션/조회수)을 한 곳에서 강제한다.
 // 실서비스 배포 시 __DEV__ 아래의 실제 광고 단위 ID로 교체.
+import { Platform } from 'react-native';
 import {
   InterstitialAd,
   AdEventType,
   TestIds,
 } from 'react-native-google-mobile-ads';
 
+// 개발(__DEV__)에서는 항상 테스트 광고 → 자기 실광고 클릭 밴 방지.
+// 배포 빌드에서만 실제 광고 단위 ID 사용.
 const INTERSTITIAL_UNIT = __DEV__
   ? TestIds.INTERSTITIAL
-  : 'ca-app-pub-0000000000000000/0000000000'; // TODO: 실제 전면광고 단위 ID
+  : Platform.select({
+      android: 'ca-app-pub-8785405056367250/3054590041',
+      ios: TestIds.INTERSTITIAL, // TODO: iOS 전면광고 단위 ID 발급 후 교체
+    });
 
 export const BANNER_UNIT = __DEV__
   ? TestIds.BANNER
-  : 'ca-app-pub-0000000000000000/1111111111'; // TODO: 실제 배너 단위 ID
+  : Platform.select({
+      android: 'ca-app-pub-8785405056367250/3437733426',
+      ios: TestIds.BANNER, // TODO: iOS 배너 단위 ID 발급 후 교체
+    });
 
 // 데모/권장 캡. 실제 값은 리텐션·수익 보며 이 안전선 안에서 조정.
 export const CAPS = {
