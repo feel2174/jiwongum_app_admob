@@ -2,15 +2,32 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const K_BOOKMARKS = '@jiwongum/bookmarks';
 const K_SETTINGS = '@jiwongum/settings';
+const K_PROFILE = '@jiwongum/profile';
 
 export const DEFAULT_SETTINGS = {
-  '지원금·수당': true,
-  청년: true,
-  '취업·일자리': false,
-  '주거·세금': false,
-  핫딜: false,
   '새 글 알림': true,
+  '속보 알림': false,
 };
+
+export const DEFAULT_PROFILE = {
+  situations: [], // 예: ['청년', '구직·취업']
+  region: '전국',
+  onboarded: false,
+};
+
+async function loadJSON(key, fallback) {
+  try {
+    const raw = await AsyncStorage.getItem(key);
+    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
+  } catch {
+    return fallback;
+  }
+}
+async function saveJSON(key, val) {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(val));
+  } catch {}
+}
 
 export async function loadBookmarks() {
   try {
@@ -20,24 +37,18 @@ export async function loadBookmarks() {
     return [];
   }
 }
-
-export async function saveBookmarks(arr) {
-  try {
-    await AsyncStorage.setItem(K_BOOKMARKS, JSON.stringify(arr));
-  } catch {}
+export function saveBookmarks(arr) {
+  return saveJSON(K_BOOKMARKS, arr);
 }
-
-export async function loadSettings() {
-  try {
-    const raw = await AsyncStorage.getItem(K_SETTINGS);
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS;
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
+export function loadSettings() {
+  return loadJSON(K_SETTINGS, DEFAULT_SETTINGS);
 }
-
-export async function saveSettings(obj) {
-  try {
-    await AsyncStorage.setItem(K_SETTINGS, JSON.stringify(obj));
-  } catch {}
+export function saveSettings(obj) {
+  return saveJSON(K_SETTINGS, obj);
+}
+export function loadProfile() {
+  return loadJSON(K_PROFILE, DEFAULT_PROFILE);
+}
+export function saveProfile(obj) {
+  return saveJSON(K_PROFILE, obj);
 }

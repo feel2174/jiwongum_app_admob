@@ -1,38 +1,36 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
-  loadBookmarks,
-  saveBookmarks,
-  loadSettings,
-  saveSettings,
-  DEFAULT_SETTINGS,
+  loadBookmarks, saveBookmarks,
+  loadSettings, saveSettings, DEFAULT_SETTINGS,
+  loadProfile, saveProfile, DEFAULT_PROFILE,
 } from './storage';
 
-// 북마크 + 알림설정을 기기 로컬에 저장. (MVP는 계정 없이 동작)
 const StoreContext = createContext(null);
 
 export function StoreProvider({ children }) {
   const [bookmarks, setBookmarks] = useState([]);
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [profile, setProfileState] = useState(DEFAULT_PROFILE);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const [b, s] = await Promise.all([loadBookmarks(), loadSettings()]);
+      const [b, s, p] = await Promise.all([loadBookmarks(), loadSettings(), loadProfile()]);
       setBookmarks(b);
       setSettings(s);
+      setProfileState(p);
       setReady(true);
     })();
   }, []);
 
   const toggleBookmark = (id) => {
     setBookmarks((prev) => {
-      const next = prev.includes(id)
-        ? prev.filter((x) => x !== id)
-        : [...prev, id];
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
       saveBookmarks(next);
       return next;
     });
   };
+  const isBookmarked = (id) => bookmarks.includes(id);
 
   const toggleSetting = (key) => {
     setSettings((prev) => {
@@ -42,11 +40,24 @@ export function StoreProvider({ children }) {
     });
   };
 
-  const isBookmarked = (id) => bookmarks.includes(id);
+  const updateProfile = (partial) => {
+    setProfileState((prev) => {
+      const next = { ...prev, ...partial };
+      saveProfile(next);
+      return next;
+    });
+  };
+  const completeOnboarding = (situations, region) =>
+    updateProfile({ situations, region, onboarded: true });
 
   return (
     <StoreContext.Provider
-      value={{ bookmarks, isBookmarked, toggleBookmark, settings, toggleSetting, ready }}
+      value={{
+        bookmarks, isBookmarked, toggleBookmark,
+        settings, toggleSetting,
+        profile, updateProfile, completeOnboarding,
+        ready,
+      }}
     >
       {children}
     </StoreContext.Provider>

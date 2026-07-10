@@ -28,3 +28,12 @@ export function useTheme() {
   const scheme = useColorScheme();
   return palettes[scheme === 'dark' ? 'dark' : 'light'];
 }
+
+// 카드/섹션 공통 그림자 (모던, 은은하게)
+export const shadow = {
+  shadowColor: '#0b1a2b',
+  shadowOpacity: 0.07,
+  shadowRadius: 14,
+  shadowOffset: { width: 0, height: 5 },
+  elevation: 2,
+};
