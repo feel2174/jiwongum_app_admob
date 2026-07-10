@@ -409,6 +409,175 @@ export const ARTICLES = [
     "summary": "제미나이 프로를 최저가로 이용하는 최신 할인 방법.",
     "url": "https://zucca100.com/%ec%a0%9c%eb%af%b8%eb%82%98%ec%9d%b4-gemini-pro-%ed%94%84%eb%a1%9c-%ea%b0%80%ea%b2%a9-%ed%95%a0%ec%9d%b8-%ec%9d%b8%ed%95%98-%eb%ac%b4%eb%a3%8c-%ec%9a%94%ea%b8%88%ec%a0%9c-%ed%95%a0%ec%9d%b8-%eb%b0%9b/",
     "date": "2026-07-09"
+  },
+  {
+    "id": "a30",
+    "title": "희망리턴패키지 신청(소상공인 재기)",
+    "category": "취업·일자리",
+    "situations": [
+      "소상공인",
+      "구직·취업"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "폐업 소상공인의 재기·재취업을 돕는 희망리턴패키지 안내.",
+    "url": "https://zucca100.com/hope-return-package/",
+    "date": "2026-07-07"
+  },
+  {
+    "id": "a31",
+    "title": "소상공인 정책자금 융자",
+    "category": "취업·일자리",
+    "situations": [
+      "소상공인"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "소상공인 대상 저리 정책자금 융자 신청 방법.",
+    "url": "https://zucca100.com/sbiz24/",
+    "date": "2026-03-27"
+  },
+  {
+    "id": "a32",
+    "title": "산후도우미 신청 방법·대상",
+    "category": "지원금·수당",
+    "situations": [
+      "신혼·육아"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "산모·신생아 건강관리 산후도우미 지원 대상과 신청 방법.",
+    "url": "https://zucca100.com/%ec%82%b0%ed%9b%84%eb%8f%84%ec%9a%b0%eb%af%b8-%ec%8b%a0%ec%b2%ad-%eb%b0%a9%eb%b2%95-%eb%b0%8f-%eb%8c%80%ec%83%81-%ec%84%9c%eb%a5%98/",
+    "date": "2026-07-07"
+  },
+  {
+    "id": "a33",
+    "title": "부모급여 신청·지급액",
+    "category": "지원금·수당",
+    "situations": [
+      "신혼·육아"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "0~1세 아동 부모급여 지급액과 신청 방법.",
+    "url": "https://zucca100.com/2026-parent-benefit-guide/",
+    "date": "2026-02-02"
+  },
+  {
+    "id": "a34",
+    "title": "첫만남이용권 신청·사용처",
+    "category": "지원금·수당",
+    "situations": [
+      "신혼·육아"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "출산 시 지급되는 첫만남이용권 바우처 신청과 사용처.",
+    "url": "https://zucca100.com/cheosmmannam-iyonggwon-sincheong/",
+    "date": "2026-02-04"
+  },
+  {
+    "id": "a35",
+    "title": "공동주택가격 확인서 인터넷 발급",
+    "category": "주거·세금",
+    "situations": [
+      "주거"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "공동주택가격 확인서 온라인 발급 방법.",
+    "url": "https://zucca100.com/%ea%b3%b5%eb%8f%99%ec%a3%bc%ed%83%9d%ea%b0%80%ea%b2%a9%ed%99%95%ec%9d%b8%ec%84%9c-%ec%9d%b8%ed%84%b0%eb%84%b7-%eb%b0%9c%ea%b8%89-%eb%b0%a9%eb%b2%95-%ec%8b%a0%ec%b2%ad/",
+    "date": "2026-07-07"
+  },
+  {
+    "id": "a36",
+    "title": "토지거래허가 조회·신청",
+    "category": "주거·세금",
+    "situations": [
+      "주거"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "토지거래허가구역 조회와 허가 신청·서류 안내.",
+    "url": "https://zucca100.com/land-seoul/",
+    "date": "2026-07-02"
+  },
+  {
+    "id": "a37",
+    "title": "노령연금 신청·수급자격",
+    "category": "지원금·수당",
+    "situations": [
+      "시니어"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "노령연금 신청 조건, 수급자격, 금액, 나이 정리.",
+    "url": "https://zucca100.com/old-age-pension/",
+    "date": "2026-07-06"
+  },
+  {
+    "id": "a38",
+    "title": "국민연금 예상수령액 조회",
+    "category": "지원금·수당",
+    "situations": [
+      "시니어"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "내 국민연금 예상수령액을 조회하는 방법.",
+    "url": "https://zucca100.com/%ea%b5%ad%eb%af%bc%ec%97%b0%ea%b8%88-%ec%98%88%ec%83%81%ec%88%98%eb%a0%b9%ec%95%a1-%ec%a1%b0%ed%9a%8c%ed%95%98%ea%b8%b0/",
+    "date": "2026-07-07"
+  },
+  {
+    "id": "a39",
+    "title": "사학연금 수령액 조회·계산",
+    "category": "지원금·수당",
+    "situations": [
+      "시니어"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "사학연금 수령액 조회와 계산 방법.",
+    "url": "https://zucca100.com/%ec%82%ac%ed%95%99%ec%97%b0%ea%b8%88-%ec%88%98%eb%a0%b9%ec%95%a1-%ec%a1%b0%ed%9a%8c-%eb%b0%a9%eb%b2%95-%ea%b3%84%ec%82%b0/",
+    "date": "2026-07-07"
+  },
+  {
+    "id": "a40",
+    "title": "국민취업지원제도 신청·요건",
+    "category": "취업·일자리",
+    "situations": [
+      "구직·취업"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "국민취업지원제도 신청 방법과 소득요건 안내.",
+    "url": "https://zucca100.com/korea-employment-support-type1-guide-2026/",
+    "date": "2026-01-05"
+  },
+  {
+    "id": "a41",
+    "title": "내일로 KTX 패스 예매·가격",
+    "category": "청년",
+    "situations": [
+      "청년"
+    ],
+    "regions": [
+      "전국"
+    ],
+    "summary": "청년 대상 내일로 KTX 3일권·7일권 예매 방법과 가격.",
+    "url": "https://zucca100.com/%eb%82%b4%ec%9d%bc%eb%a1%9c-ktx-3%ec%9d%bc%ea%b6%8c-7%ec%9d%bc%ea%b6%8c-%ec%98%88%eb%a7%a4-%eb%b0%a9%eb%b2%95-%ea%b0%80%ea%b2%a9-%eb%82%98%ec%9d%b4/",
+    "date": "2026-07-08"
   }
 ];
 
