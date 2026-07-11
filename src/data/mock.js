@@ -1,5 +1,5 @@
-// zucca100.com 큐레이션 콘텐츠 (실데이터) — 정부 정책·지원금 중심.
-// 나중에 이 배열을 WordPress REST API(/wp-json/wp/v2/posts) 응답으로 교체하면 자동화됩니다.
+// 실제 글 목록은 어드민 도구(admin/)에서 Supabase articles 테이블로 관리됨.
+// SEED_ARTICLES는 최초 실행/오프라인/Supabase 미설정 시에만 쓰이는 폴백.
 
 export const CATEGORIES = ['전체', '지원금·수당', '청년', '취업·일자리', '주거·세금', '핫딜'];
 
@@ -16,7 +16,9 @@ export const SITUATIONS = [
 
 export const REGIONS = ['전국', '서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
 
-export const ARTICLES = [
+// 최초 실행 시 네트워크 없이도 뭔가 보이도록 하는 오프라인 폴백 시드.
+// 실제 콘텐츠는 어드민 도구 → Supabase articles 테이블에서 관리됨 (src/lib/content.js 참고).
+export const SEED_ARTICLES = [
   {
     "id": "a1",
     "title": "문화누리카드 발급·잔액조회",
@@ -580,20 +582,6 @@ export const ARTICLES = [
     "date": "2026-07-08"
   }
 ];
-
-// ── 속보 영역 (건드리지 말 것) ─────────────────────────────
-// 향후 뉴스 API로 대체할 전용 슬롯. 지금은 임시 placeholder.
-export const NEWS = ARTICLES.slice(0, 3).map((a) => ({
-  id: 'nb-' + a.id,
-  tag: '속보',
-  title: a.title,
-  url: a.url,
-}));
-// ───────────────────────────────────────────────────────
-
-export function findArticle(id) {
-  return ARTICLES.find((a) => a.id === id);
-}
 
 export function formatDate(d) {
   return d ? d.replace(/-/g, '.') : '';

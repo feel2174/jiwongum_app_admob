@@ -4,11 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, shadow } from '../theme';
 import { SITUATIONS, CATEGORIES } from '../data/mock';
 import { countBySituation } from '../lib/reco';
+import { useStore } from '../lib/store';
 import Header from '../components/Header';
 import SectionHeader from '../components/SectionHeader';
 
 export default function ExploreScreen({ navigation }) {
   const t = useTheme();
+  const { articles } = useStore();
   const cats = CATEGORIES.filter((c) => c !== '전체');
 
   return (
@@ -25,7 +27,7 @@ export default function ExploreScreen({ navigation }) {
             >
               <Text style={styles.emoji}>{s.emoji}</Text>
               <Text style={[styles.collT, { color: t.ink }]}>{s.key}</Text>
-              <Text style={[styles.collC, { color: t.faint }]}>{countBySituation(s.key)}개</Text>
+              <Text style={[styles.collC, { color: t.faint }]}>{countBySituation(articles, s.key)}개</Text>
             </Pressable>
           ))}
         </View>

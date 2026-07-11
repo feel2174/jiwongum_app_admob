@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '../theme';
-import { NEWS } from '../data/mock';
 
-// 속보 영역 — 향후 뉴스 API로 대체될 전용 슬롯.
-export default function NewsSection({ onPressItem }) {
+// 속보 영역 — 향후 뉴스 API로 대체될 전용 슬롯. items는 lib/reco.js의 news()로 계산해 전달.
+export default function NewsSection({ items = [], onPressItem }) {
   const t = useTheme();
+  if (items.length === 0) return null;
   return (
     <View style={[styles.sec, { backgroundColor: t.card, borderColor: t.border }]}>
       <View style={styles.head}>
@@ -14,7 +14,7 @@ export default function NewsSection({ onPressItem }) {
           <Text style={[styles.headTitle, { color: t.danger }]}>속보</Text>
         </View>
       </View>
-      {NEWS.map((n, i) => (
+      {items.map((n, i) => (
         <Pressable
           key={n.id}
           onPress={() => onPressItem(n)}

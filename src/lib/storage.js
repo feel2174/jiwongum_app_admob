@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const K_BOOKMARKS = '@jiwongum/bookmarks';
 const K_SETTINGS = '@jiwongum/settings';
 const K_PROFILE = '@jiwongum/profile';
+const K_ARTICLES_CACHE = '@jiwongum/articles-cache';
 
 export const DEFAULT_SETTINGS = {
   '새 글 알림': true,
@@ -51,4 +52,16 @@ export function loadProfile() {
 }
 export function saveProfile(obj) {
   return saveJSON(K_PROFILE, obj);
+}
+
+export async function loadArticlesCache() {
+  try {
+    const raw = await AsyncStorage.getItem(K_ARTICLES_CACHE);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+export function saveArticlesCache(arr) {
+  return saveJSON(K_ARTICLES_CACHE, arr);
 }

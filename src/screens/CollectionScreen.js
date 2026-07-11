@@ -10,9 +10,9 @@ import ArticleCard from '../components/ArticleCard';
 export default function CollectionScreen({ route, navigation }) {
   const t = useTheme();
   const { type, value, title } = route.params;
-  const { isBookmarked, toggleBookmark } = useStore();
+  const { isBookmarked, toggleBookmark, articles } = useStore();
 
-  const list = type === 'situation' ? bySituation(value) : byCategory(value);
+  const list = type === 'situation' ? bySituation(articles, value) : byCategory(articles, value);
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>

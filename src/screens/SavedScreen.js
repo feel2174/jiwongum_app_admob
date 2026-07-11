@@ -2,16 +2,15 @@ import React from 'react';
 import { Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
-import { ARTICLES } from '../data/mock';
 import { useStore } from '../lib/store';
 import Header from '../components/Header';
 import ArticleCard from '../components/ArticleCard';
 
 export default function SavedScreen({ navigation }) {
   const t = useTheme();
-  const { bookmarks, isBookmarked, toggleBookmark } = useStore();
+  const { bookmarks, isBookmarked, toggleBookmark, articles } = useStore();
 
-  const list = ARTICLES.filter((x) => bookmarks.includes(x.id)).sort((a, b) => b.date.localeCompare(a.date));
+  const list = articles.filter((x) => bookmarks.includes(x.id)).sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>

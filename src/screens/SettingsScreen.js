@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
 import { useTheme } from '../theme';
-import { SITUATIONS, REGIONS, NEWS } from '../data/mock';
+import { SITUATIONS, REGIONS } from '../data/mock';
 import { useStore } from '../lib/store';
 import { requestPushPermission, sendBreakingDemo } from '../lib/push';
 import Header, { HeaderButton } from '../components/Header';
@@ -21,7 +21,7 @@ function Toggle({ on, onPress }) {
 
 export default function SettingsScreen({ navigation }) {
   const t = useTheme();
-  const { profile, updateProfile, settings, toggleSetting } = useStore();
+  const { profile, updateProfile, settings, toggleSetting, articles } = useStore();
 
   const toggleSit = (k) => {
     const next = profile.situations.includes(k)
@@ -31,9 +31,10 @@ export default function SettingsScreen({ navigation }) {
   };
 
   const onTestPush = async () => {
+    if (articles.length === 0) return;
     const ok = await requestPushPermission();
     if (!ok) return Alert.alert('알림 권한 필요', '설정에서 알림을 허용해 주세요.');
-    await sendBreakingDemo(NEWS[Math.floor(Math.random() * NEWS.length)]);
+    await sendBreakingDemo(articles[Math.floor(Math.random() * articles.length)]);
   };
 
   return (

@@ -6,7 +6,7 @@ import { useTheme, shadow } from '../theme';
 import { BANNER_UNIT } from '../lib/adManager';
 import { openExternal } from '../lib/openLink';
 import { useStore } from '../lib/store';
-import { personalized, matchLabel, latest } from '../lib/reco';
+import { personalized, matchLabel, latest, news } from '../lib/reco';
 import Header, { HeaderButton } from '../components/Header';
 import SectionHeader from '../components/SectionHeader';
 import NewsSection from '../components/NewsSection';
@@ -14,12 +14,13 @@ import ArticleCard from '../components/ArticleCard';
 
 export default function HomeScreen({ navigation }) {
   const t = useTheme();
-  const { isBookmarked, toggleBookmark, profile } = useStore();
+  const { isBookmarked, toggleBookmark, profile, articles } = useStore();
   const sits = profile.situations;
 
-  const matched = sits.length > 0 ? personalized(sits).slice(0, 6) : [];
+  const matched = sits.length > 0 ? personalized(articles, sits).slice(0, 6) : [];
   const matchedIds = matched.map((a) => a.id);
-  const rest = latest(matchedIds);
+  const rest = latest(articles, matchedIds);
+  const newsItems = news(articles);
 
   const cardProps = (item) => ({
     item,
@@ -32,7 +33,7 @@ export default function HomeScreen({ navigation }) {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>
       <Header title="지원금·정책" right={<HeaderButton label="⚙" onPress={() => navigation.navigate('Settings')} />} />
       <ScrollView contentContainerStyle={styles.content}>
-        <NewsSection onPressItem={(n) => openExternal(n.url)} />
+        <NewsSection items={newsItems} onPressItem={(n) => openExternal(n.url)} />
 
         {sits.length > 0 ? (
           matched.length > 0 ? (

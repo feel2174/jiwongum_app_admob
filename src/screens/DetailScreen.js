@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, shadow } from '../theme';
-import { findArticle, formatDate } from '../data/mock';
-import { related } from '../lib/reco';
+import { formatDate } from '../data/mock';
+import { related, findArticle } from '../lib/reco';
 import { recordDetailView } from '../lib/adManager';
 import { openExternal } from '../lib/openLink';
 import { useStore } from '../lib/store';
@@ -12,8 +12,8 @@ import Header, { HeaderButton } from '../components/Header';
 export default function DetailScreen({ route, navigation }) {
   const t = useTheme();
   const { id } = route.params;
-  const item = findArticle(id);
-  const { isBookmarked, toggleBookmark } = useStore();
+  const { isBookmarked, toggleBookmark, articles } = useStore();
+  const item = findArticle(articles, id);
 
   useEffect(() => {
     recordDetailView();
@@ -29,7 +29,7 @@ export default function DetailScreen({ route, navigation }) {
   }
 
   const marked = isBookmarked(item.id);
-  const recos = related(item, 3);
+  const recos = related(articles, item, 3);
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>

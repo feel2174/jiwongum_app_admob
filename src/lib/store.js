@@ -1,9 +1,12 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import {
   loadBookmarks, saveBookmarks,
   loadSettings, saveSettings, DEFAULT_SETTINGS,
   loadProfile, saveProfile, DEFAULT_PROFILE,
+  loadArticlesCache, saveArticlesCache,
 } from './storage';
+import { fetchArticles } from './content';
+import { SEED_ARTICLES } from '../data/mock';
 
 const StoreContext = createContext(null);
 
@@ -11,17 +14,30 @@ export function StoreProvider({ children }) {
   const [bookmarks, setBookmarks] = useState([]);
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [profile, setProfileState] = useState(DEFAULT_PROFILE);
+  const [articles, setArticles] = useState([]);
   const [ready, setReady] = useState(false);
+
+  const refreshArticles = useCallback(async () => {
+    const fresh = await fetchArticles();
+    if (fresh) {
+      setArticles(fresh);
+      saveArticlesCache(fresh);
+    }
+  }, []);
 
   useEffect(() => {
     (async () => {
-      const [b, s, p] = await Promise.all([loadBookmarks(), loadSettings(), loadProfile()]);
+      const [b, s, p, cachedArticles] = await Promise.all([
+        loadBookmarks(), loadSettings(), loadProfile(), loadArticlesCache(),
+      ]);
       setBookmarks(b);
       setSettings(s);
       setProfileState(p);
+      setArticles(cachedArticles && cachedArticles.length > 0 ? cachedArticles : SEED_ARTICLES);
       setReady(true);
+      refreshArticles();
     })();
-  }, []);
+  }, [refreshArticles]);
 
   const toggleBookmark = (id) => {
     setBookmarks((prev) => {
@@ -56,6 +72,7 @@ export function StoreProvider({ children }) {
         bookmarks, isBookmarked, toggleBookmark,
         settings, toggleSetting,
         profile, updateProfile, completeOnboarding,
+        articles, refreshArticles,
         ready,
       }}
     >

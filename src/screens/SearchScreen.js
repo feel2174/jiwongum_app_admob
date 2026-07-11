@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme';
-import { ARTICLES, SITUATIONS, CATEGORIES } from '../data/mock';
+import { SITUATIONS, CATEGORIES } from '../data/mock';
 import { useStore } from '../lib/store';
 import Header from '../components/Header';
 import ArticleCard from '../components/ArticleCard';
 
 export default function SearchScreen({ navigation }) {
   const t = useTheme();
-  const { isBookmarked, toggleBookmark } = useStore();
+  const { isBookmarked, toggleBookmark, articles } = useStore();
   const [query, setQuery] = useState('');
   const [sits, setSits] = useState([]);
   const [cat, setCat] = useState('전체');
@@ -17,7 +17,7 @@ export default function SearchScreen({ navigation }) {
   const toggleSit = (k) => setSits((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
 
   const q = query.trim();
-  const list = ARTICLES.filter((a) => {
+  const list = articles.filter((a) => {
     const okQ = !q || a.title.includes(q) || a.summary.includes(q) || a.category.includes(q);
     const okSit = sits.length === 0 || a.situations.some((s) => sits.includes(s));
     const okCat = cat === '전체' || a.category === cat;

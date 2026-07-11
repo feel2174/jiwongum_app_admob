@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>지원금 모아보기 — 어드민</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #0f1420;
+    --card: #171d2c;
+    --border: #2a3244;
+    --ink: #eef1f6;
+    --muted: #98a2b8;
+    --accent: #4f8cff;
+    --accent-ink: #ffffff;
+    --danger: #ff5d6c;
+    --ok: #34c77b;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f4f6fb; --card:#ffffff; --border:#dfe4ee; --ink:#171b24; --muted:#5b6376; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); }
+  header h1 { font-size:16px; margin:0; font-weight:700; }
+  main { max-width:880px; margin:0 auto; padding:20px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:14px; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  label { font-size:12px; color:var(--muted); font-weight:600; display:block; margin-bottom:4px; }
+  input[type=text], input[type=email], input[type=password], input[type=date], textarea, select {
+    width:100%; padding:9px 11px; border-radius:8px; border:1px solid var(--border);
+    background:transparent; color:var(--ink); font-size:14px; font-family:inherit;
+  }
+  textarea { resize:vertical; min-height:56px; }
+  button { cursor:pointer; border:none; border-radius:8px; padding:9px 14px; font-size:13.5px; font-weight:700; }
+  .btn-primary { background:var(--accent); color:var(--accent-ink); }
+  .btn-ghost { background:transparent; color:var(--ink); border:1px solid var(--border); }
+  .btn-danger { background:transparent; color:var(--danger); border:1px solid var(--danger); }
+  .chip { display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:20px; border:1px solid var(--border); font-size:12.5px; cursor:pointer; user-select:none; }
+  .chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .tabs { display:flex; gap:6px; margin-bottom:14px; }
+  .tab { padding:9px 16px; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer; border:1px solid var(--border); }
+  .tab.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .field { margin-bottom:10px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .title { font-weight:700; font-size:14.5px; margin:0 0 4px; }
+  .meta { font-size:12px; color:var(--muted); margin:0 0 10px; }
+  .pill { font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; }
+  .pill.pub { background:rgba(52,199,123,.15); color:var(--ok); }
+  .pill.draft { background:rgba(152,162,184,.15); color:var(--muted); }
+  #login-view { max-width:340px; margin:80px auto; }
+  .empty { text-align:center; color:var(--muted); padding:30px; font-size:13.5px; }
+  .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); padding:10px 18px; border-radius:8px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<div id="login-view" class="card">
+  <h2 style="margin-top:0">지원금 모아보기 — 어드민</h2>
+  <div class="field">
+    <label>이메일</label>
+    <input type="email" id="login-email" autocomplete="username" />
+  </div>
+  <div class="field">
+    <label>비밀번호</label>
+    <input type="password" id="login-password" autocomplete="current-password" />
+  </div>
+  <button class="btn-primary" id="login-btn" style="width:100%">로그인</button>
+  <p id="login-error" class="meta" style="color:var(--danger)"></p>
+</div>
+
+<div id="app-view" hidden>
+  <header>
+    <h1>지원금 모아보기 — 어드민</h1>
+    <button class="btn-ghost" id="logout-btn">로그아웃</button>
+  </header>
+  <main>
+    <div class="tabs">
+      <div class="tab on" data-tab="import">새 글 가져오기</div>
+      <div class="tab" data-tab="manage">글 관리</div>
+    </div>
+
+    <section id="import-tab">
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn-ghost" id="refresh-wp-btn">워드프레스에서 목록 새로고침</button>
+        <span class="meta" id="import-status"></span>
+      </div>
+      <div id="import-list"></div>
+    </section>
+
+    <section id="manage-tab" hidden>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn-ghost" id="refresh-articles-btn">목록 새로고침</button>
+        <span class="meta" id="manage-status"></span>
+      </div>
+      <div id="manage-list"></div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://oxunynxspkxfkokerftl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_T_IYdewX-mBILr-5hSIUxw_0KC4f3Nh';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const CATEGORIES = ['지원금·수당', '청년', '취업·일자리', '주거·세금', '핫딜'];
+const SITUATIONS = ['청년', '신혼·육아', '구직·취업', '주거', '시니어', '소상공인', '저소득·복지'];
+const REGIONS = ['전국', '서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+
+function chipGroup(options, selected, name) {
+  return options.map((o) => `
+    <span class="chip ${selected.includes(o) ? 'on' : ''}" data-group="${name}" data-value="${o}">${o}</span>
+  `).join('');
+}
+
+function readChipGroup(root, name) {
+  return $$(`.chip[data-group="${name}"].on`, root).map((c) => c.dataset.value);
+}
+
+function bindChipToggle(root) {
+  $$('.chip', root).forEach((chip) => {
+    chip.addEventListener('click', () => chip.classList.toggle('on'));
+  });
+}
+
+// ---------- Auth ----------
+async function checkSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) showApp(); else showLogin();
+}
+
+function showLogin() {
+  $('#login-view').hidden = false;
+  $('#app-view').hidden = true;
+}
+
+function showApp() {
+  $('#login-view').hidden = true;
+  $('#app-view').hidden = false;
+  loadWpPosts();
+  loadArticles();
+}
+
+$('#login-btn').addEventListener('click', async () => {
+  const email = $('#login-email').value.trim();
+  const password = $('#login-password').value;
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { $('#login-error').textContent = error.message; return; }
+  $('#login-error').textContent = '';
+  showApp();
+});
+
+$('#logout-btn').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  showLogin();
+});
+
+// ---------- Tabs ----------
+$$('.tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    $$('.tab').forEach((t) => t.classList.remove('on'));
+    tab.classList.add('on');
+    $('#import-tab').hidden = tab.dataset.tab !== 'import';
+    $('#manage-tab').hidden = tab.dataset.tab !== 'manage';
+  });
+});
+
+// ---------- Import tab (WordPress → articles) ----------
+async function loadWpPosts() {
+  const list = $('#import-list');
+  const status = $('#import-status');
+  status.textContent = '불러오는 중…';
+  list.innerHTML = '';
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/get-wp-posts`, {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    status.textContent = `${json.posts.length}개 (미가져옴)`;
+    if (json.posts.length === 0) {
+      list.innerHTML = '<div class="empty">새로 가져올 글이 없어요.</div>';
+      return;
+    }
+    list.innerHTML = json.posts.map((p, i) => importCard(p, i)).join('');
+    json.posts.forEach((p, i) => {
+      const card = $(`#import-card-${i}`);
+      bindChipToggle(card);
+      $(`#save-draft-${i}`).addEventListener('click', () => saveImport(p, card, false));
+      $(`#save-publish-${i}`).addEventListener('click', () => saveImport(p, card, true));
+    });
+  } catch (e) {
+    status.textContent = '오류: ' + e.message;
+  }
+}
+
+function importCard(p, i) {
+  return `
+    <div class="card" id="import-card-${i}">
+      <p class="title">${p.title}</p>
+      <p class="meta">${p.date} · <a href="${p.url}" target="_blank" style="color:var(--muted)">${p.url}</a></p>
+      <div class="field">
+        <label>요약</label>
+        <textarea id="summary-${i}">${p.summary}</textarea>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>카테고리</label>
+          <select id="category-${i}">
+            ${CATEGORIES.map((c) => `<option value="${c}">${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>날짜</label>
+          <input type="date" id="date-${i}" value="${p.date}" />
+        </div>
+      </div>
+      <div class="field">
+        <label>상황</label>
+        <div class="row">${chipGroup(SITUATIONS, [], 'sit')}</div>
+      </div>
+      <div class="field">
+        <label>지역</label>
+        <div class="row">${chipGroup(REGIONS, ['전국'], 'reg')}</div>
+      </div>
+      <div class="row">
+        <button class="btn-ghost" id="save-draft-${i}">초안 저장</button>
+        <button class="btn-primary" id="save-publish-${i}">가져와서 발행</button>
+      </div>
+    </div>
+  `;
+}
+
+async function saveImport(p, card, published) {
+  const idx = card.id.split('-').pop();
+  const payload = {
+    wp_post_id: p.wp_post_id,
+    title: p.title,
+    summary: $(`#summary-${idx}`, card).value,
+    url: p.url,
+    category: $(`#category-${idx}`, card).value,
+    date: $(`#date-${idx}`, card).value,
+    situations: readChipGroup(card, 'sit'),
+    regions: readChipGroup(card, 'reg'),
+    published,
+  };
+  const { error } = await supabase.from('articles').insert(payload);
+  if (error) { toast('저장 실패: ' + error.message); return; }
+  toast(published ? '발행되었습니다.' : '초안으로 저장했습니다.');
+  card.remove();
+  loadArticles();
+}
+
+// ---------- Manage tab ----------
+async function loadArticles() {
+  const list = $('#manage-list');
+  const status = $('#manage-status');
+  status.textContent = '불러오는 중…';
+  const { data, error } = await supabase.from('articles').select('*').order('date', { ascending: false });
+  if (error) { status.textContent = '오류: ' + error.message; return; }
+  status.textContent = `총 ${data.length}개`;
+  if (data.length === 0) { list.innerHTML = '<div class="empty">글이 없어요.</div>'; return; }
+  list.innerHTML = data.map((a, i) => manageCard(a, i)).join('');
+  data.forEach((a, i) => {
+    const card = $(`#manage-card-${i}`);
+    bindChipToggle(card);
+    $(`#update-${i}`).addEventListener('click', () => updateArticle(a.id, card));
+    $(`#toggle-pub-${i}`).addEventListener('click', () => togglePublished(a));
+    $(`#delete-${i}`).addEventListener('click', () => deleteArticle(a.id, a.title));
+  });
+}
+
+function manageCard(a, i) {
+  return `
+    <div class="card" id="manage-card-${i}">
+      <div class="row" style="justify-content:space-between">
+        <p class="title">${a.title}</p>
+        <span class="pill ${a.published ? 'pub' : 'draft'}">${a.published ? '발행중' : '초안'}</span>
+      </div>
+      <p class="meta">${a.date} · <a href="${a.url}" target="_blank" style="color:var(--muted)">원문</a></p>
+      <div class="field">
+        <label>요약</label>
+        <textarea id="m-summary-${i}">${a.summary || ''}</textarea>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>카테고리</label>
+          <select id="m-category-${i}">
+            ${CATEGORIES.map((c) => `<option value="${c}" ${c === a.category ? 'selected' : ''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>날짜</label>
+          <input type="date" id="m-date-${i}" value="${a.date}" />
+        </div>
+      </div>
+      <div class="field">
+        <label>상황</label>
+        <div class="row">${chipGroup(SITUATIONS, a.situations || [], 'sit')}</div>
+      </div>
+      <div class="field">
+        <label>지역</label>
+        <div class="row">${chipGroup(REGIONS, a.regions || [], 'reg')}</div>
+      </div>
+      <div class="row">
+        <button class="btn-primary" id="update-${i}">저장</button>
+        <button class="btn-ghost" id="toggle-pub-${i}">${a.published ? '초안으로 내리기' : '발행하기'}</button>
+        <button class="btn-danger" id="delete-${i}">삭제</button>
+      </div>
+    </div>
+  `;
+}
+
+async function updateArticle(id, card) {
+  const idx = card.id.split('-').pop();
+  const patch = {
+    summary: $(`#m-summary-${idx}`, card).value,
+    category: $(`#m-category-${idx}`, card).value,
+    date: $(`#m-date-${idx}`, card).value,
+    situations: readChipGroup(card, 'sit'),
+    regions: readChipGroup(card, 'reg'),
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await supabase.from('articles').update(patch).eq('id', id);
+  if (error) { toast('저장 실패: ' + error.message); return; }
+  toast('저장되었습니다.');
+}
+
+async function togglePublished(a) {
+  const { error } = await supabase.from('articles').update({ published: !a.published, updated_at: new Date().toISOString() }).eq('id', a.id);
+  if (error) { toast('변경 실패: ' + error.message); return; }
+  loadArticles();
+}
+
+async function deleteArticle(id, title) {
+  if (!confirm(`"${title}"을(를) 삭제할까요?`)) return;
+  const { error } = await supabase.from('articles').delete().eq('id', id);
+  if (error) { toast('삭제 실패: ' + error.message); return; }
+  toast('삭제되었습니다.');
+  loadArticles();
+}
+
+$('#refresh-wp-btn').addEventListener('click', loadWpPosts);
+$('#refresh-articles-btn').addEventListener('click', loadArticles);
+
+checkSession();
+</script>
+</body>
+</html>

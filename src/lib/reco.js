@@ -1,5 +1,5 @@
 // 규칙 기반 추천/매칭 (ML 불필요). 상황 태그 겹침으로 개인화.
-import { ARTICLES } from '../data/mock';
+// articles는 항상 호출하는 쪽(화면)에서 useStore().articles로 받아 첫 인자로 넘긴다.
 
 const byDateDesc = (a, b) => b.date.localeCompare(a.date);
 
@@ -9,8 +9,8 @@ export function overlap(article, situations) {
 }
 
 // 홈: 내 상황과 겹치는 글 (겹침 수 → 최신순)
-export function personalized(situations) {
-  return ARTICLES.map((a) => ({ a, s: overlap(a, situations) }))
+export function personalized(articles, situations) {
+  return articles.map((a) => ({ a, s: overlap(a, situations) }))
     .filter((x) => x.s > 0)
     .sort((x, y) => y.s - x.s || byDateDesc(x.a, y.a))
     .map((x) => x.a);
@@ -22,25 +22,25 @@ export function matchLabel(article, situations) {
   return article.situations.find((s) => situations.includes(s)) || null;
 }
 
-export function latest(excludeIds = []) {
-  return ARTICLES.filter((a) => !excludeIds.includes(a.id)).slice().sort(byDateDesc);
+export function latest(articles, excludeIds = []) {
+  return articles.filter((a) => !excludeIds.includes(a.id)).slice().sort(byDateDesc);
 }
 
-export function bySituation(sit) {
-  return ARTICLES.filter((a) => a.situations.includes(sit)).sort(byDateDesc);
+export function bySituation(articles, sit) {
+  return articles.filter((a) => a.situations.includes(sit)).sort(byDateDesc);
 }
 
-export function byCategory(cat) {
-  return cat === '전체' ? ARTICLES.slice().sort(byDateDesc) : ARTICLES.filter((a) => a.category === cat).sort(byDateDesc);
+export function byCategory(articles, cat) {
+  return cat === '전체' ? articles.slice().sort(byDateDesc) : articles.filter((a) => a.category === cat).sort(byDateDesc);
 }
 
-export function countBySituation(sit) {
-  return ARTICLES.filter((a) => a.situations.includes(sit)).length;
+export function countBySituation(articles, sit) {
+  return articles.filter((a) => a.situations.includes(sit)).length;
 }
 
 // 상세: 이런 지원금도 (상황 공유 2점 + 같은 카테고리 1점)
-export function related(article, n = 3) {
-  return ARTICLES.filter((a) => a.id !== article.id)
+export function related(articles, article, n = 3) {
+  return articles.filter((a) => a.id !== article.id)
     .map((a) => ({
       a,
       s: a.situations.filter((x) => article.situations.includes(x)).length * 2 + (a.category === article.category ? 1 : 0),
@@ -50,3 +50,20 @@ export function related(article, n = 3) {
     .slice(0, n)
     .map((x) => x.a);
 }
+
+export function findArticle(articles, id) {
+  return articles.find((a) => a.id === id);
+}
+
+// ── 속보 영역 (건드리지 말 것) ─────────────────────────────
+// 향후 뉴스 API로 대체할 전용 슬롯. 지금은 최신 글 상위 3개로 임시 대체.
+// 지원금 목록(전체 최신 등)과 섞이지 않도록 화면에서 이 결과를 별도 슬롯으로만 사용할 것.
+export function news(articles) {
+  return articles.slice().sort(byDateDesc).slice(0, 3).map((a) => ({
+    id: 'nb-' + a.id,
+    tag: '속보',
+    title: a.title,
+    url: a.url,
+  }));
+}
+// ───────────────────────────────────────────────────────
