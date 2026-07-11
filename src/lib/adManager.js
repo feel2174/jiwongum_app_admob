@@ -14,14 +14,14 @@ const INTERSTITIAL_UNIT = __DEV__
   ? TestIds.INTERSTITIAL
   : Platform.select({
       android: 'ca-app-pub-8785405056367250/3054590041',
-      ios: TestIds.INTERSTITIAL, // TODO: iOS 전면광고 단위 ID 발급 후 교체
+      ios: 'ca-app-pub-8785405056367250/9854435134',
     });
 
 export const BANNER_UNIT = __DEV__
   ? TestIds.BANNER
   : Platform.select({
       android: 'ca-app-pub-8785405056367250/3437733426',
-      ios: TestIds.BANNER, // TODO: iOS 배너 단위 ID 발급 후 교체
+      ios: 'ca-app-pub-8785405056367250/1761955604',
     });
 
 // 데모/권장 캡. 실제 값은 리텐션·수익 보며 이 안전선 안에서 조정.
