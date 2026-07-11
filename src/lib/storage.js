@@ -4,6 +4,7 @@ const K_BOOKMARKS = '@jiwongum/bookmarks';
 const K_SETTINGS = '@jiwongum/settings';
 const K_PROFILE = '@jiwongum/profile';
 const K_ARTICLES_CACHE = '@jiwongum/articles-cache';
+const K_NEWS_CACHE = '@jiwongum/breaking-news-cache';
 
 export const DEFAULT_SETTINGS = {
   '새 글 알림': true,
@@ -64,4 +65,16 @@ export async function loadArticlesCache() {
 }
 export function saveArticlesCache(arr) {
   return saveJSON(K_ARTICLES_CACHE, arr);
+}
+
+export async function loadNewsCache() {
+  try {
+    const raw = await AsyncStorage.getItem(K_NEWS_CACHE);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+export function saveNewsCache(arr) {
+  return saveJSON(K_NEWS_CACHE, arr);
 }

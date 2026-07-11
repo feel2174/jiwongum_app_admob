@@ -18,6 +18,7 @@ import { useTheme } from './src/theme';
 import { StoreProvider, useStore } from './src/lib/store';
 import { init as initAds } from './src/lib/adManager';
 import { openExternal } from './src/lib/openLink';
+import { syncPushTokenIfPermitted } from './src/lib/push';
 
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import HomeScreen from './src/screens/HomeScreen';
@@ -83,6 +84,7 @@ export default function App() {
       try { await requestTrackingPermissionsAsync(); } catch {}
       try { await mobileAds().initialize(); } catch {}
       initAds();
+      syncPushTokenIfPermitted();
     })();
   }, []);
 

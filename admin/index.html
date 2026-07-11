@@ -248,6 +248,23 @@ function importCard(p, i) {
   `;
 }
 
+// 발행 성공 직후 호출 — push_tokens 전체에 브로드캐스트 알림 발송(notify-new-article Edge Function).
+async function notifyPublished(article) {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/notify-new-article`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ id: article.id, title: article.title, url: article.url }),
+    });
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    toast(`알림 발송: ${json.sent}명`);
+  } catch (e) {
+    toast('알림 발송 실패: ' + e.message);
+  }
+}
+
 async function saveImport(p, card, published) {
   const idx = card.id.split('-').pop();
   const payload = {
@@ -261,11 +278,12 @@ async function saveImport(p, card, published) {
     regions: readChipGroup(card, 'reg'),
     published,
   };
-  const { error } = await supabase.from('articles').insert(payload);
+  const { data, error } = await supabase.from('articles').insert(payload).select().single();
   if (error) { toast('저장 실패: ' + error.message); return; }
   toast(published ? '발행되었습니다.' : '초안으로 저장했습니다.');
   card.remove();
   loadArticles();
+  if (published) notifyPublished(data);
 }
 
 // ---------- Manage tab ----------
@@ -344,9 +362,11 @@ async function updateArticle(id, card) {
 }
 
 async function togglePublished(a) {
-  const { error } = await supabase.from('articles').update({ published: !a.published, updated_at: new Date().toISOString() }).eq('id', a.id);
+  const turningOn = !a.published;
+  const { error } = await supabase.from('articles').update({ published: turningOn, updated_at: new Date().toISOString() }).eq('id', a.id);
   if (error) { toast('변경 실패: ' + error.message); return; }
   loadArticles();
+  if (turningOn) notifyPublished(a);
 }
 
 async function deleteArticle(id, title) {

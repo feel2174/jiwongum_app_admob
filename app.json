@@ -41,7 +41,13 @@
           "userTrackingPermission": "맞춤형 광고 제공을 위해 기기 활동 데이터 사용에 동의해 주세요."
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-notifications",
+        {
+          "color": "#154c76"
+        }
+      ]
     ],
     "extra": {
       "eas": {

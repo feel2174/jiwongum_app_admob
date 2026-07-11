@@ -1,4 +1,7 @@
+import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import { supabase } from './supabase';
 
 // 알림 표시 방식 (앱 포그라운드 상태에서도 배너 표시)
 Notifications.setNotificationHandler({
@@ -16,6 +19,53 @@ export async function requestPushPermission() {
   if (status === 'granted') return true;
   const req = await Notifications.requestPermissionsAsync();
   return req.status === 'granted';
+}
+
+const PROJECT_ID = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+
+async function getPushToken() {
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
+  const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId: PROJECT_ID });
+  return token;
+}
+
+// 알림 권한을 허용한 기기의 Expo push token을 Supabase push_tokens에 등록.
+// 어드민이 글을 발행하면 이 테이블 전체에 브로드캐스트로 알림이 감(상황별 타겟팅 없음).
+export async function registerPushToken() {
+  const granted = await requestPushPermission();
+  if (!granted || !supabase) return null;
+  try {
+    const token = await getPushToken();
+    await supabase.from('push_tokens').upsert({ token }, { onConflict: 'token' });
+    return token;
+  } catch (e) {
+    console.warn('registerPushToken failed:', e.message);
+    return null;
+  }
+}
+
+// 앱 시작 시 호출 — 이미 권한을 허용한 기기라면 조용히 토큰을 재등록(갱신)하고,
+// 아직 허용 안 한 기기는 권한 팝업을 띄우지 않고 그냥 넘어감.
+export async function syncPushTokenIfPermitted() {
+  const { status } = await Notifications.getPermissionsAsync();
+  if (status !== 'granted') return null;
+  return registerPushToken();
+}
+
+// 알림을 끌 때 호출 — 이 기기로는 더 이상 브로드캐스트가 가지 않도록 토큰 삭제.
+export async function unregisterPushToken() {
+  if (!supabase) return;
+  try {
+    const token = await getPushToken();
+    await supabase.from('push_tokens').delete().eq('token', token);
+  } catch (e) {
+    console.warn('unregisterPushToken failed:', e.message);
+  }
 }
 
 // [새 글] 데모 알림. 실서비스에서는 서버(FCM/APNs)에서 세그먼트 발송으로 대체.

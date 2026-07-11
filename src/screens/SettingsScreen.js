@@ -5,7 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useTheme } from '../theme';
 import { SITUATIONS, REGIONS } from '../data/mock';
 import { useStore } from '../lib/store';
-import { requestPushPermission, sendBreakingDemo } from '../lib/push';
+import { requestPushPermission, sendBreakingDemo, registerPushToken, unregisterPushToken } from '../lib/push';
 import Header, { HeaderButton } from '../components/Header';
 
 const PRIVACY_URL = 'https://workable-crowberry-292.notion.site/3993761bd6b28049b341ffc4e1002044';
@@ -28,6 +28,19 @@ export default function SettingsScreen({ navigation }) {
       ? profile.situations.filter((x) => x !== k)
       : [...profile.situations, k];
     updateProfile({ situations: next });
+  };
+
+  // '새 글 알림'을 켜면 이 기기를 push_tokens에 등록(전체 브로드캐스트 대상), 끄면 해제.
+  const onToggleSetting = async (key) => {
+    const turningOn = !settings[key];
+    toggleSetting(key);
+    if (key !== '새 글 알림') return;
+    if (turningOn) {
+      const token = await registerPushToken();
+      if (!token) Alert.alert('알림 권한 필요', '설정에서 알림을 허용해 주세요.');
+    } else {
+      await unregisterPushToken();
+    }
   };
 
   const onTestPush = async () => {
@@ -70,7 +83,7 @@ export default function SettingsScreen({ navigation }) {
         {Object.keys(settings).map((key) => (
           <View key={key} style={[styles.row, { borderBottomColor: t.line }]}>
             <Text style={[styles.rowLabel, { color: t.ink }]}>{key}</Text>
-            <Toggle on={settings[key]} onPress={() => toggleSetting(key)} />
+            <Toggle on={settings[key]} onPress={() => onToggleSetting(key)} />
           </View>
         ))}
         <Pressable onPress={onTestPush} style={[styles.testBtn, { backgroundColor: t.dangerSoft, borderColor: t.danger }]}>

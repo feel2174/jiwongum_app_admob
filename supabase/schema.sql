@@ -36,3 +36,25 @@ create policy "authenticated manage all articles"
   to authenticated
   using (true)
   with check (true);
+
+-- 푸시 알림 대상 기기 토큰 (전체 브로드캐스트용, 상황별 타겟팅 없음)
+create table if not exists push_tokens (
+  token text primary key,
+  created_at timestamptz not null default now()
+);
+
+alter table push_tokens enable row level security;
+
+-- 앱(anon)이 알림 허용 시 자기 토큰을 등록/해제할 수 있음. select는 안 열어줌(대량 수집 방지).
+-- notify-new-article Edge Function은 service_role로 조회하므로 RLS와 무관하게 전체를 볼 수 있음.
+drop policy if exists "anon register token" on push_tokens;
+create policy "anon register token"
+  on push_tokens for insert
+  to anon, authenticated
+  with check (true);
+
+drop policy if exists "anon unregister token" on push_tokens;
+create policy "anon unregister token"
+  on push_tokens for delete
+  to anon, authenticated
+  using (true);

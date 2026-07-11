@@ -4,8 +4,11 @@ import {
   loadSettings, saveSettings, DEFAULT_SETTINGS,
   loadProfile, saveProfile, DEFAULT_PROFILE,
   loadArticlesCache, saveArticlesCache,
+  loadNewsCache, saveNewsCache,
 } from './storage';
 import { fetchArticles } from './content';
+import { fetchBreakingNews } from './breakingNews';
+import { news as newsFallback } from './reco';
 import { SEED_ARTICLES } from '../data/mock';
 
 const StoreContext = createContext(null);
@@ -15,6 +18,7 @@ export function StoreProvider({ children }) {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [profile, setProfileState] = useState(DEFAULT_PROFILE);
   const [articles, setArticles] = useState([]);
+  const [breakingNews, setBreakingNews] = useState([]);
   const [ready, setReady] = useState(false);
 
   const refreshArticles = useCallback(async () => {
@@ -25,19 +29,31 @@ export function StoreProvider({ children }) {
     }
   }, []);
 
+  const refreshBreakingNews = useCallback(async () => {
+    const fresh = await fetchBreakingNews();
+    if (fresh && fresh.length > 0) {
+      setBreakingNews(fresh);
+      saveNewsCache(fresh);
+    }
+  }, []);
+
   useEffect(() => {
     (async () => {
-      const [b, s, p, cachedArticles] = await Promise.all([
-        loadBookmarks(), loadSettings(), loadProfile(), loadArticlesCache(),
+      const [b, s, p, cachedArticles, cachedNews] = await Promise.all([
+        loadBookmarks(), loadSettings(), loadProfile(), loadArticlesCache(), loadNewsCache(),
       ]);
+      const initialArticles = cachedArticles && cachedArticles.length > 0 ? cachedArticles : SEED_ARTICLES;
       setBookmarks(b);
       setSettings(s);
       setProfileState(p);
-      setArticles(cachedArticles && cachedArticles.length > 0 ? cachedArticles : SEED_ARTICLES);
+      setArticles(initialArticles);
+      // 뉴스 API 실패 시 지원금 글 상위 3개로 대체(reco.js의 기존 placeholder 로직 재사용)
+      setBreakingNews(cachedNews && cachedNews.length > 0 ? cachedNews : newsFallback(initialArticles));
       setReady(true);
       refreshArticles();
+      refreshBreakingNews();
     })();
-  }, [refreshArticles]);
+  }, [refreshArticles, refreshBreakingNews]);
 
   const toggleBookmark = (id) => {
     setBookmarks((prev) => {
@@ -73,6 +89,7 @@ export function StoreProvider({ children }) {
         settings, toggleSetting,
         profile, updateProfile, completeOnboarding,
         articles, refreshArticles,
+        breakingNews, refreshBreakingNews,
         ready,
       }}
     >
