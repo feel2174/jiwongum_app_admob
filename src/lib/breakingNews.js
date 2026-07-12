@@ -6,9 +6,10 @@ const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 export async function fetchBreakingNews() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
   try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/get-breaking-news`, {
-      headers: { apikey: SUPABASE_ANON_KEY },
-    });
+    const res = await fetch(
+      `${SUPABASE_URL}/functions/v1/get-breaking-news?query=${encodeURIComponent('속보')}&display=8`,
+      { headers: { apikey: SUPABASE_ANON_KEY } },
+    );
     if (!res.ok) return null;
     const json = await res.json();
     if (json.error || !Array.isArray(json.items)) return null;
