@@ -59,7 +59,10 @@ export function findArticle(articles, id) {
 // 향후 뉴스 API로 대체할 전용 슬롯. 지금은 최신 글 상위 3개로 임시 대체.
 // 지원금 목록(전체 최신 등)과 섞이지 않도록 화면에서 이 결과를 별도 슬롯으로만 사용할 것.
 export function news(articles) {
-  return articles.slice().sort(byDateDesc).slice(0, 3).map((a) => ({
+  // 네이버 API 실패 시 폴백. 핫딜(할인·구독)은 속보로 부적절하니 제외하고 지원금·정책 글만.
+  const pool = articles.filter((a) => a.category !== '핫딜');
+  const base = pool.length > 0 ? pool : articles;
+  return base.slice().sort(byDateDesc).slice(0, 3).map((a) => ({
     id: 'nb-' + a.id,
     tag: '속보',
     title: a.title,
