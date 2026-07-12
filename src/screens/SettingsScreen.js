@@ -5,7 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useTheme } from '../theme';
 import { SITUATIONS, REGIONS } from '../data/mock';
 import { useStore } from '../lib/store';
-import { requestPushPermission, sendBreakingDemo, registerPushToken, unregisterPushToken } from '../lib/push';
+import { registerPushToken, unregisterPushToken } from '../lib/push';
 import Header, { HeaderButton } from '../components/Header';
 
 const PRIVACY_URL = 'https://workable-crowberry-292.notion.site/3993761bd6b28049b341ffc4e1002044';
@@ -21,7 +21,8 @@ function Toggle({ on, onPress }) {
 
 export default function SettingsScreen({ navigation }) {
   const t = useTheme();
-  const { profile, updateProfile, settings, toggleSetting, articles } = useStore();
+  const { profile, updateProfile, settings, toggleSetting } = useStore();
+  const notifOn = !!settings['새 글 알림'];
 
   const toggleSit = (k) => {
     const next = profile.situations.includes(k)
@@ -30,24 +31,19 @@ export default function SettingsScreen({ navigation }) {
     updateProfile({ situations: next });
   };
 
-  // '새 글 알림'을 켜면 이 기기를 push_tokens에 등록(전체 브로드캐스트 대상), 끄면 해제.
-  const onToggleSetting = async (key) => {
-    const turningOn = !settings[key];
-    toggleSetting(key);
-    if (key !== '새 글 알림') return;
-    if (turningOn) {
-      const token = await registerPushToken();
-      if (!token) Alert.alert('알림 권한 필요', '설정에서 알림을 허용해 주세요.');
+  // 새 글 알림 토글: 켤 때 권한요청+토큰등록(실패 시 켜지 않음), 끌 때 토큰해제.
+  const onToggleNotif = async () => {
+    if (!notifOn) {
+      const token = await registerPushToken(); // 내부에서 권한요청
+      if (token) {
+        toggleSetting('새 글 알림');
+      } else {
+        Alert.alert('알림 권한이 필요해요', '기기 설정에서 이 앱의 알림을 허용하면 새 글 알림을 받을 수 있어요.');
+      }
     } else {
+      toggleSetting('새 글 알림');
       await unregisterPushToken();
     }
-  };
-
-  const onTestPush = async () => {
-    if (articles.length === 0) return;
-    const ok = await requestPushPermission();
-    if (!ok) return Alert.alert('알림 권한 필요', '설정에서 알림을 허용해 주세요.');
-    await sendBreakingDemo(articles[Math.floor(Math.random() * articles.length)]);
   };
 
   return (
@@ -80,15 +76,15 @@ export default function SettingsScreen({ navigation }) {
         </ScrollView>
 
         <Text style={[styles.h, { color: t.ink, marginTop: 22 }]}>알림</Text>
-        {Object.keys(settings).map((key) => (
-          <View key={key} style={[styles.row, { borderBottomColor: t.line }]}>
-            <Text style={[styles.rowLabel, { color: t.ink }]}>{key}</Text>
-            <Toggle on={settings[key]} onPress={() => onToggleSetting(key)} />
+        <View style={[styles.notifRow, { borderColor: t.border, backgroundColor: t.card }]}>
+          <View style={styles.notifText}>
+            <Text style={[styles.notifTitle, { color: t.ink }]}>새 글 알림</Text>
+            <Text style={[styles.notifSub, { color: t.muted }]}>
+              관심 지원금·정책이 올라오면 푸시로 알려드려요. 언제든 여기서 끌 수 있어요.
+            </Text>
           </View>
-        ))}
-        <Pressable onPress={onTestPush} style={[styles.testBtn, { backgroundColor: t.dangerSoft, borderColor: t.danger }]}>
-          <Text style={{ color: t.danger, fontWeight: '700', fontSize: 14 }}>🔔 [새 글] 테스트 푸시 보내기</Text>
-        </Pressable>
+          <Toggle on={notifOn} onPress={onToggleNotif} />
+        </View>
 
         <Text style={[styles.h, { color: t.ink, marginTop: 22 }]}>정보</Text>
         <Pressable onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)} style={[styles.row, { borderBottomColor: t.line }]}>
@@ -107,9 +103,12 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1 },
   regionRow: { gap: 8, paddingVertical: 2, paddingRight: 16 },
+  notifRow: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 14, padding: 16 },
+  notifText: { flex: 1 },
+  notifTitle: { fontSize: 15, fontWeight: '700' },
+  notifSub: { fontSize: 12.5, marginTop: 3, lineHeight: 17 },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16, borderBottomWidth: 1 },
   rowLabel: { fontSize: 14.5, fontWeight: '600' },
   tg: { width: 44, height: 26, borderRadius: 14, justifyContent: 'center' },
   knob: { position: 'absolute', top: 3, width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff' },
-  testBtn: { marginTop: 14, borderWidth: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center' },
 });

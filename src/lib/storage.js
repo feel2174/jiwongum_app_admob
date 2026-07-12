@@ -7,8 +7,7 @@ const K_ARTICLES_CACHE = '@jiwongum/articles-cache';
 const K_NEWS_CACHE = '@jiwongum/breaking-news-cache';
 
 export const DEFAULT_SETTINGS = {
-  '새 글 알림': true,
-  '속보 알림': false,
+  '새 글 알림': false, // 명시적 opt-in — 사용자가 직접 켜야 푸시 토큰 등록
 };
 
 export const DEFAULT_PROFILE = {
