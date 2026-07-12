@@ -14,6 +14,7 @@
     "expo-dev-client": "~56.0.22",
     "expo-device": "~56.0.4",
     "expo-notifications": "~56.0.20",
+    "expo-splash-screen": "~56.0.12",
     "expo-status-bar": "~56.0.4",
     "expo-tracking-transparency": "~56.0.5",
     "expo-web-browser": "~56.0.5",
@@ -30,5 +31,9 @@
     "ios": "expo run:ios",
     "web": "expo start --web"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/react": "~19.2.14",
+    "typescript": "~6.0.3"
+  }
 }
