@@ -41,6 +41,7 @@ export async function registerPushToken() {
   if (!granted || !supabase) return null;
   try {
     const token = await getPushToken();
+    console.log('[push] Expo push token:', token); // 테스트용 — expo.dev/notifications에 붙여넣어 발송
     await supabase.from('push_tokens').upsert({ token }, { onConflict: 'token' });
     return token;
   } catch (e) {
