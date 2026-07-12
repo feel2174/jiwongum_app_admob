@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "761716509120",
+    "project_id": "jiwongum",
+    "storage_bucket": "jiwongum.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:761716509120:android:5a1bb10047aacc25bb2025",
+        "android_client_info": {
+          "package_name": "com.jiwongum.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8qvR4ynzUh3etv8ok1-S_jCn7MEeWzbA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

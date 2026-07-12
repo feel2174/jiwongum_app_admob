@@ -13,6 +13,7 @@
     },
     "android": {
       "package": "com.jiwongum.app",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#154c76",
         "foregroundImage": "./assets/android-icon-foreground.png",

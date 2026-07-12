@@ -8,19 +8,20 @@
 - **토큰 등록/해제** — 켜면 `push_tokens`에 등록, 끄면 삭제
 - **탭 동작** — 알림 탭 시 `data.url`/`data.articleId`로 해당 글 이동 (`App.js`)
 
-## ⚠️ 반드시 먼저 — FCM 자격증명 (Android 원격 푸시의 전제)
-Expo 푸시 서비스는 Android 전송을 위해 **네 Firebase(FCM) 자격증명**이 필요해.
-없으면 토큰은 발급되지만 **알림이 기기에 도착하지 않음**.
+## ⚠️ 반드시 먼저 — FCM 설정 (Android 원격 푸시의 전제)
+**JSON이 두 종류**야. 둘 다 필요해:
+
+| JSON | 어디에 | 역할 |
+|---|---|---|
+| **google-services.json** | 프로젝트 루트 (앱) | 기기가 FCM에 **등록·수신** |
+| **서비스 계정 키 JSON** | `eas credentials` (서버) | Expo가 **발송** |
 
 **설정 (1회):**
-1. [Firebase 콘솔](https://console.firebase.google.com) → 프로젝트 생성(또는 기존) → **Android 앱 추가**, 패키지명 `com.jiwongum.app`
-2. 프로젝트 설정 → **서비스 계정** → **새 비공개 키 생성** → JSON 다운로드
-3. Expo에 업로드:
-   ```
-   eas credentials
-   # Android → 빌드 프로필 선택 → Push Notifications: FCM V1 → 서비스 계정 키(JSON) 업로드
-   ```
-   (또는 expo.dev 대시보드 → 프로젝트 → Credentials → FCM V1)
+1. [Firebase 콘솔](https://console.firebase.google.com) → 프로젝트 → **Android 앱 추가**, 패키지명 정확히 `com.jiwongum.app`
+2. **google-services.json 다운로드** → **프로젝트 루트**(`google-services.json`)에 저장
+   - `app.json`의 `android.googleServicesFile: "./google-services.json"` 로 이미 참조 설정됨
+   - EAS 빌드가 이 파일을 쓰므로 **git에 커밋**해야 함(공개 레포면 Google Cloud Console에서 API 키에 패키지·SHA 제한 걸기 권장)
+3. 프로젝트 설정 → **서비스 계정** → 새 비공개 키 → JSON → `eas credentials` → Android → **FCM V1** 업로드 ✅(완료)
 4. 이후 **빌드를 다시 해야** 반영됨.
 
 ## 빌드
