@@ -1,13 +1,12 @@
-import * as WebBrowser from 'expo-web-browser';
+import { Linking } from 'react-native';
 import { gateThenOpen } from './adManager';
 
-// 글 열기 (zucca100.com).
-// 광고 판정(gateThenOpen)을 거친 뒤 시스템 인앱 브라우저로 오픈한다.
-// 앱 WebView에 임베드하지 않고 SFSafariViewController/Custom Tabs로 열어
-// 블로그(웹·AdSense)를 합법적으로 노출한다.
+// "자세히 보기" / 뉴스 열기 (zucca100.com 등).
+// 광고 판정(gateThenOpen)을 거친 뒤, 앱을 벗어나 기기 기본 브라우저(크롬 등)로 오픈한다.
+// 앱 WebView 임베드가 아니라 실제 외부 브라우저라 AdSense가 정상 노출되고 정책상도 안전.
 export function openExternal(url) {
   const full = /^https?:\/\//i.test(url) ? url : 'https://' + url;
   gateThenOpen(() => {
-    WebBrowser.openBrowserAsync(full).catch(() => {});
+    Linking.openURL(full).catch(() => {});
   });
 }
