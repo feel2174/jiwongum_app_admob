@@ -74,11 +74,20 @@ export async function unregisterPushToken() {
 // 설정 화면 "알림 진단"에서 호출해 토큰이 실제로 나오는지 확인.
 export async function getPushDiagnostics() {
   const perm = await Notifications.getPermissionsAsync();
-  const out = { status: perm.status, hasSupabase: !!supabase, token: null, error: null };
+  const out = { status: perm.status, hasSupabase: !!supabase, token: null, error: null, saved: false, saveError: null };
   try {
     out.token = await getPushToken();
   } catch (e) {
     out.error = e?.message || String(e);
+    return out;
+  }
+  // push_tokens에 실제로 저장 시도 → 성공/실패 및 에러를 그대로 리포트
+  if (supabase && out.token) {
+    const { error } = await supabase
+      .from('push_tokens')
+      .upsert({ token: out.token }, { onConflict: 'token', ignoreDuplicates: true });
+    if (error) out.saveError = error.message;
+    else out.saved = true;
   }
   return out;
 }
