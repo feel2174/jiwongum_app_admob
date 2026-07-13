@@ -40,6 +40,8 @@ Deno.serve(async (req) => {
       to: t.token,
       title: title, // 글 제목
       body: '지금 바로 확인하세요',
+      channelId: 'default', // 앱의 HIGH 중요도 채널 → 헤드업(플로팅) 배너
+      priority: 'high',
       data: { articleId: id, url },
     }));
 

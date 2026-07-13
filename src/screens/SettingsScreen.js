@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
 import { useTheme } from '../theme';
 import { SITUATIONS, REGIONS } from '../data/mock';
 import { useStore } from '../lib/store';
-import { registerPushToken, unregisterPushToken, getPushDiagnostics } from '../lib/push';
+import { registerPushToken, unregisterPushToken } from '../lib/push';
 import Header, { HeaderButton } from '../components/Header';
 
 const PRIVACY_URL = 'https://workable-crowberry-292.notion.site/3993761bd6b28049b341ffc4e1002044';
@@ -23,11 +23,6 @@ export default function SettingsScreen({ navigation }) {
   const t = useTheme();
   const { profile, updateProfile, settings, toggleSetting } = useStore();
   const notifOn = !!settings['새 글 알림'];
-  const [diag, setDiag] = useState(null);
-  const runDiag = async () => {
-    setDiag('loading');
-    setDiag(await getPushDiagnostics()); // 토큰 생성 + push_tokens 저장 시도 + 결과 리포트
-  };
 
   const toggleSit = (k) => {
     const next = profile.situations.includes(k)
@@ -91,34 +86,6 @@ export default function SettingsScreen({ navigation }) {
           <Toggle on={notifOn} onPress={onToggleNotif} />
         </View>
 
-        <Text style={[styles.h, { color: t.ink, marginTop: 22 }]}>알림 진단</Text>
-        <Pressable onPress={runDiag} style={[styles.diagBtn, { borderColor: t.border, backgroundColor: t.card }]}>
-          <Text style={{ color: t.accent, fontWeight: '700', fontSize: 14 }}>푸시 토큰 확인</Text>
-        </Pressable>
-        {diag === 'loading' && <Text style={[styles.diagLine, { color: t.faint }]}>확인 중…</Text>}
-        {diag && diag !== 'loading' && (
-          <View style={[styles.diagBox, { backgroundColor: t.surface2 }]}>
-            <Text style={[styles.diagLine, { color: t.muted }]}>
-              권한: {diag.status}{diag.hasSupabase ? '' : ' · ⚠️ Supabase 미연결'}
-            </Text>
-            {diag.token ? (
-              <>
-                <Text style={[styles.diagLine, { color: t.ok }]}>토큰 생성됨 (길게 눌러 복사)</Text>
-                <Text selectable style={[styles.diagToken, { color: t.ink }]}>{diag.token}</Text>
-              </>
-            ) : (
-              <Text style={[styles.diagLine, { color: t.danger }]}>
-                ❌ 토큰 없음{diag.error ? ` — ${diag.error}` : ''}
-              </Text>
-            )}
-            {diag.token ? (
-              <Text style={[styles.diagLine, { color: diag.saved ? t.ok : t.danger }]}>
-                push_tokens 저장: {diag.saved ? '성공 ✅' : `실패 ❌${diag.saveError ? ' — ' + diag.saveError : ''}`}
-              </Text>
-            ) : null}
-          </View>
-        )}
-
         <Text style={[styles.h, { color: t.ink, marginTop: 22 }]}>정보</Text>
         <Pressable onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)} style={[styles.row, { borderBottomColor: t.line }]}>
           <Text style={[styles.rowLabel, { color: t.ink }]}>개인정보처리방침</Text>
@@ -144,8 +111,4 @@ const styles = StyleSheet.create({
   rowLabel: { fontSize: 14.5, fontWeight: '600' },
   tg: { width: 44, height: 26, borderRadius: 14, justifyContent: 'center' },
   knob: { position: 'absolute', top: 3, width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff' },
-  diagBtn: { borderWidth: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center' },
-  diagBox: { marginTop: 10, borderRadius: 12, padding: 14, gap: 6 },
-  diagLine: { fontSize: 12.5, fontWeight: '600' },
-  diagToken: { fontSize: 12, fontFamily: 'monospace' },
 });

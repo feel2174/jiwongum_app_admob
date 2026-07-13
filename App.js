@@ -54,26 +54,29 @@ function Tabs() {
 }
 
 function RootNavigator() {
-  const { profile, ready, setSetting } = useStore();
+  const { profile, ready, settings, setSetting } = useStore();
   const t = useTheme();
   const askedRef = useRef(false);
 
-  // 최초 실행(온보딩 완료) 시 알림 권한 팝업. 허용되면 토큰 등록 + 토글 ON.
+  // 앱 실행(온보딩 완료) 시 알림 권한 체크 — 1회.
+  // · 미결정: OS 권한 팝업 → 허용하면 토큰 등록 + 토글 ON
+  // · 이미 허용 + 토글 ON: 토큰 조용히 재등록(갱신)
+  // · 거부/토글 OFF: 아무것도 안 함(사용자 선택 존중, 매번 조르지 않음)
   useEffect(() => {
     if (!ready || !profile.onboarded || askedRef.current) return;
     askedRef.current = true;
     (async () => {
       try {
         const { status } = await Notifications.getPermissionsAsync();
-        if (status === 'granted') {
-          await registerPushToken();
-        } else if (status === 'undetermined') {
+        if (status === 'undetermined') {
           const token = await registerPushToken(); // OS 권한 팝업 표시
           if (token) setSetting('새 글 알림', true);
+        } else if (status === 'granted' && settings['새 글 알림']) {
+          await registerPushToken();
         }
       } catch {}
     })();
-  }, [ready, profile.onboarded, setSetting]);
+  }, [ready, profile.onboarded, settings, setSetting]);
 
   if (!ready) return <View style={{ flex: 1, backgroundColor: t.bg }} />;
 
