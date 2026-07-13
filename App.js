@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Text, View, useColorScheme } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -18,7 +18,7 @@ import { useTheme } from './src/theme';
 import { StoreProvider, useStore } from './src/lib/store';
 import { init as initAds } from './src/lib/adManager';
 import { openExternal } from './src/lib/openLink';
-import { syncPushTokenIfPermitted } from './src/lib/push';
+import { registerPushToken } from './src/lib/push';
 
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import HomeScreen from './src/screens/HomeScreen';
@@ -54,8 +54,26 @@ function Tabs() {
 }
 
 function RootNavigator() {
-  const { profile, ready } = useStore();
+  const { profile, ready, setSetting } = useStore();
   const t = useTheme();
+  const askedRef = useRef(false);
+
+  // 최초 실행(온보딩 완료) 시 알림 권한 팝업. 허용되면 토큰 등록 + 토글 ON.
+  useEffect(() => {
+    if (!ready || !profile.onboarded || askedRef.current) return;
+    askedRef.current = true;
+    (async () => {
+      try {
+        const { status } = await Notifications.getPermissionsAsync();
+        if (status === 'granted') {
+          await registerPushToken();
+        } else if (status === 'undetermined') {
+          const token = await registerPushToken(); // OS 권한 팝업 표시
+          if (token) setSetting('새 글 알림', true);
+        }
+      } catch {}
+    })();
+  }, [ready, profile.onboarded, setSetting]);
 
   if (!ready) return <View style={{ flex: 1, backgroundColor: t.bg }} />;
 
@@ -84,7 +102,6 @@ export default function App() {
       try { await requestTrackingPermissionsAsync(); } catch {}
       try { await mobileAds().initialize(); } catch {}
       initAds();
-      syncPushTokenIfPermitted();
     })();
   }, []);
 

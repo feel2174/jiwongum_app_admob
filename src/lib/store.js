@@ -71,6 +71,13 @@ export function StoreProvider({ children }) {
       return next;
     });
   };
+  const setSetting = (key, value) => {
+    setSettings((prev) => {
+      const next = { ...prev, [key]: value };
+      saveSettings(next);
+      return next;
+    });
+  };
 
   const updateProfile = (partial) => {
     setProfileState((prev) => {
@@ -86,7 +93,7 @@ export function StoreProvider({ children }) {
     <StoreContext.Provider
       value={{
         bookmarks, isBookmarked, toggleBookmark,
-        settings, toggleSetting,
+        settings, toggleSetting, setSetting,
         profile, updateProfile, completeOnboarding,
         articles, refreshArticles,
         breakingNews, refreshBreakingNews,
