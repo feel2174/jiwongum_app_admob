@@ -69,6 +69,19 @@ export async function unregisterPushToken() {
   }
 }
 
+// 진단용 — 권한 상태 + Expo 토큰(또는 에러) + Supabase 연결 여부.
+// 설정 화면 "알림 진단"에서 호출해 토큰이 실제로 나오는지 확인.
+export async function getPushDiagnostics() {
+  const perm = await Notifications.getPermissionsAsync();
+  const out = { status: perm.status, hasSupabase: !!supabase, token: null, error: null };
+  try {
+    out.token = await getPushToken();
+  } catch (e) {
+    out.error = e?.message || String(e);
+  }
+  return out;
+}
+
 // [새 글] 데모 알림. 실서비스에서는 서버(FCM/APNs)에서 세그먼트 발송으로 대체.
 // data.url 로 해당 글 주소를 실어 보내 → 탭 시 그 글로 연결.
 export async function sendBreakingDemo(article) {
