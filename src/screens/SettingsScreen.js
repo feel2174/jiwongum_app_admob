@@ -26,6 +26,7 @@ export default function SettingsScreen({ navigation }) {
   const [diag, setDiag] = useState(null);
   const runDiag = async () => {
     setDiag('loading');
+    await registerPushToken(); // 토큰을 push_tokens에 실제로 저장(어드민 발송 대상 등록)
     setDiag(await getPushDiagnostics());
   };
 

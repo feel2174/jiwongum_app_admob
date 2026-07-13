@@ -38,8 +38,8 @@ Deno.serve(async (req) => {
 
     const messages = (tokens || []).map((t: any) => ({
       to: t.token,
-      title: '[새 글] 지원금·정책',
-      body: title,
+      title: title, // 글 제목
+      body: '지금 바로 확인하세요',
       data: { articleId: id, url },
     }));
 

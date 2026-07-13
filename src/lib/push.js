@@ -42,7 +42,8 @@ export async function registerPushToken() {
   try {
     const token = await getPushToken();
     console.log('[push] Expo push token:', token); // 테스트용 — expo.dev/notifications에 붙여넣어 발송
-    await supabase.from('push_tokens').upsert({ token }, { onConflict: 'token' });
+    // ignoreDuplicates: 이미 있으면 INSERT DO NOTHING (RLS에 UPDATE 정책이 없어 upsert-update가 막히는 문제 회피)
+    await supabase.from('push_tokens').upsert({ token }, { onConflict: 'token', ignoreDuplicates: true });
     return token;
   } catch (e) {
     console.warn('registerPushToken failed:', e.message);
