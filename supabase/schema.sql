@@ -48,13 +48,14 @@ alter table push_tokens enable row level security;
 -- 앱(anon)이 알림 허용 시 자기 토큰을 등록/해제할 수 있음. select는 안 열어줌(대량 수집 방지).
 -- notify-new-article Edge Function은 service_role로 조회하므로 RLS와 무관하게 전체를 볼 수 있음.
 drop policy if exists "anon register token" on push_tokens;
-create policy "anon register token"
+drop policy if exists "anyone can insert token" on push_tokens;
+create policy "anyone can insert token"
   on push_tokens for insert
-  to anon, authenticated
+  to public
   with check (true);
 
 drop policy if exists "anon unregister token" on push_tokens;
 create policy "anon unregister token"
   on push_tokens for delete
-  to anon, authenticated
+  to public
   using (true);
