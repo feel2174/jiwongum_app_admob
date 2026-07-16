@@ -5,7 +5,7 @@ import { useTheme, shadow } from '../theme';
 import { formatDate } from '../data/mock';
 import { related, findArticle } from '../lib/reco';
 import { recordDetailView } from '../lib/adManager';
-import { openExternal } from '../lib/openLink';
+import { openContent } from '../lib/openLink';
 import { useStore } from '../lib/store';
 import Header, { HeaderButton } from '../components/Header';
 
@@ -55,12 +55,12 @@ export default function DetailScreen({ route, navigation }) {
         <Text style={[styles.summary, { color: t.muted }]}>{item.summary}</Text>
 
         <Pressable
-          onPress={() => openExternal(item.url)}
+          onPress={() => openContent(navigation, item.url, item.title)}
           style={({ pressed }) => [styles.cta, shadow, { backgroundColor: t.accent, opacity: pressed ? 0.92 : 1 }]}
         >
           <Text style={{ color: t.onAccent, fontWeight: '700', fontSize: 15 }}>자세히 보기  →</Text>
         </Pressable>
-        <Text style={[styles.note, { color: t.faint }]}>탭하면 보조금24에서 자세히 확인할 수 있어요.</Text>
+        <Text style={[styles.note, { color: t.faint }]}>탭하면 전체 내용을 확인할 수 있어요.</Text>
 
         {recos.length > 0 && (
           <View style={styles.reco}>

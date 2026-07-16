@@ -13,10 +13,12 @@
 - 각 글에 **상황 태그**(청년/신혼·육아/구직·취업/주거/시니어/소상공인/저소득·복지) → 온보딩 프로필과 **규칙 기반 매칭**으로 개인화.
 - 탭: **홈(맞춤)·탐색(상황별 컬렉션)·검색(패싯)·저장** + 홈 ⚙설정. 첫 실행 온보딩(건너뛰기 가능).
 
-## 3. 수익 모델 (합법 구조)
-- **수익 = 앱 내부 AdMob**(배너+전면광고)만. **"자세히 보기"는 보조금24 공식 포털**(https://plus.gov.kr/portal/benefitV2)로 연결.
-  - (2026-07 변경) zucca100.com AdSense 유도 **제거** — 심사·정당성 위해 공식 포털로. `openLink.js`가 zucca100.com URL을 전부 보조금24로 리다이렉트(SUBSIDY_PORTAL_URL). Supabase/SEED 데이터의 url은 안 건드림(앱단에서 차단).
-- ⚠️ 광고를 앱 WebView에 임베드 금지(밴). 외부 링크는 `Linking.openURL`로 **외부 브라우저** 오픈.
+## 3. 수익 모델 (2026-07-13 피벗: WebView API for Ads)
+- **앱 네이티브 영역 = AdMob**(배너+전면광고) + **인앱 WebView = zucca100.com(AdSense)**.
+- 핵심: Google 공식 **WebView API for Ads**(https://developers.google.com/admob/android/browser/webview/api-for-ads)로 WebView를 SDK에 등록 → WebView 안 AdSense가 **합법** 노출. (미등록 일반 WebView에 AdSense는 여전히 위반 — 등록이 필수 조건)
+- 구현: `modules/webview-ads`(로컬 Expo 모듈, Kotlin)가 `MobileAds.registerWebView()` 호출. `src/screens/WebScreen.js`가 Google 권장 설정(JS·DOM Storage·서드파티쿠키·미디어 자동재생)으로 로드하되 **등록 후에 URL 로드**(about:blank → 등록 → 실제 URL). play-services-ads **25.0.0 고정**(25.4.0=Kotlin2.3 금지).
+- 라우팅(`openLink.js`): zucca100.com → 인앱 WebView / 그 외(네이버 뉴스 등) → 외부 브라우저. 이전 보조금24 리다이렉트는 **제거**됨.
+- 주의: AdMob 네이티브 광고와 WebView 내 AdSense가 **혼동되는 배치 금지**(정책). 앱/웹 **동의(CMP)는 자동 공유 안 됨** — 웹사이트 쪽 동의 플로우 별도(추후). Play Integrity는 Play Console 쪽 적용됨(사용자 확인), 앱 내 Integrity API 검증은 추후 서버 검증과 함께.
 - 전면광고 밴 방지 캡: `src/lib/adManager.js` `CAPS`(조회 3회 후 / 90초 간격 / 세션 4회 / 복귀 억제).
 
 ## 4. 기술 스택 / 버전 (⚠️ 올리지 말 것)
@@ -81,6 +83,7 @@ google-services.json FCM 클라이언트 config (project: jiwongum, 커밋됨)
 - 배포 전 디버그 제거 완료(푸시 토큰 진단 UI·토큰 로그·미사용 함수)
 
 ## 10. 남은 할 일 (우선순위순)
+- [ ] **(피벗 검증) 재빌드 후 WebView 광고 확인** — `modules/webview-ads` Kotlin은 EAS 빌드에서 첫 컴파일됨(로컬 SDK 없어 미검증). 빌드 실패 시 gradle 로그 확인. 성공 시: 상세→자세히보기→인앱 WebView에서 zucca100.com 로드 + AdSense 노출 확인
 - [ ] **notify-new-article 재배포** (title/body·헤드업 priority 반영) — 8절 방법
 - [ ] **EAS 무료 빌드 소진** — 이번 달 Android 빌드 다 씀, **2026-08-01 리셋**. 선택지: ①대기(무료) ②로컬 빌드(무료, Android SDK+JDK17+키스토어) ③EAS 구독(유료)
 - [ ] **production AAB 빌드**: `eas build -p android --profile production` (위 빌드 한도 때문에 대기/로컬)

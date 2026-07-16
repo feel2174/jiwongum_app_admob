@@ -17,7 +17,7 @@ import * as Notifications from 'expo-notifications';
 import { useTheme } from './src/theme';
 import { StoreProvider, useStore } from './src/lib/store';
 import { init as initAds } from './src/lib/adManager';
-import { openExternal } from './src/lib/openLink';
+import { openContent } from './src/lib/openLink';
 import { registerPushToken } from './src/lib/push';
 
 import OnboardingScreen from './src/screens/OnboardingScreen';
@@ -28,6 +28,7 @@ import SavedScreen from './src/screens/SavedScreen';
 import DetailScreen from './src/screens/DetailScreen';
 import CollectionScreen from './src/screens/CollectionScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import WebScreen from './src/screens/WebScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -90,6 +91,7 @@ function RootNavigator() {
           <Stack.Screen name="Detail" component={DetailScreen} />
           <Stack.Screen name="Collection" component={CollectionScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Web" component={WebScreen} />
         </>
       )}
     </Stack.Navigator>
@@ -111,8 +113,8 @@ export default function App() {
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((resp) => {
       const data = resp.notification.request.content.data || {};
-      if (data.url) openExternal(data.url);
-      else if (data.articleId && navRef.isReady()) navRef.navigate('Detail', { id: data.articleId });
+      if (data.articleId && navRef.isReady()) navRef.navigate('Detail', { id: data.articleId });
+      else if (data.url && navRef.isReady()) openContent(navRef, data.url);
     });
     return () => sub.remove();
   }, [navRef]);

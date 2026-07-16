@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { useTheme, shadow } from '../theme';
 import { BANNER_UNIT } from '../lib/adManager';
-import { openExternal } from '../lib/openLink';
+import { openContent } from '../lib/openLink';
 import { useStore } from '../lib/store';
 import { personalized, matchLabel, latest } from '../lib/reco';
 import Header, { HeaderButton } from '../components/Header';
@@ -32,7 +32,7 @@ export default function HomeScreen({ navigation }) {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>
       <Header title="지원금·정책" right={<HeaderButton label="⚙" onPress={() => navigation.navigate('Settings')} />} />
       <ScrollView contentContainerStyle={styles.content}>
-        <NewsSection items={breakingNews} onPressItem={(n) => openExternal(n.url)} />
+        <NewsSection items={breakingNews} onPressItem={(n) => openContent(navigation, n.url, '속보')} />
 
         {sits.length > 0 ? (
           matched.length > 0 ? (

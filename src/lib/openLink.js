@@ -1,13 +1,27 @@
 import { Linking } from 'react-native';
 import { gateThenOpen } from './adManager';
 
-// 지원금 "자세히 보기"는 보조금24 공식 포털로 연결.
-// zucca100.com으로 향하는 모든 경로(상세·속보 폴백·푸시 탭 등)는 여기서 전부 이 포털로 대체된다.
-export const SUBSIDY_PORTAL_URL = 'https://plus.gov.kr/portal/benefitV2';
+const normalize = (url) => (/^https?:\/\//i.test(url) ? url : url ? 'https://' + url : '');
 
+// 콘텐츠 열기 (전면광고 판정 후):
+// · zucca100.com → 인앱 WebView(WebView API for Ads 등록됨 → AdSense 합법 노출)
+// · 그 외(네이버 뉴스 등) → 외부 브라우저
+export function openContent(navigation, url, title) {
+  const full = normalize(url);
+  if (!full) return;
+  gateThenOpen(() => {
+    if (/zucca100\.com/i.test(full) && navigation) {
+      navigation.navigate('Web', { url: full, title });
+    } else {
+      Linking.openURL(full).catch(() => {});
+    }
+  });
+}
+
+// 외부 브라우저로만 열기 (navigation 없는 곳에서 사용; 동일하게 광고 판정 거침)
 export function openExternal(url) {
-  let full = /^https?:\/\//i.test(url) ? url : url ? 'https://' + url : '';
-  if (!full || /zucca100\.com/i.test(full)) full = SUBSIDY_PORTAL_URL;
+  const full = normalize(url);
+  if (!full) return;
   gateThenOpen(() => {
     Linking.openURL(full).catch(() => {});
   });
