@@ -13,17 +13,17 @@ if (Platform.OS === 'android') {
   }
 }
 
-// viewTag: findNodeHandle(webViewRef.current). 콘텐츠 로드 "전"에 호출할 것(Google 권장).
+// 화면에 마운트된 WebView를 SDK에 등록. 콘텐츠 로드 "전"에 호출할 것(Google 권장).
 // 테스트 빌드(USE_TEST_ADS)에서는 결과를 Alert로 표시해 Metro 없이도 검증 가능.
-export async function registerWebViewForAds(viewTag) {
-  if (!nativeModule || viewTag == null) {
+export async function registerWebViewForAds() {
+  if (!nativeModule) {
     if (USE_TEST_ADS) Alert.alert('WebView 광고', '네이티브 모듈 없음 (등록 생략)');
     return false;
   }
   try {
-    await nativeModule.registerWebView(viewTag);
-    if (USE_TEST_ADS) Alert.alert('WebView 광고', '등록 성공 ✅ (registerWebView)');
-    return true;
+    const count = await nativeModule.registerWebViews();
+    if (USE_TEST_ADS) Alert.alert('WebView 광고', `등록 성공 ✅ (WebView ${count}개)`);
+    return count > 0;
   } catch (e) {
     console.warn('registerWebViewForAds failed:', e.message);
     if (USE_TEST_ADS) Alert.alert('WebView 광고', '등록 실패 ❌ — ' + e.message);

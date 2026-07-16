@@ -3,37 +3,32 @@ package expo.modules.webviewads
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
-import com.facebook.react.bridge.ReactContext
-import com.facebook.react.uimanager.UIManagerHelper
 import com.google.android.gms.ads.MobileAds
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
-// Google "WebView API for Ads" 연동 — react-native-webview의 네이티브 WebView를
+// Google "WebView API for Ads" 연동 — 현재 Activity 뷰 트리의 WebView들을
 // Mobile Ads SDK에 등록해 WebView 안 AdSense/GPT 광고에 앱 신호를 제공한다.
+// React Native 클래스에 의존하지 않도록 뷰 트리 탐색 방식 사용(컴파일 의존성 최소화).
 // https://developers.google.com/admob/android/browser/webview/api-for-ads
 class WebviewAdsModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("WebviewAds")
 
-    AsyncFunction("registerWebView") { viewTag: Int, promise: Promise ->
-      val reactContext = appContext.reactContext as? ReactContext
-      if (reactContext == null) {
-        promise.reject("ERR_NO_CONTEXT", "React context unavailable", null)
+    // 화면에 마운트된 WebView를 모두 찾아 등록. 등록된 개수를 반환.
+    AsyncFunction("registerWebViews") { promise: Promise ->
+      val activity = appContext.currentActivity
+      if (activity == null) {
+        promise.reject("ERR_NO_ACTIVITY", "Current activity unavailable", null)
         return@AsyncFunction
       }
-      reactContext.runOnUiQueueThread {
+      activity.runOnUiThread {
         try {
-          val uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, viewTag)
-          val root = uiManager?.resolveView(viewTag)
-          val webView = findWebView(root)
-          if (webView != null) {
-            MobileAds.registerWebView(webView)
-            promise.resolve(true)
-          } else {
-            promise.reject("ERR_NO_WEBVIEW", "No WebView found for tag $viewTag", null)
-          }
+          val found = mutableListOf<WebView>()
+          collectWebViews(activity.window?.decorView, found)
+          found.forEach { MobileAds.registerWebView(it) }
+          promise.resolve(found.size)
         } catch (e: Throwable) {
           promise.reject("ERR_REGISTER", e.message ?: "registerWebView failed", e)
         }
@@ -41,15 +36,16 @@ class WebviewAdsModule : Module() {
     }
   }
 
-  // react-native-webview 13.x는 WebView를 래퍼(FrameLayout) 안에 두므로 재귀 탐색
-  private fun findWebView(view: View?): WebView? {
-    if (view == null) return null
-    if (view is WebView) return view
+  private fun collectWebViews(view: View?, out: MutableList<WebView>) {
+    if (view == null) return
+    if (view is WebView) {
+      out.add(view)
+      return
+    }
     if (view is ViewGroup) {
       for (i in 0 until view.childCount) {
-        findWebView(view.getChildAt(i))?.let { return it }
+        collectWebViews(view.getChildAt(i), out)
       }
     }
-    return null
   }
 }

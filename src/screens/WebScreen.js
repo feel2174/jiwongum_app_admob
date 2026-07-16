@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, findNodeHandle, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
@@ -22,8 +22,7 @@ export default function WebScreen({ route, navigation }) {
       webRef.current = ref;
       if (!ref || registeredRef.current) return;
       registeredRef.current = true;
-      const tag = findNodeHandle(ref);
-      await registerWebViewForAds(tag); // 실패해도 콘텐츠는 정상 로드(광고 신호만 빠짐)
+      await registerWebViewForAds(); // 마운트된 WebView를 뷰 트리에서 찾아 등록. 실패해도 콘텐츠는 정상 로드
       setSourceUri(url);
     },
     [url],
