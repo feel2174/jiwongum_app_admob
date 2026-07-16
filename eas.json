@@ -16,7 +16,8 @@
       "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://oxunynxspkxfkokerftl.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_T_IYdewX-mBILr-5hSIUxw_0KC4f3Nh"
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_T_IYdewX-mBILr-5hSIUxw_0KC4f3Nh",
+        "EXPO_PUBLIC_USE_TEST_ADS": "1"
       }
     },
     "production": {

@@ -8,16 +8,19 @@ import {
   TestIds,
 } from 'react-native-google-mobile-ads';
 
-// 개발(__DEV__)에서는 항상 테스트 광고 → 자기 실광고 클릭 밴 방지.
-// 배포 빌드에서만 실제 광고 단위 ID 사용.
-const INTERSTITIAL_UNIT = __DEV__
+// 테스트 광고 조건: 개발(__DEV__) 또는 테스트 빌드(EXPO_PUBLIC_USE_TEST_ADS=1, eas preview 프로필).
+// → standalone 테스트 빌드에서도 실광고 대신 테스트 광고가 떠서 자기 클릭 밴 방지.
+// production 빌드에서만 실제 광고 단위 ID 사용.
+export const USE_TEST_ADS = __DEV__ || process.env.EXPO_PUBLIC_USE_TEST_ADS === '1';
+
+const INTERSTITIAL_UNIT = USE_TEST_ADS
   ? TestIds.INTERSTITIAL
   : Platform.select({
       android: 'ca-app-pub-8785405056367250/3054590041',
       ios: 'ca-app-pub-8785405056367250/9854435134',
     });
 
-export const BANNER_UNIT = __DEV__
+export const BANNER_UNIT = USE_TEST_ADS
   ? TestIds.BANNER
   : Platform.select({
       android: 'ca-app-pub-8785405056367250/3437733426',
