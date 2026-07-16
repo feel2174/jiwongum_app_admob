@@ -14,8 +14,9 @@
 - 탭: **홈(맞춤)·탐색(상황별 컬렉션)·검색(패싯)·저장** + 홈 ⚙설정. 첫 실행 온보딩(건너뛰기 가능).
 
 ## 3. 수익 모델 (합법 구조)
-- **앱 내부 = AdMob**(배너+전면광고), **앱 밖 = AdSense**(자세히보기 → 외부 크롬으로 zucca100.com 원문).
-- ⚠️ AdSense를 앱 WebView에 임베드 금지(계정 밴). `openLink.js`가 `Linking.openURL`로 **외부 브라우저** 오픈.
+- **수익 = 앱 내부 AdMob**(배너+전면광고)만. **"자세히 보기"는 보조금24 공식 포털**(https://plus.gov.kr/portal/benefitV2)로 연결.
+  - (2026-07 변경) zucca100.com AdSense 유도 **제거** — 심사·정당성 위해 공식 포털로. `openLink.js`가 zucca100.com URL을 전부 보조금24로 리다이렉트(SUBSIDY_PORTAL_URL). Supabase/SEED 데이터의 url은 안 건드림(앱단에서 차단).
+- ⚠️ 광고를 앱 WebView에 임베드 금지(밴). 외부 링크는 `Linking.openURL`로 **외부 브라우저** 오픈.
 - 전면광고 밴 방지 캡: `src/lib/adManager.js` `CAPS`(조회 3회 후 / 90초 간격 / 세션 4회 / 복귀 억제).
 
 ## 4. 기술 스택 / 버전 (⚠️ 올리지 말 것)

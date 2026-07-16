@@ -60,7 +60,7 @@ export default function DetailScreen({ route, navigation }) {
         >
           <Text style={{ color: t.onAccent, fontWeight: '700', fontSize: 15 }}>자세히 보기  →</Text>
         </Pressable>
-        <Text style={[styles.note, { color: t.faint }]}>탭하면 해당 글로 이동합니다.</Text>
+        <Text style={[styles.note, { color: t.faint }]}>탭하면 보조금24에서 자세히 확인할 수 있어요.</Text>
 
         {recos.length > 0 && (
           <View style={styles.reco}>
