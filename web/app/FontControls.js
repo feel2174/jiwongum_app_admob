@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 
 const sizes = [
-  { key: 'normal', label: '기본' },
-  { key: 'large', label: '크게' },
-  { key: 'xlarge', label: '더 크게' },
+  { key: 'normal', label: '기본', value: 0 },
+  { key: 'large', label: '크게', value: 1 },
+  { key: 'xlarge', label: '더 크게', value: 2 },
 ];
 
 export default function FontControls() {
@@ -23,21 +23,37 @@ export default function FontControls() {
     window.localStorage.setItem('senior-font-size', size);
   }
 
+  const selectedIndex = sizes.find((size) => size.key === selected)?.value ?? 0;
+
   return (
-    <div className="fontControls" aria-label="글자 크기 조절">
-      <span>글자 크기</span>
-      <div>
-        {sizes.map((size) => (
-          <button
-            key={size.key}
-            type="button"
-            aria-pressed={selected === size.key}
-            onClick={() => changeSize(size.key)}
-          >
-            {size.label}
-          </button>
-        ))}
+    <div className="fontControls floatingFontControls" aria-label="글자 크기 조절">
+      <span className="fontTitle">글자 크기</span>
+      <div className="fontSliderRow">
+        <button
+          type="button"
+          aria-label="글자 작게"
+          onClick={() => changeSize(sizes[Math.max(0, selectedIndex - 1)].key)}
+        >
+          -
+        </button>
+        <input
+          type="range"
+          min="0"
+          max="2"
+          step="1"
+          value={selectedIndex}
+          aria-label="글자 크기"
+          onChange={(event) => changeSize(sizes[Number(event.target.value)].key)}
+        />
+        <button
+          type="button"
+          aria-label="글자 크게"
+          onClick={() => changeSize(sizes[Math.min(sizes.length - 1, selectedIndex + 1)].key)}
+        >
+          +
+        </button>
       </div>
+      <strong>{sizes[selectedIndex].label}</strong>
     </div>
   );
 }

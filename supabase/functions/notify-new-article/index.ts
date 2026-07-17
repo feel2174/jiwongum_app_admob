@@ -8,6 +8,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 const CHUNK_SIZE = 100;
+const CHANNEL_ID = 'new-posts-v2';
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -40,8 +41,9 @@ Deno.serve(async (req) => {
       to: t.token,
       title: title, // 글 제목
       body: '지금 바로 확인하세요',
-      channelId: 'default', // 앱의 HIGH 중요도 채널 → 헤드업(플로팅) 배너
+      channelId: CHANNEL_ID, // 앱의 MAX 중요도 채널 → 헤드업(플로팅) 배너
       priority: 'high',
+      sound: 'default',
       data: { articleId: id, url },
     }));
 

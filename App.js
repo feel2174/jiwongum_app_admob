@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Text, View, useColorScheme } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { AppState, Text, View, useColorScheme } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -16,15 +16,13 @@ import * as Notifications from 'expo-notifications';
 
 import { useTheme } from './src/theme';
 import { StoreProvider, useStore } from './src/lib/store';
+import { NOTIFICATION_SETTING_KEY } from './src/lib/storage';
 import { init as initAds } from './src/lib/adManager';
 import { openContent } from './src/lib/openLink';
-import { registerPushToken } from './src/lib/push';
+import { getPushPermissionStatus, syncPushPermission } from './src/lib/push';
 
 import OnboardingScreen from './src/screens/OnboardingScreen';
-import HomeScreen from './src/screens/HomeScreen';
-import ExploreScreen from './src/screens/ExploreScreen';
-import SearchScreen from './src/screens/SearchScreen';
-import SavedScreen from './src/screens/SavedScreen';
+import BreakingNewsScreen from './src/screens/BreakingNewsScreen';
 import DetailScreen from './src/screens/DetailScreen';
 import CollectionScreen from './src/screens/CollectionScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -35,10 +33,12 @@ const Tab = createBottomTabNavigator();
 
 const tabIcon = (emoji) => ({ color }) => <Text style={{ fontSize: 18, color }}>{emoji}</Text>;
 
-function Tabs() {
+function Tabs({ initialRouteName = 'Home' }) {
   const t = useTheme();
+
   return (
     <Tab.Navigator
+      initialRouteName={initialRouteName}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: t.accent,
@@ -46,10 +46,24 @@ function Tabs() {
         tabBarStyle: { backgroundColor: t.surface, borderTopColor: t.border },
       }}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: '홈', tabBarIcon: tabIcon('🏠') }} />
-      <Tab.Screen name="Explore" component={ExploreScreen} options={{ tabBarLabel: '탐색', tabBarIcon: tabIcon('🧭') }} />
-      <Tab.Screen name="Search" component={SearchScreen} options={{ tabBarLabel: '검색', tabBarIcon: tabIcon('🔍') }} />
-      <Tab.Screen name="Saved" component={SavedScreen} options={{ tabBarLabel: '저장', tabBarIcon: tabIcon('🔖') }} />
+      <Tab.Screen
+        name="Home"
+        component={WebScreen}
+        initialParams={{
+          url: 'https://www.senior.zucca100.com',
+          title: '홈',
+          showBack: false,
+          showHeader: false,
+        }}
+        options={{ tabBarLabel: '홈', tabBarIcon: tabIcon('🏠') }}
+      />
+      <Tab.Screen
+        name="SettingsTab"
+        component={SettingsScreen}
+        initialParams={{ showBack: false }}
+        options={{ tabBarLabel: '설정', tabBarIcon: tabIcon('⚙') }}
+      />
+      <Tab.Screen name="More" component={BreakingNewsScreen} options={{ tabBarLabel: '기타', tabBarIcon: tabIcon('⋯') }} />
     </Tab.Navigator>
   );
 }
@@ -57,29 +71,56 @@ function Tabs() {
 function RootNavigator() {
   const { profile, ready, settings, setSetting } = useStore();
   const t = useTheme();
-  const askedRef = useRef(false);
+  const notifOn = !!settings[NOTIFICATION_SETTING_KEY];
+  const [initialTab, setInitialTab] = useState(null);
 
-  // 앱 실행(온보딩 완료) 시 알림 권한 체크 — 1회.
-  // · 미결정: OS 권한 팝업 → 허용하면 토큰 등록 + 토글 ON
-  // · 이미 허용 + 토글 ON: 토큰 조용히 재등록(갱신)
-  // · 거부/토글 OFF: 아무것도 안 함(사용자 선택 존중, 매번 조르지 않음)
   useEffect(() => {
-    if (!ready || !profile.onboarded || askedRef.current) return;
-    askedRef.current = true;
+    if (!ready || !profile.onboarded) return undefined;
+
+    let mounted = true;
+
     (async () => {
       try {
-        const { status } = await Notifications.getPermissionsAsync();
-        if (status === 'undetermined') {
-          const token = await registerPushToken(); // OS 권한 팝업 표시
-          if (token) setSetting('새 글 알림', true);
-        } else if (status === 'granted' && settings['새 글 알림']) {
-          await registerPushToken();
-        }
-      } catch {}
+        const status = await getPushPermissionStatus();
+        if (mounted) setInitialTab(status === 'granted' ? 'Home' : 'SettingsTab');
+      } catch {
+        if (mounted) setInitialTab('Home');
+      }
     })();
-  }, [ready, profile.onboarded, settings, setSetting]);
 
-  if (!ready) return <View style={{ flex: 1, backgroundColor: t.bg }} />;
+    return () => {
+      mounted = false;
+    };
+  }, [ready, profile.onboarded]);
+
+  useEffect(() => {
+    if (!ready || !profile.onboarded) return undefined;
+
+    let mounted = true;
+
+    const syncNotifications = async ({ requestIfNeeded }) => {
+      if (!notifOn) return;
+      try {
+        const enabled = await syncPushPermission({ requestIfNeeded });
+        if (mounted) setSetting(NOTIFICATION_SETTING_KEY, enabled);
+      } catch {}
+    };
+
+    syncNotifications({ requestIfNeeded: false });
+
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        syncNotifications({ requestIfNeeded: false });
+      }
+    });
+
+    return () => {
+      mounted = false;
+      sub.remove();
+    };
+  }, [ready, profile.onboarded, notifOn, setSetting]);
+
+  if (!ready || (profile.onboarded && !initialTab)) return <View style={{ flex: 1, backgroundColor: t.bg }} />;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -87,7 +128,9 @@ function RootNavigator() {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       ) : (
         <>
-          <Stack.Screen name="Tabs" component={Tabs} />
+          <Stack.Screen name="Tabs">
+            {() => <Tabs initialRouteName={initialTab || 'Home'} />}
+          </Stack.Screen>
           <Stack.Screen name="Detail" component={DetailScreen} />
           <Stack.Screen name="Collection" component={CollectionScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
@@ -116,6 +159,7 @@ export default function App() {
       if (data.articleId && navRef.isReady()) navRef.navigate('Detail', { id: data.articleId });
       else if (data.url && navRef.isReady()) openContent(navRef, data.url);
     });
+
     return () => sub.remove();
   }, [navRef]);
 

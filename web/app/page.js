@@ -2,6 +2,15 @@ import FontControls from './FontControls';
 import ArticleExplorer from './ArticleExplorer';
 import { seniorArticles } from './seniorArticles';
 
+const situationCards = [
+  { label: '내 연금이 궁금해요', target: 'a2', text: '기초연금, 노령연금, 국민연금 예상액을 먼저 확인해보세요.' },
+  { label: '일자리를 찾고 있어요', target: 'a14', text: '지역별 노인일자리와 참여 조건을 확인할 수 있습니다.' },
+  { label: '부모님 돌봄이 필요해요', target: 'guide-care', text: '장기요양과 돌봄 절차를 어디서 시작할지 잡아보세요.' },
+  { label: '치매나 건강이 걱정돼요', target: 'guide-dementia', text: '검진과 상담이 필요한 상황인지 차분히 살펴보세요.' },
+  { label: '상속·사망 후 절차를 알아봐요', target: 'guide-inheritance', text: '가족 사망 후 재산과 채무 확인 순서를 정리합니다.' },
+  { label: '내가 받을 혜택을 찾고 싶어요', target: 'originals', text: '보조금24와 공식 서비스에서 받을 수 있는 혜택을 더 찾아보세요.' },
+];
+
 export default function Home() {
   const featuredArticles = seniorArticles.filter((article) => article.featured);
 
@@ -17,9 +26,9 @@ export default function Home() {
         <div className="heroGrid">
           <div>
             <p className="eyebrow">시니어 생활 지원 안내</p>
-            <h1>연금, 일자리, 건강보험을 한 번에 확인하세요</h1>
+            <h1>시니어 혜택 길잡이</h1>
             <p className="heroCopy">
-              필요한 항목을 고르면 설명을 먼저 보고, 공식 신청·조회 화면으로 바로 이동할 수 있습니다.
+              연금, 일자리, 돌봄, 가족 절차까지 내 상황에 맞는 공식 확인 경로를 쉽게 찾아보세요.
             </p>
             <div className="heroActions">
               <a href="#articles">항목별로 확인하기</a>
@@ -36,10 +45,24 @@ export default function Home() {
               <strong>공식</strong>
               <span>서비스 연결</span>
             </div>
-            <FontControls />
           </section>
         </div>
       </header>
+
+      <section className="section situationSection" aria-label="상황별 선택">
+        <div className="sectionHeading">
+          <p className="eyebrow">내 상황부터 선택</p>
+          <h2>지금 무엇이 필요하신가요?</h2>
+        </div>
+        <div className="situationGrid">
+          {situationCards.map((card) => (
+            <a key={card.label} className="situationCard" href={`#${card.target}`}>
+              <strong>{card.label}</strong>
+              <span>{card.text}</span>
+            </a>
+          ))}
+        </div>
+      </section>
 
       <section className="section intro" id="checklist">
         <div>
@@ -53,9 +76,9 @@ export default function Home() {
             기본 금액을 가늠하기 좋습니다.
           </li>
           <li>
-            <strong>건강보험 조건 점검</strong>
-            부모님을 피부양자로 등록할 수 있는지 확인하면 가구 지출 계획을 세우는 데
-            도움이 됩니다.
+            <strong>돌봄과 건강 상태 점검</strong>
+            부모님 혼자 생활이 어려운지, 치매 검진이나 장기요양 상담이 필요한지 먼저
+            살펴보면 좋습니다.
           </li>
           <li>
             <strong>일자리 공고 확인</strong>
@@ -68,7 +91,7 @@ export default function Home() {
       <section className="section featuredSection" aria-label="자주 찾는 항목">
         <div className="sectionHeading">
           <p className="eyebrow">자주 찾는 항목</p>
-          <h2>먼저 확인하면 좋은 3가지</h2>
+          <h2>많이 찾는 확인 항목</h2>
         </div>
         <div className="featuredGrid">
           {featuredArticles.map((article) => (
@@ -96,10 +119,17 @@ export default function Home() {
         </div>
         <div className="linkList">
           {seniorArticles.map((article) => (
-            <a key={article.id} href={article.url}>
-              <span>{article.title}</span>
-              <small>{article.buttonText}</small>
-            </a>
+            article.url && !article.comingSoon ? (
+              <a key={article.id} href={article.url}>
+                <span>{article.title}</span>
+                <small>{article.buttonText}</small>
+              </a>
+            ) : (
+              <div key={article.id} className="pendingLink">
+                <span>{article.title}</span>
+                <small>준비중입니다</small>
+              </div>
+            )
           ))}
         </div>
       </section>
@@ -116,10 +146,19 @@ export default function Home() {
         </a>
       </section>
 
+      <section className="section disclaimer" aria-label="참고자료 안내">
+        <strong>참고자료 안내</strong>
+        <p>
+          이 페이지는 정부24, 보조금24 및 각 공식 기관의 공개 안내를 쉽게 확인할 수 있도록 정리한 참고용 자료입니다.
+          실제 지원 대상, 신청 가능 여부, 지급 금액, 제출 서류는 각 기관의 최신 공지와 심사 결과에 따라 달라질 수 있습니다.
+        </p>
+      </section>
+
       <footer className="footer">
         <strong>시니어 지원금 모아보기</strong>
         <span>각 항목은 공식 서비스 페이지로 연결됩니다.</span>
       </footer>
+      <FontControls />
     </main>
   );
 }

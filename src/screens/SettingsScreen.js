@@ -1,28 +1,45 @@
-import React from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
-import { useTheme } from '../theme';
 import { SITUATIONS, REGIONS } from '../data/mock';
 import { useStore } from '../lib/store';
-import { registerPushToken, unregisterPushToken } from '../lib/push';
+import { NOTIFICATION_SETTING_KEY } from '../lib/storage';
+import { registerPushToken, requestPushPermission, syncPushPermission, unregisterPushToken } from '../lib/push';
 import Header, { HeaderButton } from '../components/Header';
 
 const PRIVACY_URL = 'https://workable-crowberry-292.notion.site/3993761bd6b28049b341ffc4e1002044';
 
 function Toggle({ on, onPress }) {
-  const t = useTheme();
   return (
-    <Pressable onPress={onPress} style={[styles.tg, { backgroundColor: on ? t.ok : t.surface2 }]}>
-      <View style={[styles.knob, { left: on ? 21 : 3 }]} />
+    <Pressable onPress={onPress} style={[styles.tg, { backgroundColor: on ? '#295f48' : '#ded8cc' }]}>
+      <View style={[styles.knob, { left: on ? 24 : 4 }]} />
     </Pressable>
   );
 }
 
-export default function SettingsScreen({ navigation }) {
-  const t = useTheme();
-  const { profile, updateProfile, settings, toggleSetting } = useStore();
-  const notifOn = !!settings['새 글 알림'];
+export default function SettingsScreen({ route, navigation }) {
+  const { profile, updateProfile, settings, setSetting } = useStore();
+  const notifOn = !!settings[NOTIFICATION_SETTING_KEY];
+  const showBack = route?.params?.showBack ?? true;
+
+  useFocusEffect(
+    useCallback(() => {
+      let mounted = true;
+
+      if (notifOn) {
+        (async () => {
+          const enabled = await syncPushPermission({ requestIfNeeded: false });
+          if (mounted && !enabled) setSetting(NOTIFICATION_SETTING_KEY, false);
+        })();
+      }
+
+      return () => {
+        mounted = false;
+      };
+    }, [notifOn, setSetting]),
+  );
 
   const toggleSit = (k) => {
     const next = profile.situations.includes(k)
@@ -31,84 +48,175 @@ export default function SettingsScreen({ navigation }) {
     updateProfile({ situations: next });
   };
 
-  // 새 글 알림 토글: 켤 때 권한요청+토큰등록(실패 시 켜지 않음), 끌 때 토큰해제.
+  const showPermissionHelp = () => {
+    Alert.alert(
+      '알림 권한이 필요해요',
+      '기기 설정에서 이 앱의 알림을 허용하면 새 글 알림을 받을 수 있어요.',
+      [
+        { text: '나중에', style: 'cancel' },
+        { text: '설정 열기', onPress: () => Linking.openSettings() },
+      ],
+    );
+  };
+
   const onToggleNotif = async () => {
     if (!notifOn) {
-      const token = await registerPushToken(); // 내부에서 권한요청
-      if (token) {
-        toggleSetting('새 글 알림');
-      } else {
-        Alert.alert('알림 권한이 필요해요', '기기 설정에서 이 앱의 알림을 허용하면 새 글 알림을 받을 수 있어요.');
+      const granted = await requestPushPermission();
+      if (!granted) {
+        setSetting(NOTIFICATION_SETTING_KEY, false);
+        showPermissionHelp();
+        return;
       }
-    } else {
-      toggleSetting('새 글 알림');
-      await unregisterPushToken();
+
+      setSetting(NOTIFICATION_SETTING_KEY, true);
+      await registerPushToken({ requestPermission: false });
+      return;
     }
+
+    setSetting(NOTIFICATION_SETTING_KEY, false);
+    await unregisterPushToken();
   };
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>
-      <Header title="설정" left={<HeaderButton label="←" onPress={() => navigation.goBack()} />} />
+    <SafeAreaView edges={['top']} style={styles.screen}>
+      <Header
+        title="설정"
+        left={showBack ? <HeaderButton label="←" onPress={() => navigation.goBack()} /> : null}
+      />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.h, { color: t.ink }]}>내 상황</Text>
-        <Text style={[styles.sub, { color: t.muted }]}>선택한 상황에 맞춰 홈에서 맞춤 추천해드려요.</Text>
-        <View style={styles.chips}>
-          {SITUATIONS.map((s) => {
-            const on = profile.situations.includes(s.key);
-            return (
-              <Pressable key={s.key} onPress={() => toggleSit(s.key)} style={[styles.chip, { backgroundColor: on ? t.accent : t.surface2, borderColor: on ? t.accent : t.border }]}>
-                <Text style={{ color: on ? t.onAccent : t.muted, fontSize: 13.5, fontWeight: '600' }}>{s.emoji} {s.key}</Text>
-              </Pressable>
-            );
-          })}
+        <View style={styles.heroCard}>
+          <Text style={styles.kicker}>시니어 혜택 알림 설정</Text>
+          <Text style={styles.heroTitle}>필요한 소식만 편하게 받아보세요</Text>
+          <Text style={styles.heroText}>
+            홈 화면은 시니어 혜택 페이지로 바로 연결되고, 알림은 새 지원금과 생활 안내 소식을 받을 때만 사용됩니다.
+          </Text>
         </View>
 
-        <Text style={[styles.h, { color: t.ink, marginTop: 12 }]}>내 지역</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.regionRow}>
-          {REGIONS.map((r) => {
-            const on = profile.region === r;
-            return (
-              <Pressable key={r} onPress={() => updateProfile({ region: r })} style={[styles.chip, { backgroundColor: on ? t.accent : t.surface2, borderColor: on ? t.accent : t.border }]}>
-                <Text style={{ color: on ? t.onAccent : t.muted, fontSize: 13.5, fontWeight: '600' }}>{r}</Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-
-        <Text style={[styles.h, { color: t.ink, marginTop: 22 }]}>알림</Text>
-        <View style={[styles.notifRow, { borderColor: t.border, backgroundColor: t.card }]}>
-          <View style={styles.notifText}>
-            <Text style={[styles.notifTitle, { color: t.ink }]}>새 글 알림</Text>
-            <Text style={[styles.notifSub, { color: t.muted }]}>
-              관심 지원금·정책이 올라오면 푸시로 알려드려요. 언제든 여기서 끌 수 있어요.
-            </Text>
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.iconBadge}>
+              <Text style={styles.iconText}>🔔</Text>
+            </View>
+            <View style={styles.notifText}>
+              <Text style={styles.cardTitle}>새 소식 알림</Text>
+              <Text style={styles.cardSub}>
+                새 글이나 중요한 혜택 안내가 있을 때 알려드려요. 원하지 않으면 언제든 끌 수 있습니다.
+              </Text>
+            </View>
+            <Toggle on={notifOn} onPress={onToggleNotif} />
           </View>
-          <Toggle on={notifOn} onPress={onToggleNotif} />
+          <Text style={[styles.statusText, notifOn ? styles.statusOn : styles.statusOff]}>
+            {notifOn ? '알림이 켜져 있습니다.' : '알림이 꺼져 있습니다.'}
+          </Text>
         </View>
 
-        <Text style={[styles.h, { color: t.ink, marginTop: 22 }]}>정보</Text>
-        <Pressable onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)} style={[styles.row, { borderBottomColor: t.line }]}>
-          <Text style={[styles.rowLabel, { color: t.ink }]}>개인정보처리방침</Text>
-          <Text style={{ color: t.faint, fontSize: 18 }}>›</Text>
-        </Pressable>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>관심 상황</Text>
+          <Text style={styles.cardSub}>기타 화면에서 지원금 목록을 볼 때 참고되는 선택입니다.</Text>
+          <View style={styles.chips}>
+            {SITUATIONS.map((s) => {
+              const on = profile.situations.includes(s.key);
+              return (
+                <Pressable
+                  key={s.key}
+                  onPress={() => toggleSit(s.key)}
+                  style={[styles.chip, on && styles.chipOn]}
+                >
+                  <Text style={[styles.chipText, on && styles.chipTextOn]}>{s.emoji} {s.key}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>지역</Text>
+          <Text style={styles.cardSub}>사는 지역을 고르면 관련 지원금 확인에 도움이 됩니다.</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.regionRow}>
+            {REGIONS.map((r) => {
+              const on = profile.region === r;
+              return (
+                <Pressable
+                  key={r}
+                  onPress={() => updateProfile({ region: r })}
+                  style={[styles.chip, on && styles.chipOn]}
+                >
+                  <Text style={[styles.chipText, on && styles.chipTextOn]}>{r}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>정보</Text>
+          <Pressable onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)} style={styles.row}>
+            <Text style={styles.rowLabel}>개인정보처리방침</Text>
+            <Text style={styles.rowArrow}>›</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 16, paddingBottom: 40 },
-  h: { fontSize: 17, fontWeight: '750', marginBottom: 4 },
-  sub: { fontSize: 13, marginBottom: 12 },
+  screen: { flex: 1, backgroundColor: '#f6f2ea' },
+  content: { padding: 16, paddingBottom: 40, gap: 14 },
+  heroCard: {
+    borderRadius: 10,
+    padding: 20,
+    backgroundColor: '#173c2d',
+  },
+  kicker: { color: '#ffd99a', fontSize: 13, fontWeight: '800', marginBottom: 8 },
+  heroTitle: { color: '#fffdf8', fontSize: 23, lineHeight: 30, fontWeight: '800' },
+  heroText: { color: 'rgba(255,253,248,0.82)', fontSize: 15, lineHeight: 22, marginTop: 10 },
+  card: {
+    borderWidth: 1,
+    borderColor: '#ded8cc',
+    borderRadius: 10,
+    padding: 16,
+    backgroundColor: '#fffdf8',
+  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8f0e0',
+  },
+  iconText: { fontSize: 20 },
+  cardTitle: { color: '#1f2a24', fontSize: 18, fontWeight: '800' },
+  cardSub: { color: '#66736a', fontSize: 14, lineHeight: 20, marginTop: 5, marginBottom: 12 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1 },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#ded8cc',
+    backgroundColor: '#f6f2ea',
+  },
+  chipOn: { backgroundColor: '#295f48', borderColor: '#295f48' },
+  chipText: { color: '#66736a', fontSize: 14, fontWeight: '700' },
+  chipTextOn: { color: '#fffdf8' },
   regionRow: { gap: 8, paddingVertical: 2, paddingRight: 16 },
-  notifRow: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 14, padding: 16 },
   notifText: { flex: 1 },
-  notifTitle: { fontSize: 15, fontWeight: '700' },
-  notifSub: { fontSize: 12.5, marginTop: 3, lineHeight: 17 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16, borderBottomWidth: 1 },
-  rowLabel: { fontSize: 14.5, fontWeight: '600' },
-  tg: { width: 44, height: 26, borderRadius: 14, justifyContent: 'center' },
-  knob: { position: 'absolute', top: 3, width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff' },
+  statusText: {
+    marginTop: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 8,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  statusOn: { color: '#295f48', backgroundColor: '#e9f3eb' },
+  statusOff: { color: '#8d3f4f', backgroundColor: '#f7e9ed' },
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 },
+  rowLabel: { color: '#1f2a24', fontSize: 15, fontWeight: '700' },
+  rowArrow: { color: '#66736a', fontSize: 22 },
+  tg: { width: 50, height: 30, borderRadius: 16, justifyContent: 'center' },
+  knob: { position: 'absolute', top: 4, width: 22, height: 22, borderRadius: 11, backgroundColor: '#fff' },
 });

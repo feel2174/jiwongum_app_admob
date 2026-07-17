@@ -3,7 +3,7 @@ import { View, Text, Pressable, Animated, StyleSheet } from 'react-native';
 import { useTheme } from '../theme';
 
 const ROW_H = 40;
-const VISIBLE = 3; // 한 번에 보이는 줄 수
+const VISIBLE = 7; // 한 번에 보이는 줄 수
 const DWELL_MS = 3500; // 각 줄 머무는 시간
 const SLIDE_MS = 650; // 위로 한 줄 흐르는 시간
 

@@ -11,7 +11,7 @@ import Header, { HeaderButton } from '../components/Header';
 // 그리고 콘텐츠 로드 "전"에 MobileAds.registerWebView 등록.
 export default function WebScreen({ route, navigation }) {
   const t = useTheme();
-  const { url, title } = route.params;
+  const { url, title, showBack = true, showHeader = true } = route.params;
   const webRef = useRef(null);
   // 등록이 끝나기 전에는 콘텐츠를 로드하지 않는다 (about:blank → 등록 → 실제 URL)
   const [sourceUri, setSourceUri] = useState('about:blank');
@@ -30,10 +30,12 @@ export default function WebScreen({ route, navigation }) {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>
-      <Header
-        title={title || '자세히 보기'}
-        left={<HeaderButton label="←" onPress={() => navigation.goBack()} />}
-      />
+      {showHeader ? (
+        <Header
+          title={title || '자세히 보기'}
+          left={showBack ? <HeaderButton label="←" onPress={() => navigation.goBack()} /> : null}
+        />
+      ) : null}
       <WebView
         ref={onRefReady}
         source={{ uri: sourceUri }}

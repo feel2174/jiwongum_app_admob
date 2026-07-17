@@ -6,12 +6,14 @@ const K_PROFILE = '@jiwongum/profile';
 const K_ARTICLES_CACHE = '@jiwongum/articles-cache';
 const K_NEWS_CACHE = '@jiwongum/breaking-news-cache';
 
+export const NOTIFICATION_SETTING_KEY = 'newPostNotifications';
+
 export const DEFAULT_SETTINGS = {
-  '새 글 알림': false, // 명시적 opt-in — 사용자가 직접 켜야 푸시 토큰 등록
+  [NOTIFICATION_SETTING_KEY]: false,
 };
 
 export const DEFAULT_PROFILE = {
-  situations: [], // 예: ['청년', '구직·취업']
+  situations: [],
   region: '전국',
   onboarded: false,
 };
@@ -24,6 +26,7 @@ async function loadJSON(key, fallback) {
     return fallback;
   }
 }
+
 async function saveJSON(key, val) {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(val));
@@ -38,18 +41,23 @@ export async function loadBookmarks() {
     return [];
   }
 }
+
 export function saveBookmarks(arr) {
   return saveJSON(K_BOOKMARKS, arr);
 }
+
 export function loadSettings() {
   return loadJSON(K_SETTINGS, DEFAULT_SETTINGS);
 }
+
 export function saveSettings(obj) {
   return saveJSON(K_SETTINGS, obj);
 }
+
 export function loadProfile() {
   return loadJSON(K_PROFILE, DEFAULT_PROFILE);
 }
+
 export function saveProfile(obj) {
   return saveJSON(K_PROFILE, obj);
 }
@@ -62,6 +70,7 @@ export async function loadArticlesCache() {
     return null;
   }
 }
+
 export function saveArticlesCache(arr) {
   return saveJSON(K_ARTICLES_CACHE, arr);
 }
@@ -74,6 +83,7 @@ export async function loadNewsCache() {
     return null;
   }
 }
+
 export function saveNewsCache(arr) {
   return saveJSON(K_NEWS_CACHE, arr);
 }
