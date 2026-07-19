@@ -1037,17 +1037,6 @@ h1 {
   cursor: pointer;
 }
 
-.sampleNotice {
-  margin: 0 0 10px;
-  border: 1px solid #d8ccb9;
-  border-radius: 8px;
-  background: #fff8ea;
-  color: #594b38;
-  padding: 12px 14px;
-  font-size: 0.9em;
-  font-weight: 800;
-}
-
 .communityRuleNotice {
   margin: 10px 0;
   border: 1px solid #f0d0d0;

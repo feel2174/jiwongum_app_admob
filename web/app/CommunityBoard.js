@@ -420,7 +420,6 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
 
       {variant === 'full' ? (
         <>
-          <div className="sampleNotice">처음 방문한 분도 분위기를 볼 수 있도록 대표 질문을 먼저 보여드립니다.</div>
           <div className="communityFeed sampleFeed" aria-label="대표 질문">
             {renderPost(samplePost)}
           </div>
