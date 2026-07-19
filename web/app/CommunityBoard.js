@@ -142,6 +142,7 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [notice, setNotice] = useState('');
+  const [searchDraft, setSearchDraft] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState('latest');
   const [openReplyForms, setOpenReplyForms] = useState({});
@@ -254,6 +255,16 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
 
   function toggleReplyForm(key) {
     setOpenReplyForms((current) => ({ ...current, [key]: !current[key] }));
+  }
+
+  function handleSearchSubmit(event) {
+    event.preventDefault();
+    setSearchTerm(searchDraft.trim());
+  }
+
+  function clearSearch() {
+    setSearchDraft('');
+    setSearchTerm('');
   }
 
   async function handleReplySubmit(event, postId) {
@@ -424,26 +435,29 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
             {renderPost(samplePost)}
           </div>
 
-          <div className="communitySearch" role="search">
+          <form className="communitySearch" role="search" onSubmit={handleSearchSubmit}>
             <label htmlFor="communitySearchInput">실제 질문 검색</label>
             <div className="searchInputWrap">
-              <input
-                id="communitySearchInput"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="기초연금, 돌봄, 치매처럼 입력"
-              />
-              {searchTerm ? (
-                <button type="button" onClick={() => setSearchTerm('')}>
-                  지우기
-                </button>
-              ) : null}
+              <div className="searchField">
+                <input
+                  id="communitySearchInput"
+                  value={searchDraft}
+                  onChange={(event) => setSearchDraft(event.target.value)}
+                  placeholder="기초연금, 돌봄, 치매처럼 입력"
+                />
+                {searchDraft ? (
+                  <button type="button" className="clearSearchButton" aria-label="검색어 지우기" onClick={clearSearch}>
+                    ×
+                  </button>
+                ) : null}
+              </div>
+              <button type="submit" className="searchSubmitButton">검색</button>
             </div>
             <p>
               등록된 정책명, 질문, 댓글을 함께 찾습니다.
               {searchTerm ? ` 현재 ${filteredPosts.length}개 글이 보입니다.` : ''}
             </p>
-          </div>
+          </form>
 
           <div className="communityTabs" aria-label="글 정렬">
             <button type="button" aria-pressed={sortMode === 'latest'} onClick={() => setSortMode('latest')}>
