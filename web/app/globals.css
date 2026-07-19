@@ -1061,6 +1061,10 @@ h1 {
   word-break: keep-all;
 }
 
+.formRuleNotice {
+  margin: 2px 0 4px;
+}
+
 .sampleFeed {
   margin-bottom: 14px;
 }

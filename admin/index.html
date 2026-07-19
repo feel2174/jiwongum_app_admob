@@ -50,7 +50,6 @@
   .pill { font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; }
   .pill.pub { background:rgba(52,199,123,.15); color:var(--ok); }
   .pill.draft { background:rgba(152,162,184,.15); color:var(--muted); }
-  .notice { border-color:rgba(255,93,108,.45); background:rgba(255,93,108,.08); color:var(--ink); font-size:13px; line-height:1.55; }
   .comment-body { margin:8px 0 12px; white-space:pre-wrap; line-height:1.55; font-size:14px; }
   .comment-grid { display:grid; gap:10px; }
   .comment-card.is-nested { border-left:4px solid var(--accent); }
@@ -104,10 +103,6 @@
     </section>
 
     <section id="comments-tab" hidden>
-      <div class="card notice">
-        상대를 비방하거나 욕설, 개인정보 노출, 광고성 내용이 포함된 댓글은 별도 경고 없이 삭제할 수 있습니다.
-        상위 댓글을 삭제하면 연결된 대댓글도 함께 삭제됩니다.
-      </div>
       <div class="row" style="margin-bottom:12px">
         <button class="btn-ghost" id="refresh-comments-btn">댓글 새로고침</button>
         <span class="meta" id="comments-status"></span>

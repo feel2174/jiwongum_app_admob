@@ -425,10 +425,6 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
             {renderPost(samplePost)}
           </div>
 
-          <div className="communityRuleNotice">
-            서로를 비방하거나 욕설, 개인정보, 광고성 내용을 포함한 글과 댓글은 별도 경고 없이 삭제될 수 있습니다.
-          </div>
-
           <div className="communitySearch" role="search">
             <label htmlFor="communitySearchInput">실제 질문 검색</label>
             <div className="searchInputWrap">
@@ -489,6 +485,10 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
               rows={5}
               maxLength={360}
             />
+
+            <div className="communityRuleNotice formRuleNotice">
+              상대를 비방하거나 욕설, 개인정보 노출, 광고성 내용이 포함된 댓글은 별도 경고 없이 삭제할 수 있습니다.
+            </div>
 
             <button type="submit">질문 남기기</button>
             {notice ? <p className="formNotice">{notice}</p> : null}
