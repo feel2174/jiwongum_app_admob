@@ -1069,12 +1069,19 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  flex: 0 0 72px;
+  justify-content: flex-start;
+  min-width: 72px;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
 }
 
 .likeButton span {
+  flex: 0 0 15px;
   color: #a5aca7;
   font-size: 1.08em;
   line-height: 1;
+  text-align: center;
 }
 
 .likeButton.isLiked {
