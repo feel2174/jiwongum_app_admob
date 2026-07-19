@@ -10,6 +10,7 @@ const sizes = [
 
 export default function FontControls() {
   const [selected, setSelected] = useState('normal');
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const stored = window.localStorage.getItem('senior-font-size') || 'normal';
@@ -26,34 +27,52 @@ export default function FontControls() {
   const selectedIndex = sizes.find((size) => size.key === selected)?.value ?? 0;
 
   return (
-    <div className="fontControls floatingFontControls" aria-label="글자 크기 조절">
-      <span className="fontTitle">글자 크기</span>
-      <div className="fontSliderRow">
+    <div className={`fontControls floatingFontControls ${expanded ? 'isOpen' : 'isCollapsed'}`} aria-label="글자 크기 조절">
+      {!expanded ? (
         <button
           type="button"
-          aria-label="글자 작게"
-          onClick={() => changeSize(sizes[Math.max(0, selectedIndex - 1)].key)}
+          className="fontToggle"
+          aria-label="글자 크기 조절 열기"
+          onClick={() => setExpanded(true)}
         >
-          -
+          가
         </button>
-        <input
-          type="range"
-          min="0"
-          max="2"
-          step="1"
-          value={selectedIndex}
-          aria-label="글자 크기"
-          onChange={(event) => changeSize(sizes[Number(event.target.value)].key)}
-        />
-        <button
-          type="button"
-          aria-label="글자 크게"
-          onClick={() => changeSize(sizes[Math.min(sizes.length - 1, selectedIndex + 1)].key)}
-        >
-          +
-        </button>
-      </div>
-      <strong>{sizes[selectedIndex].label}</strong>
+      ) : (
+        <>
+          <div className="fontHeader">
+            <span className="fontTitle">글자 크기</span>
+            <button type="button" className="fontClose" onClick={() => setExpanded(false)}>
+              접기
+            </button>
+          </div>
+          <div className="fontSliderRow">
+            <button
+              type="button"
+              aria-label="글자 작게"
+              onClick={() => changeSize(sizes[Math.max(0, selectedIndex - 1)].key)}
+            >
+              -
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="2"
+              step="1"
+              value={selectedIndex}
+              aria-label="글자 크기"
+              onChange={(event) => changeSize(sizes[Number(event.target.value)].key)}
+            />
+            <button
+              type="button"
+              aria-label="글자 크게"
+              onClick={() => changeSize(sizes[Math.min(sizes.length - 1, selectedIndex + 1)].key)}
+            >
+              +
+            </button>
+          </div>
+          <strong>{sizes[selectedIndex].label}</strong>
+        </>
+      )}
     </div>
   );
 }

@@ -26,3 +26,35 @@
 9. **어드민 페이지 배포**: `admin/` 폴더를 Vercel(추천) 또는 GitHub Pages 등 아무 정적 호스팅에 올림. 로그인 없이는 데이터에 접근 못 하므로 공개 URL이어도 무방.
 
 이후 새 글 추가는 배포된 어드민 페이지에서 "새 글 가져오기" → 태그 선택 → 발행만 누르면 앱에 바로 반영됨 (앱은 시작 시 자동으로 최신 목록을 가져옴).
+
+## 선발대 커뮤니티 테이블 적용
+
+웹 `/community` 화면에서 실제 글/댓글/공감을 저장하려면 커뮤니티 테이블을 원격 Supabase에 적용해야 합니다.
+
+Codex 환경에서는 Supabase access token이 없어 직접 push가 막힐 수 있습니다. 그 경우 아래 둘 중 하나로 적용하세요.
+
+### 방법 1. Supabase CLI
+
+```bash
+npx supabase login
+npx supabase link --project-ref oxunynxspkxfkokerftl --workdir supabase
+npx supabase db push --linked --workdir supabase
+```
+
+적용되는 migration:
+
+```text
+supabase/migrations/20260719000100_create_community_tables.sql
+```
+
+### 방법 2. SQL Editor
+
+Supabase 대시보드 → SQL Editor에서 `supabase/schema.sql`의 `community_posts`, `community_replies`, `community_likes` 구간을 실행합니다.
+
+테이블 적용 후 웹 `/community` 화면은 다음 구조로 동작합니다.
+
+- 상단: 화면 확인용 샘플 글 1개
+- 하단: Supabase에 실제 저장된 질문 목록
+- 글 작성: `community_posts` insert
+- 댓글/대댓글 작성: `community_replies` insert
+- 공감: `community_likes` insert/delete 및 `community_posts.likes_count` update

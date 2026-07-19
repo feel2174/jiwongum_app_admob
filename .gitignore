@@ -46,6 +46,7 @@ yarn-error.*
 
 # Supabase CLI local cache
 supabase/.temp/
+supabase/supabase/
 
 # Firebase service account key (SECRET — never commit)
 *-firebase-adminsdk-*.json

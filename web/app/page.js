@@ -1,5 +1,6 @@
 import FontControls from './FontControls';
 import ArticleExplorer from './ArticleExplorer';
+import CommunityBoard from './CommunityBoard';
 import { seniorArticles } from './seniorArticles';
 
 const situationCards = [
@@ -17,12 +18,6 @@ export default function Home() {
   return (
     <main>
       <header className="hero">
-        <nav className="topBar" aria-label="페이지 이동">
-          <a href="#articles">글 목록</a>
-          <a href="#checklist">확인 순서</a>
-          <a href="#originals">바로가기</a>
-        </nav>
-
         <div className="heroGrid">
           <div>
             <p className="eyebrow">시니어 생활 지원 안내</p>
@@ -63,6 +58,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <CommunityBoard policies={seniorArticles} variant="preview" />
 
       <section className="section intro" id="checklist">
         <div>

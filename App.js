@@ -22,7 +22,6 @@ import { openContent } from './src/lib/openLink';
 import { getPushPermissionStatus, syncPushPermission } from './src/lib/push';
 
 import OnboardingScreen from './src/screens/OnboardingScreen';
-import BreakingNewsScreen from './src/screens/BreakingNewsScreen';
 import DetailScreen from './src/screens/DetailScreen';
 import CollectionScreen from './src/screens/CollectionScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -58,12 +57,22 @@ function Tabs({ initialRouteName = 'Home' }) {
         options={{ tabBarLabel: '홈', tabBarIcon: tabIcon('🏠') }}
       />
       <Tab.Screen
+        name="Community"
+        component={WebScreen}
+        initialParams={{
+          url: 'https://www.senior.zucca100.com/community',
+          title: '선발대',
+          showBack: false,
+          showHeader: false,
+        }}
+        options={{ tabBarLabel: '선발대', tabBarIcon: tabIcon('✦') }}
+      />
+      <Tab.Screen
         name="SettingsTab"
         component={SettingsScreen}
         initialParams={{ showBack: false }}
         options={{ tabBarLabel: '설정', tabBarIcon: tabIcon('⚙') }}
       />
-      <Tab.Screen name="More" component={BreakingNewsScreen} options={{ tabBarLabel: '기타', tabBarIcon: tabIcon('⋯') }} />
     </Tab.Navigator>
   );
 }
