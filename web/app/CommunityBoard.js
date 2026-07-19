@@ -30,6 +30,41 @@ const samplePost = {
   isSample: true,
 };
 
+const nicknameWords = [
+  '감귤',
+  '포도',
+  '자두',
+  '복숭아',
+  '살구',
+  '참외',
+  '수박',
+  '딸기',
+  '사과',
+  '바나나',
+  '달고나',
+  '팽이',
+  '딱지',
+  '구슬',
+  '윷놀이',
+  '숨바꼭질',
+  '제기',
+  '공기',
+  '연날리기',
+  '소풍',
+  '햇살',
+  '마실',
+  '동네',
+  '다정',
+  '느티나무',
+];
+
+function makeNickname() {
+  const word = nicknameWords[Math.floor(Math.random() * nicknameWords.length)];
+  const shortWord = word.replace(/\s/g, '').slice(0, 5);
+  const number = String(Math.floor(Math.random() * 100)).padStart(2, '0');
+  return `${shortWord}${number}`;
+}
+
 function getClientId() {
   if (typeof window === 'undefined') return '';
 
@@ -183,7 +218,7 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
       policy: selectedPolicy,
       title: cleanTitle,
       body: cleanBody,
-      author_label: `선발대 ${posts.length + 1}번`,
+      author_label: makeNickname(),
     });
 
     if (error) {
@@ -229,7 +264,7 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
     const { error } = await communitySupabase.from('community_replies').insert({
       post_id: postId,
       body: cleanReply,
-      author_label: '댓글 선발대',
+      author_label: makeNickname(),
     });
 
     if (!error) {
@@ -249,7 +284,7 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
       post_id: postId,
       parent_reply_id: replyId,
       body: cleanReply,
-      author_label: '대댓글 선발대',
+      author_label: makeNickname(),
     });
 
     if (!error) {
