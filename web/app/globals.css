@@ -58,21 +58,6 @@ main {
   padding: 24px clamp(20px, 5vw, 72px) 56px;
 }
 
-.communityHero {
-  background:
-    linear-gradient(90deg, rgba(23, 60, 45, 0.96), rgba(91, 73, 43, 0.78)),
-    url("https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1800&q=80");
-  background-position: center;
-  background-size: cover;
-  color: #fffdf8;
-  padding: 24px clamp(20px, 5vw, 72px) 60px;
-}
-
-.communityHeroInner {
-  max-width: 920px;
-  margin: 0 auto;
-}
-
 .topBar {
   display: flex;
   justify-content: flex-end;
@@ -726,25 +711,6 @@ h1 {
   color: var(--muted);
   font-size: 0.92em;
   font-weight: 800;
-}
-
-.communityHero {
-  background: #f7f8f6;
-  color: var(--ink);
-  padding: 22px clamp(16px, 5vw, 42px) 18px;
-  border-bottom: 1px solid #e3e1da;
-}
-
-.communityHero .heroCopy {
-  max-width: 680px;
-  margin-top: 12px;
-  color: #506056;
-  font-size: 1em;
-}
-
-.communityHero h1 {
-  max-width: 760px;
-  font-size: clamp(31px, 5vw, 46px);
 }
 
 .communitySection {
@@ -1583,10 +1549,6 @@ button.readButton {
     padding-bottom: 46px;
   }
 
-  .communityHero {
-    padding-bottom: 42px;
-  }
-
   .topBar {
     justify-content: flex-start;
     overflow-x: auto;
@@ -1647,10 +1609,6 @@ button.readButton {
   }
 
   .hero {
-    padding: 16px 12px 36px;
-  }
-
-  .communityHero {
     padding: 16px 12px 36px;
   }
 
