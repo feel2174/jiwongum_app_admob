@@ -121,6 +121,12 @@ create policy "public insert community replies"
   to anon, authenticated
   with check (true);
 
+drop policy if exists "authenticated delete community replies" on community_replies;
+create policy "authenticated delete community replies"
+  on community_replies for delete
+  to authenticated
+  using (true);
+
 create table if not exists community_likes (
   post_id uuid not null references community_posts(id) on delete cascade,
   client_id text not null,

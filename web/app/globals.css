@@ -1048,6 +1048,19 @@ h1 {
   font-weight: 800;
 }
 
+.communityRuleNotice {
+  margin: 10px 0;
+  border: 1px solid #f0d0d0;
+  border-radius: 8px;
+  background: #fff4f1;
+  color: #714038;
+  padding: 12px 14px;
+  font-size: 0.88em;
+  font-weight: 800;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
 .sampleFeed {
   margin-bottom: 14px;
 }

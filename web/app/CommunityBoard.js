@@ -425,6 +425,10 @@ export default function CommunityBoard({ policies, variant = 'full' }) {
             {renderPost(samplePost)}
           </div>
 
+          <div className="communityRuleNotice">
+            서로를 비방하거나 욕설, 개인정보, 광고성 내용을 포함한 글과 댓글은 별도 경고 없이 삭제될 수 있습니다.
+          </div>
+
           <div className="communitySearch" role="search">
             <label htmlFor="communitySearchInput">실제 질문 검색</label>
             <div className="searchInputWrap">

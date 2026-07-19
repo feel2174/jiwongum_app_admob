@@ -50,6 +50,10 @@
   .pill { font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; }
   .pill.pub { background:rgba(52,199,123,.15); color:var(--ok); }
   .pill.draft { background:rgba(152,162,184,.15); color:var(--muted); }
+  .notice { border-color:rgba(255,93,108,.45); background:rgba(255,93,108,.08); color:var(--ink); font-size:13px; line-height:1.55; }
+  .comment-body { margin:8px 0 12px; white-space:pre-wrap; line-height:1.55; font-size:14px; }
+  .comment-grid { display:grid; gap:10px; }
+  .comment-card.is-nested { border-left:4px solid var(--accent); }
   #login-view { max-width:340px; margin:80px auto; }
   .empty { text-align:center; color:var(--muted); padding:30px; font-size:13.5px; }
   .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); padding:10px 18px; border-radius:8px; font-size:13px; }
@@ -80,6 +84,7 @@
     <div class="tabs">
       <div class="tab on" data-tab="import">새 글 가져오기</div>
       <div class="tab" data-tab="manage">글 관리</div>
+      <div class="tab" data-tab="comments">댓글 관리</div>
     </div>
 
     <section id="import-tab">
@@ -96,6 +101,18 @@
         <span class="meta" id="manage-status"></span>
       </div>
       <div id="manage-list"></div>
+    </section>
+
+    <section id="comments-tab" hidden>
+      <div class="card notice">
+        상대를 비방하거나 욕설, 개인정보 노출, 광고성 내용이 포함된 댓글은 별도 경고 없이 삭제할 수 있습니다.
+        상위 댓글을 삭제하면 연결된 대댓글도 함께 삭제됩니다.
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn-ghost" id="refresh-comments-btn">댓글 새로고침</button>
+        <span class="meta" id="comments-status"></span>
+      </div>
+      <div id="comments-list" class="comment-grid"></div>
     </section>
   </main>
 </div>
@@ -114,6 +131,15 @@ const REGIONS = ['전국', '서울', '경기', '인천', '부산', '대구', '�
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
 
 function toast(msg) {
   const el = document.createElement('div');
@@ -155,6 +181,7 @@ function showApp() {
   $('#app-view').hidden = false;
   loadWpPosts();
   loadArticles();
+  loadComments();
 }
 
 $('#login-btn').addEventListener('click', async () => {
@@ -178,6 +205,7 @@ $$('.tab').forEach((tab) => {
     tab.classList.add('on');
     $('#import-tab').hidden = tab.dataset.tab !== 'import';
     $('#manage-tab').hidden = tab.dataset.tab !== 'manage';
+    $('#comments-tab').hidden = tab.dataset.tab !== 'comments';
   });
 });
 
@@ -377,8 +405,70 @@ async function deleteArticle(id, title) {
   loadArticles();
 }
 
+// ---------- Comment moderation tab ----------
+async function loadComments() {
+  const list = $('#comments-list');
+  const status = $('#comments-status');
+  status.textContent = '불러오는 중…';
+  list.innerHTML = '';
+
+  const { data, error } = await supabase
+    .from('community_replies')
+    .select('id, post_id, parent_reply_id, body, author_label, created_at, community_posts(title, policy)')
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (error) {
+    status.textContent = '오류: ' + error.message;
+    return;
+  }
+
+  status.textContent = `최근 댓글 ${data.length}개`;
+  if (data.length === 0) {
+    list.innerHTML = '<div class="empty">아직 등록된 댓글이 없어요.</div>';
+    return;
+  }
+
+  list.innerHTML = data.map((reply, i) => commentCard(reply, i)).join('');
+  data.forEach((reply, i) => {
+    $(`#delete-comment-${i}`).addEventListener('click', () => deleteComment(reply.id, reply.body));
+  });
+}
+
+function commentCard(reply, i) {
+  const post = reply.community_posts || {};
+  const createdAt = reply.created_at ? new Date(reply.created_at).toLocaleString('ko-KR') : '시간 정보 없음';
+  const typeLabel = reply.parent_reply_id ? '대댓글' : '댓글';
+
+  return `
+    <div class="card comment-card ${reply.parent_reply_id ? 'is-nested' : ''}">
+      <div class="row" style="justify-content:space-between">
+        <p class="title">${escapeHtml(reply.author_label || '익명')} · ${typeLabel}</p>
+        <span class="pill draft">${escapeHtml(post.policy || '정책 미확인')}</span>
+      </div>
+      <p class="meta">${escapeHtml(createdAt)} · ${escapeHtml(post.title || '연결된 질문 없음')}</p>
+      <p class="comment-body">${escapeHtml(reply.body)}</p>
+      <div class="row">
+        <button class="btn-danger" id="delete-comment-${i}">댓글 삭제</button>
+      </div>
+    </div>
+  `;
+}
+
+async function deleteComment(id, body) {
+  const preview = (body || '').replace(/\s+/g, ' ').slice(0, 40);
+  const hasMore = (body || '').length > 40;
+  if (!confirm(`이 댓글을 삭제할까요?\n\n"${preview}${hasMore ? '…' : ''}"`)) return;
+
+  const { error } = await supabase.from('community_replies').delete().eq('id', id);
+  if (error) { toast('댓글 삭제 실패: ' + error.message); return; }
+  toast('댓글을 삭제했습니다.');
+  loadComments();
+}
+
 $('#refresh-wp-btn').addEventListener('click', loadWpPosts);
 $('#refresh-articles-btn').addEventListener('click', loadArticles);
+$('#refresh-comments-btn').addEventListener('click', loadComments);
 
 checkSession();
 </script>
