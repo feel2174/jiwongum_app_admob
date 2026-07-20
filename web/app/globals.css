@@ -1551,6 +1551,30 @@ button.readButton {
   color: rgba(255, 253, 248, 0.78);
 }
 
+.footerSources {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 14px;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 253, 248, 0.18);
+}
+
+.footerSourcesLabel {
+  font-weight: 800;
+  color: #ffd99a;
+}
+
+.footerSources a {
+  color: #fffdf8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 0.95rem;
+}
+
 @media (max-width: 860px) {
   .hero {
     padding-bottom: 46px;

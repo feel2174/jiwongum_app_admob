@@ -153,7 +153,15 @@ export default function Home() {
 
       <footer className="footer">
         <strong>시니어 지원금 모아보기</strong>
-        <span>각 항목은 공식 서비스 페이지로 연결됩니다.</span>
+        <span>이 사이트는 공식 기관이 아닌 참고용 안내 서비스입니다. 각 항목은 공식 서비스 페이지로 연결됩니다.</span>
+        <nav className="footerSources" aria-label="공식 정부 출처">
+          <span className="footerSourcesLabel">공식 출처</span>
+          <a href="https://www.gov.kr" target="_blank" rel="noopener noreferrer">정부24 (www.gov.kr)</a>
+          <a href="https://www.bokjiro.go.kr" target="_blank" rel="noopener noreferrer">복지로 (bokjiro.go.kr)</a>
+          <a href="https://basicpension.mohw.go.kr" target="_blank" rel="noopener noreferrer">기초연금 (mohw.go.kr)</a>
+          <a href="https://www.nps.or.kr" target="_blank" rel="noopener noreferrer">국민연금공단 (nps.or.kr)</a>
+          <a href="https://www.nhis.or.kr" target="_blank" rel="noopener noreferrer">국민건강보험공단 (nhis.or.kr)</a>
+        </nav>
       </footer>
       <FontControls />
     </main>

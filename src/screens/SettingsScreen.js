@@ -11,6 +11,16 @@ import Header, { HeaderButton } from '../components/Header';
 
 const PRIVACY_URL = 'https://workable-crowberry-292.notion.site/3993761bd6b28049b341ffc4e1002044';
 
+// 공식 정부 출처 — 앱 정보의 원본 기관 페이지(.go.kr / .or.kr). Play 정책상 명확히 노출 필요.
+const OFFICIAL_SOURCES = [
+  { name: '정부24', host: 'www.gov.kr', url: 'https://www.gov.kr' },
+  { name: '복지로 (복지서비스 통합)', host: 'www.bokjiro.go.kr', url: 'https://www.bokjiro.go.kr' },
+  { name: '기초연금 (보건복지부)', host: 'basicpension.mohw.go.kr', url: 'https://basicpension.mohw.go.kr' },
+  { name: '국민연금공단', host: 'www.nps.or.kr', url: 'https://www.nps.or.kr' },
+  { name: '국민건강보험공단', host: 'www.nhis.or.kr', url: 'https://www.nhis.or.kr' },
+  { name: '대한민국 정책브리핑', host: 'www.korea.kr', url: 'https://www.korea.kr' },
+];
+
 function Toggle({ on, onPress }) {
   return (
     <Pressable onPress={onPress} style={[styles.tg, { backgroundColor: on ? '#295f48' : '#ded8cc' }]}>
@@ -90,6 +100,26 @@ export default function SettingsScreen({ route, navigation }) {
           <Text style={styles.heroText}>
             홈 화면은 시니어 혜택 페이지로 바로 연결되고, 알림은 새 지원금과 생활 안내 소식을 받을 때만 사용됩니다.
           </Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>공식 정부 사이트 바로가기</Text>
+          <Text style={styles.cardSub}>
+            이 앱은 공식 앱이 아닌 안내 서비스이며, 제공 정보는 참고용입니다. 정확한 내용과 신청은 아래 공식 기관에서 확인하세요.
+          </Text>
+          {OFFICIAL_SOURCES.map((s, i) => (
+            <Pressable
+              key={s.url}
+              onPress={() => WebBrowser.openBrowserAsync(s.url)}
+              style={[styles.linkRow, i === 0 && styles.linkRowFirst]}
+            >
+              <View style={styles.linkTextWrap}>
+                <Text style={styles.rowLabel}>{s.name}</Text>
+                <Text style={styles.rowUrl}>{s.host}</Text>
+              </View>
+              <Text style={styles.rowArrow}>›</Text>
+            </Pressable>
+          ))}
         </View>
 
         <View style={styles.card}>
@@ -217,6 +247,17 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 },
   rowLabel: { color: '#1f2a24', fontSize: 15, fontWeight: '700' },
   rowArrow: { color: '#66736a', fontSize: 22 },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 13,
+    borderTopWidth: 1,
+    borderTopColor: '#efe9dd',
+  },
+  linkRowFirst: { borderTopWidth: 0 },
+  linkTextWrap: { flex: 1 },
+  rowUrl: { color: '#3a7a5c', fontSize: 13, fontWeight: '600', marginTop: 3 },
   tg: { width: 50, height: 30, borderRadius: 16, justifyContent: 'center' },
   knob: { position: 'absolute', top: 4, width: 22, height: 22, borderRadius: 11, backgroundColor: '#fff' },
 });
