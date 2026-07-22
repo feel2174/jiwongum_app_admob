@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
     <html lang="ko">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="naver-site-verification" content="0a0ed39995ca899760145f38965825220462b797" />
+        <meta name="naver-site-verification" content="8bd2fc666424fe37884a593e1a2991a5c778c9bd" />
         {adsenseClient ? (
           <script
             async
