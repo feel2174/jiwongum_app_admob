@@ -4,13 +4,13 @@ import './globals.css';
 export const metadata = {
   metadataBase: new URL('https://senior.zucca100.com'),
   title: {
-    default: '시니어 지원금 모아보기',
-    template: '%s | 시니어 지원금 모아보기',
+    default: '시니어 서포트',
+    template: '%s | 시니어 서포트',
   },
-  description: '기초연금, 노령연금, 국민연금, 사학연금, 노인일자리, 건강보험 피부양자 등록까지 시니어에게 필요한 글을 한 페이지에 모았습니다.',
+  description: '기초연금, 의료비, 주거, 노인일자리, 난방비까지 — 낱말 하나로 시니어 지원금을 바로 찾는 시니어 서포트(Senior Support).',
   openGraph: {
-    title: '시니어 지원금 모아보기',
-    description: '앱에 등록된 시니어 대상 글만 골라 보기 쉽게 정리한 안내 페이지입니다.',
+    title: '시니어 서포트',
+    description: '낱말 하나만 입력하면 관련 지원금을 바로 찾아드립니다. 시니어 서포트(Senior Support).',
     type: 'website',
     locale: 'ko_KR',
   },

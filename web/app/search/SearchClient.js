@@ -23,12 +23,21 @@ const BANNER = {
   errorPopular: () => '연결이 잠시 어려워, 많이 찾는 지원금을 보여드려요.',
 };
 
-function Field({ label, children }) {
-  if (!children) return null;
+// value는 문자열 배열(구두점 기준 재정렬된 줄) 또는 문자열. 1줄이면 문장, 여러 줄이면 목록.
+function Field({ label, value, children }) {
+  const hasValue = Array.isArray(value) ? value.length > 0 : !!value;
+  if (!hasValue && !children) return null;
   return (
     <div className="sumRow">
       <span className="sumLabel">{label}</span>
-      <span className="sumValue">{children}</span>
+      <div className="sumValue">
+        {Array.isArray(value)
+          ? (value.length === 1
+            ? <span>{value[0]}</span>
+            : <ul className="sumBullets">{value.map((v, i) => <li key={i}>{v}</li>)}</ul>)
+          : (value ? <span>{value}</span> : null)}
+        {children}
+      </div>
     </div>
   );
 }
@@ -43,11 +52,10 @@ function ResultCard({ item }) {
       ) : null}
 
       <div className="sumCard">
-        <Field label="대상">{item.target}</Field>
-        <Field label="금액">{item.amount}</Field>
-        <Field label="신청방법">{item.method}</Field>
-        <Field label="신청처">
-          {item.receiver}
+        <Field label="대상" value={item.target} />
+        <Field label="금액" value={item.amount} />
+        <Field label="신청방법" value={item.method} />
+        <Field label="신청처" value={item.receiver}>
           {item.phone ? (
             <a className="telButton" href={`tel:${item.phone}`}>📞 {item.phone} 전화</a>
           ) : null}
@@ -56,7 +64,8 @@ function ResultCard({ item }) {
 
       {item.url ? (
         <div className="resultActions">
-          <a className="resultButton" href={item.url} target="_blank" rel="noopener noreferrer">
+          {/* 앱 내 웹뷰(인앱 브라우저) 현재 탭에서 열리도록 target="_blank" 제외 */}
+          <a className="resultButton" href={item.url}>
             자세히 보기(원문)
           </a>
         </div>
@@ -73,6 +82,14 @@ export default function SearchClient() {
   const [results, setResults] = useState([]);
   const [lastQuery, setLastQuery] = useState('');
   const popularRef = useRef(null);
+  const resultsRef = useRef(null);
+
+  // 검색을 시작하면 결과 영역으로 부드럽게 스크롤(버튼 클릭 검색 포함).
+  const scrollToResults = useCallback(() => {
+    requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
 
   useEffect(() => {
     setRegionState(getRegion());
@@ -117,6 +134,7 @@ export default function SearchClient() {
     setDraft(q);
     setLastQuery(q);
     setStatus('loading');
+    scrollToResults();
 
     const params = new URLSearchParams({ q });
     const r = getRegion();
@@ -156,7 +174,7 @@ export default function SearchClient() {
       }
       setStatus('error');
     }
-  }, [draft, ensurePopular]);
+  }, [draft, ensurePopular, scrollToResults]);
 
   function onRegionChange(next) {
     setRegionState(next);
@@ -230,7 +248,7 @@ export default function SearchClient() {
         <span className="regionHint">지역을 정하면 다음에도 기억해요.</span>
       </div>
 
-      <section className="results" aria-live="polite">
+      <section className="results" aria-live="polite" ref={resultsRef}>
         {status === 'loading' ? (
           <div className="loadingBox">
             <span className="loadingSpinner" aria-hidden="true" />

@@ -12,8 +12,23 @@ const PER_PAGE = 1000;
 const REVALIDATE_SECONDS = 21600; // 6시간
 const MEMO_TTL_MS = REVALIDATE_SECONDS * 1000;
 
-// 카드 표시용: 공백/줄바꿈 정리 + 길이 제한(원문 전체는 상세링크로).
-function cleanText(s, max = 180) {
+// 카드 표시용: 원문을 구두점/불릿(○ ● ▷ ※ ||) 기준으로 줄을 나눠 읽기 좋게 재정렬.
+// 공공데이터 원문은 "○ 항목1 ○ 항목2" 처럼 붙어 있어 그대로 뿌리면 정렬이 무너진다.
+function toBullets(text, { maxLines = 6, maxLen = 140 } = {}) {
+  if (!text) return [];
+  let t = String(text).replace(/\r/g, '\n');
+  t = t.replace(/\s*\|\|\s*/g, '\n'); // || → 줄바꿈
+  t = t.replace(/\s*[○●◦▷▶■□▪※]\s*/g, '\n'); // 불릿/기호 → 줄바꿈 (·는 '결정·고시' 등 단어 내 구분자라 제외)
+  return t
+    .split(/\n+/)
+    .map((s) => s.replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .slice(0, maxLines)
+    .map((s) => (s.length > maxLen ? `${s.slice(0, maxLen)}…` : s));
+}
+
+// 단문(신청처 기관명 등): 한 줄로 정리 + 길이 제한.
+function cleanText(s, max = 80) {
   const t = (s || '').replace(/\s*\|\|\s*/g, ', ').replace(/\s+/g, ' ').trim();
   return t.length > max ? `${t.slice(0, max)}…` : t;
 }
@@ -25,7 +40,7 @@ function firstPhone(s) {
   return m ? m[0] : '';
 }
 
-// gov24 원본 한글 필드명 → 앱 내부 키. 상세 4항목(대상/금액/신청방법/신청처) 포함.
+// gov24 원본 한글 필드명 → 앱 내부 키. 상세 4항목(대상/금액/신청방법/신청처)은 줄 배열로.
 function trim(row) {
   return {
     id: row['서비스ID'] || '',
@@ -36,10 +51,10 @@ function trim(row) {
     field: row['서비스분야'] || '',
     deadline: row['신청기한'] || '',
     url: row['상세조회URL'] || '',
-    // 4항목 요약 카드
-    target: cleanText(row['지원대상'] || row['선정기준']), // 대상
-    amount: cleanText([row['지원유형'], row['지원내용']].filter(Boolean).join(' · ')), // 금액
-    method: cleanText(row['신청방법'], 120), // 신청방법
+    // 4항목 요약 카드 (구두점 기준 재정렬된 줄 배열)
+    target: toBullets(row['지원대상'] || row['선정기준']), // 대상
+    amount: toBullets(row['지원내용'] || row['지원유형']), // 금액
+    method: toBullets(row['신청방법'], { maxLines: 5, maxLen: 60 }), // 신청방법
     receiver: cleanText(row['접수기관'], 60), // 신청처(기관)
     phone: firstPhone(row['전화문의']), // 신청처(전화)
     views: Number(row['조회수']) || 0,

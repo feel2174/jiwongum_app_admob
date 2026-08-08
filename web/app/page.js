@@ -27,8 +27,8 @@ export default function Home() {
       <header className="hero">
         <div className="heroGrid">
           <div>
-            <p className="eyebrow">시니어 생활 지원 안내</p>
-            <h1>시니어 혜택 길잡이</h1>
+            <p className="eyebrow">시니어 서포트 · Senior Support</p>
+            <h1>시니어 서포트</h1>
             <p className="heroCopy">
               받을 수 있는 지원금을 낱말 하나로 찾아보세요.
             </p>
@@ -73,11 +73,11 @@ export default function Home() {
           <h2>궁금한 점 물어보기</h2>
         </div>
         <div className="askButtons">
-          <a className="askButton kakaoChannel" href="http://pf.kakao.com/_NJYBX" target="_blank" rel="noopener noreferrer">
+          <a className="askButton kakaoChannel" href="http://pf.kakao.com/_NJYBX">
             <span className="askIcon" aria-hidden="true">💬</span>
             카카오톡 채널로 물어보기
           </a>
-          <a className="askButton kakaoOpen" href="https://open.kakao.com/o/plqZYTHi" target="_blank" rel="noopener noreferrer">
+          <a className="askButton kakaoOpen" href="https://open.kakao.com/o/plqZYTHi">
             <span className="askIcon" aria-hidden="true">🗣️</span>
             오픈채팅으로 물어보기
           </a>
@@ -175,15 +175,15 @@ export default function Home() {
       </section>
 
       <footer className="footer">
-        <strong>시니어 지원금 모아보기</strong>
+        <strong>시니어 서포트</strong>
         <span>이 사이트는 공식 기관이 아닌 참고용 안내 서비스입니다. 각 항목은 공식 서비스 페이지로 연결됩니다.</span>
         <nav className="footerSources" aria-label="공식 정부 출처">
           <span className="footerSourcesLabel">공식 출처</span>
-          <a href="https://www.gov.kr" target="_blank" rel="noopener noreferrer">정부24 (www.gov.kr)</a>
-          <a href="https://www.bokjiro.go.kr" target="_blank" rel="noopener noreferrer">복지로 (bokjiro.go.kr)</a>
-          <a href="https://basicpension.mohw.go.kr" target="_blank" rel="noopener noreferrer">기초연금 (mohw.go.kr)</a>
-          <a href="https://www.nps.or.kr" target="_blank" rel="noopener noreferrer">국민연금공단 (nps.or.kr)</a>
-          <a href="https://www.nhis.or.kr" target="_blank" rel="noopener noreferrer">국민건강보험공단 (nhis.or.kr)</a>
+          <a href="https://www.gov.kr">정부24 (www.gov.kr)</a>
+          <a href="https://www.bokjiro.go.kr">복지로 (bokjiro.go.kr)</a>
+          <a href="https://basicpension.mohw.go.kr">기초연금 (mohw.go.kr)</a>
+          <a href="https://www.nps.or.kr">국민연금공단 (nps.or.kr)</a>
+          <a href="https://www.nhis.or.kr">국민건강보험공단 (nhis.or.kr)</a>
         </nav>
       </footer>
       <FontControls />

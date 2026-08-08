@@ -1863,17 +1863,18 @@ button.readButton {
   font-weight: 800;
 }
 
-/* 홈: 오늘의 혜택 */
+/* 홈: 오늘의 혜택 (박스형 섹션 — .section엔 패딩이 없으므로 자체 패딩 필수) */
 .todaysBenefit {
+  padding: 26px clamp(20px, 4vw, 28px);
   background: var(--green-dark);
   color: #fffdf8;
   border-radius: 16px;
 }
-.todaysBenefit .eyebrow { color: #ffd99a; }
-.todaysBenefit h2 { color: #fffdf8; }
+.todaysBenefit .eyebrow { color: #ffd99a; margin-bottom: 8px; }
+.todaysBenefit h2 { color: #fffdf8; margin: 0; font-size: clamp(24px, 3.4vw, 34px); line-height: 1.28; }
 .todaysBenefit .todaysSummary {
   color: rgba(255, 253, 248, 0.92);
-  margin: 8px 0 18px;
+  margin: 10px 0 20px;
 }
 
 /* 홈: 궁금한 점 물어보기(카카오) */
@@ -2103,6 +2104,13 @@ button.readButton {
   line-height: 1.55;
   color: var(--ink);
 }
+.sumBullets {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 4px;
+}
+.sumBullets li { padding-left: 2px; }
 .telButton {
   display: inline-flex;
   align-items: center;
