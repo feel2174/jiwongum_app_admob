@@ -81,8 +81,11 @@ export default function SearchClient() {
   const [mode, setMode] = useState('search'); // search | popular | cache | errorPopular
   const [results, setResults] = useState([]);
   const [lastQuery, setLastQuery] = useState('');
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [listening, setListening] = useState(false);
   const popularRef = useRef(null);
   const resultsRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   // 검색을 시작하면 결과 영역으로 부드럽게 스크롤(버튼 클릭 검색 포함).
   const scrollToResults = useCallback(() => {
@@ -93,6 +96,10 @@ export default function SearchClient() {
 
   useEffect(() => {
     setRegionState(getRegion());
+    // 음성 검색 지원 여부(브라우저/웹뷰에 Web Speech API가 있을 때만 노출)
+    if (typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition)) {
+      setVoiceSupported(true);
+    }
     // 인기 지원금 미리 확보(폴백 즉시성 + 오프라인 캐시 적재)
     (async () => {
       try {
@@ -176,6 +183,39 @@ export default function SearchClient() {
     }
   }, [draft, ensurePopular, scrollToResults]);
 
+  // 음성 검색: 말하면 인식된 텍스트로 바로 검색.
+  const startVoice = useCallback(() => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      return;
+    }
+
+    const recognition = new SR();
+    recognition.lang = 'ko-KR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event) => {
+      const transcript = event.results?.[0]?.[0]?.transcript?.trim();
+      if (transcript) {
+        setDraft(transcript);
+        runSearch(transcript);
+      }
+    };
+    recognition.onend = () => setListening(false);
+    recognition.onerror = () => setListening(false);
+
+    recognitionRef.current = recognition;
+    setListening(true);
+    try {
+      recognition.start();
+    } catch {
+      setListening(false);
+    }
+  }, [listening, runSearch]);
+
   function onRegionChange(next) {
     setRegionState(next);
     saveRegion(next);
@@ -233,6 +273,18 @@ export default function SearchClient() {
         />
         <button type="submit" className="searchButton">검색</button>
       </form>
+
+      {voiceSupported ? (
+        <button
+          type="button"
+          className={`voiceButton ${listening ? 'isListening' : ''}`}
+          onClick={startVoice}
+          aria-pressed={listening}
+        >
+          <span className="voiceIcon" aria-hidden="true">🎤</span>
+          {listening ? '듣고 있어요… (다시 누르면 멈춤)' : '말로 검색하기'}
+        </button>
+      ) : null}
 
       <div className="regionBar">
         <label htmlFor="regionSelect">내 지역</label>

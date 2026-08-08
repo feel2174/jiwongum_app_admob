@@ -10,11 +10,5 @@ export default function sitemap() {
       changeFrequency: 'weekly',
       priority: 1,
     },
-    {
-      url: `${baseUrl}/search`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
   ];
 }
