@@ -1,7 +1,13 @@
 import FontControls from './FontControls';
 import ArticleExplorer from './ArticleExplorer';
-import CommunityBoard from './CommunityBoard';
 import { seniorArticles } from './seniorArticles';
+import { pickTodaysBenefit } from './todaysBenefit';
+
+// 한국(KST) 기준 오늘 날짜로 '오늘의 혜택' 선택 (서버 타임존이 UTC여도 하루가 밀리지 않게).
+function kstToday() {
+  const now = new Date();
+  return new Date(now.getTime() + (9 * 60 + now.getTimezoneOffset()) * 60 * 1000);
+}
 
 const situationCards = [
   { label: '내 연금이 궁금해요', target: 'a2', text: '기초연금, 노령연금, 국민연금 예상액을 먼저 확인해보세요.' },
@@ -14,6 +20,7 @@ const situationCards = [
 
 export default function Home() {
   const featuredArticles = seniorArticles.filter((article) => article.featured);
+  const todays = pickTodaysBenefit(seniorArticles, kstToday());
 
   return (
     <main>
@@ -23,26 +30,27 @@ export default function Home() {
             <p className="eyebrow">시니어 생활 지원 안내</p>
             <h1>시니어 혜택 길잡이</h1>
             <p className="heroCopy">
-              연금, 일자리, 돌봄, 가족 절차까지 내 상황에 맞는 공식 확인 경로를 쉽게 찾아보세요.
+              받을 수 있는 지원금을 낱말 하나로 찾아보세요.
             </p>
             <div className="heroActions">
-              <a href="#articles">항목별로 확인하기</a>
-              <a href="#originals">바로가기 모음</a>
+              <a className="primaryCta" href="/search">🔎 지원금 검색하기</a>
             </div>
           </div>
-
-          <section className="summaryBox" aria-label="요약">
-            <div>
-              <strong>{seniorArticles.length}개</strong>
-              <span>확인 항목</span>
-            </div>
-            <div>
-              <strong>공식</strong>
-              <span>서비스 연결</span>
-            </div>
-          </section>
         </div>
       </header>
+
+      {todays ? (
+        <section className="section todaysBenefit" aria-label="오늘의 혜택">
+          <p className="eyebrow">오늘의 혜택</p>
+          <h2>{todays.title}</h2>
+          <p className="todaysSummary">{todays.summary}</p>
+          {todays.url && !todays.comingSoon ? (
+            <a className="readButton" href={todays.url}>{todays.buttonText || '자세히 보기'}</a>
+          ) : (
+            <a className="readButton" href="/search">지원금 검색하기</a>
+          )}
+        </section>
+      ) : null}
 
       <section className="section situationSection" aria-label="상황별 선택">
         <div className="sectionHeading">
@@ -59,7 +67,22 @@ export default function Home() {
         </div>
       </section>
 
-      <CommunityBoard policies={seniorArticles} variant="preview" />
+      <section className="section askSection" aria-label="궁금한 점 물어보기">
+        <div className="sectionHeading">
+          <p className="eyebrow">도움이 필요하면</p>
+          <h2>궁금한 점 물어보기</h2>
+        </div>
+        <div className="askButtons">
+          <a className="askButton kakaoChannel" href="http://pf.kakao.com/_NJYBX" target="_blank" rel="noopener noreferrer">
+            <span className="askIcon" aria-hidden="true">💬</span>
+            카카오톡 채널로 물어보기
+          </a>
+          <a className="askButton kakaoOpen" href="https://open.kakao.com/o/plqZYTHi" target="_blank" rel="noopener noreferrer">
+            <span className="askIcon" aria-hidden="true">🗣️</span>
+            오픈채팅으로 물어보기
+          </a>
+        </div>
+      </section>
 
       <section className="section intro" id="checklist">
         <div>

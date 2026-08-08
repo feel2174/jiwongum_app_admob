@@ -11,10 +11,10 @@ export default function sitemap() {
       priority: 1,
     },
     {
-      url: `${baseUrl}/community`,
+      url: `${baseUrl}/search`,
       lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.8,
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
   ];
 }

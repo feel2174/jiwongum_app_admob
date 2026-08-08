@@ -1,17 +1,7 @@
-import FontControls from '../FontControls';
-import CommunityBoard from '../CommunityBoard';
-import { seniorArticles } from '../seniorArticles';
+import { redirect } from 'next/navigation';
 
-export const metadata = {
-  title: '선발대',
-  description: '시니어 혜택을 먼저 확인한 사람들의 질문과 경험을 가볍게 남겨보는 공간입니다.',
-};
-
+// 커뮤니티는 제거되었다(재방문율 저하 우려). 기존 경로/앱 탭 유입은 검색으로 보낸다.
+// 궁금한 점은 홈의 카카오 채널/오픈채팅 버튼으로 안내.
 export default function CommunityPage() {
-  return (
-    <main>
-      <CommunityBoard policies={seniorArticles} />
-      <FontControls />
-    </main>
-  );
+  redirect('/search');
 }
