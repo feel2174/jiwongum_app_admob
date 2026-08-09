@@ -13,6 +13,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import mobileAds from 'react-native-google-mobile-ads';
 import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import * as Notifications from 'expo-notifications';
+import * as SplashScreen from 'expo-splash-screen';
+
+import AppSplash from './src/components/AppSplash';
 
 import { useTheme } from './src/theme';
 import { StoreProvider, useStore } from './src/lib/store';
@@ -28,6 +31,9 @@ import WebScreen from './src/screens/WebScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// 네이티브 스플래시가 JS 준비 전에 사라지지 않게 막아둔다(코드 스플래시로 교체하기 위함).
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 // 음성 검색용 마이크 권한. Android는 앱에 권한이 있어야 웹뷰가 웹 콘텐츠에 마이크를 허용한다.
 // (iOS는 웹뷰가 실제로 마이크를 쓸 때 OS가 요청 — mediaCapturePermissionGrantType 참고.)
@@ -96,14 +102,16 @@ function RootNavigator() {
   const { profile, ready, settings, setSetting, completeOnboarding } = useStore();
   const t = useTheme();
   const notifOn = !!settings[NOTIFICATION_SETTING_KEY];
-  const [initialTab, setInitialTab] = useState(null);
 
-  // 온보딩(혜택 선택) 화면 제거 — 최초 접속도 곧바로 앱으로 들어간다.
+  // 온보딩(혜택 선택) 화면 제거 — 최초 접속도 곧바로 홈으로 들어간다.
   // 권한 요청 등 onboarded 기반 로직이 계속 동작하도록 조용히 완료 처리한다.
   useEffect(() => {
     if (ready && !profile.onboarded) completeOnboarding([], '전국');
   }, [ready, profile.onboarded, completeOnboarding]);
 
+  // 앱 사용 시 알림·마이크 권한을 확보한다.
+  // - 알림: 이미 허용돼 있으면 기본으로 켜고(토글 ON), 미결정이면 1회 요청 후 허용 시 켠다.
+  // - 마이크: Android에서 음성 검색용으로 요청.
   useEffect(() => {
     if (!ready || !profile.onboarded) return undefined;
 
@@ -112,27 +120,9 @@ function RootNavigator() {
     (async () => {
       try {
         const status = await getPushPermissionStatus();
-        if (mounted) setInitialTab(status === 'granted' ? 'Home' : 'SettingsTab');
-      } catch {
-        if (mounted) setInitialTab('Home');
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [ready, profile.onboarded]);
-
-  // 앱 사용 시 알림·마이크 권한을 확보한다. 알림은 미결정이면 1회 요청, 마이크는 Android에서 요청.
-  useEffect(() => {
-    if (!ready || !profile.onboarded) return undefined;
-
-    let mounted = true;
-
-    (async () => {
-      try {
-        const status = await getPushPermissionStatus();
-        if (status === 'undetermined') {
+        if (status === 'granted') {
+          if (mounted) setSetting(NOTIFICATION_SETTING_KEY, true);
+        } else if (status === 'undetermined') {
           const granted = await syncPushPermission({ requestIfNeeded: true });
           if (mounted && granted) setSetting(NOTIFICATION_SETTING_KEY, true);
         }
@@ -172,12 +162,12 @@ function RootNavigator() {
     };
   }, [ready, profile.onboarded, notifOn, setSetting]);
 
-  if (!ready || (profile.onboarded && !initialTab)) return <View style={{ flex: 1, backgroundColor: t.bg }} />;
+  if (!ready) return <View style={{ flex: 1, backgroundColor: t.bg }} />;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Tabs">
-        {() => <Tabs initialRouteName={initialTab || 'Home'} />}
+        {() => <Tabs initialRouteName="Home" />}
       </Stack.Screen>
       <Stack.Screen name="Detail" component={DetailScreen} />
       <Stack.Screen name="Collection" component={CollectionScreen} />
@@ -190,6 +180,14 @@ function RootNavigator() {
 export default function App() {
   const navRef = useNavigationContainerRef();
   const scheme = useColorScheme();
+  const [showSplash, setShowSplash] = useState(true);
+
+  // 네이티브 스플래시를 감추고, 코드로 그린 스플래시(노란 배경 + Senior Support)를 잠깐 보여준다.
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
+    const timer = setTimeout(() => setShowSplash(false), 1100);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -217,6 +215,7 @@ export default function App() {
         </NavigationContainer>
         <StatusBar style="auto" />
       </StoreProvider>
+      {showSplash ? <AppSplash /> : null}
     </SafeAreaProvider>
   );
 }

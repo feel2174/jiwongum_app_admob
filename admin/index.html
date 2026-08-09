@@ -84,6 +84,7 @@
       <div class="tab on" data-tab="import">새 글 가져오기</div>
       <div class="tab" data-tab="manage">글 관리</div>
       <div class="tab" data-tab="comments">댓글 관리</div>
+      <div class="tab" data-tab="today">오늘의 혜택</div>
     </div>
 
     <section id="import-tab">
@@ -108,6 +109,27 @@
         <span class="meta" id="comments-status"></span>
       </div>
       <div id="comments-list" class="comment-grid"></div>
+    </section>
+
+    <section id="today-tab" hidden>
+      <div class="card">
+        <p class="title">‘오늘의 혜택’ 컴포넌트</p>
+        <p class="meta">홈 검색창 아래에 노출됩니다. 최근 발행글(24시간 이내)이 있을 때만 표시돼요.</p>
+        <div class="field">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
+            <input type="checkbox" id="today-enabled" style="width:auto" />
+            컴포넌트 표시(켜기)
+          </label>
+        </div>
+        <div class="field">
+          <label>설명 문구 (컴포넌트에 함께 표시)</label>
+          <textarea id="today-note" placeholder="예: 이번 주 새로 올라온 혜택이에요. 확인해 보세요."></textarea>
+        </div>
+        <div class="row">
+          <button class="btn-primary" id="today-save">저장</button>
+          <span class="meta" id="today-status"></span>
+        </div>
+      </div>
     </section>
   </main>
 </div>
@@ -177,6 +199,28 @@ function showApp() {
   loadWpPosts();
   loadArticles();
   loadComments();
+  loadTodaySettings();
+}
+
+// ---------- '오늘의 혜택' 컴포넌트 설정 (app_settings.todays_benefit) ----------
+async function loadTodaySettings() {
+  const status = $('#today-status');
+  const { data, error } = await supabase
+    .from('app_settings').select('value').eq('key', 'todays_benefit').maybeSingle();
+  if (error) { status.textContent = '오류: ' + error.message; return; }
+  const v = data?.value || {};
+  $('#today-enabled').checked = v.enabled !== false;
+  $('#today-note').value = v.note || '';
+  status.textContent = '';
+}
+
+async function saveTodaySettings() {
+  const value = { enabled: $('#today-enabled').checked, note: $('#today-note').value.trim() };
+  const { error } = await supabase
+    .from('app_settings')
+    .upsert({ key: 'todays_benefit', value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  if (error) { toast('저장 실패: ' + error.message); return; }
+  toast('저장되었습니다.');
 }
 
 $('#login-btn').addEventListener('click', async () => {
@@ -201,6 +245,7 @@ $$('.tab').forEach((tab) => {
     $('#import-tab').hidden = tab.dataset.tab !== 'import';
     $('#manage-tab').hidden = tab.dataset.tab !== 'manage';
     $('#comments-tab').hidden = tab.dataset.tab !== 'comments';
+    $('#today-tab').hidden = tab.dataset.tab !== 'today';
   });
 });
 
@@ -464,6 +509,7 @@ async function deleteComment(id, body) {
 $('#refresh-wp-btn').addEventListener('click', loadWpPosts);
 $('#refresh-articles-btn').addEventListener('click', loadArticles);
 $('#refresh-comments-btn').addEventListener('click', loadComments);
+$('#today-save').addEventListener('click', saveTodaySettings);
 
 checkSession();
 </script>

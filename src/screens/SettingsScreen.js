@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking } from 'r
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
-import { SITUATIONS, REGIONS } from '../data/mock';
+import { REGIONS } from '../data/mock';
 import { useStore } from '../lib/store';
 import { NOTIFICATION_SETTING_KEY } from '../lib/storage';
 import { registerPushToken, requestPushPermission, syncPushPermission, unregisterPushToken } from '../lib/push';
@@ -50,13 +50,6 @@ export default function SettingsScreen({ route, navigation }) {
       };
     }, [notifOn, setSetting]),
   );
-
-  const toggleSit = (k) => {
-    const next = profile.situations.includes(k)
-      ? profile.situations.filter((x) => x !== k)
-      : [...profile.situations, k];
-    updateProfile({ situations: next });
-  };
 
   const showPermissionHelp = () => {
     Alert.alert(
@@ -138,25 +131,6 @@ export default function SettingsScreen({ route, navigation }) {
           <Text style={[styles.statusText, notifOn ? styles.statusOn : styles.statusOff]}>
             {notifOn ? '알림이 켜져 있습니다.' : '알림이 꺼져 있습니다.'}
           </Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>관심 상황</Text>
-          <Text style={styles.cardSub}>기타 화면에서 지원금 목록을 볼 때 참고되는 선택입니다.</Text>
-          <View style={styles.chips}>
-            {SITUATIONS.map((s) => {
-              const on = profile.situations.includes(s.key);
-              return (
-                <Pressable
-                  key={s.key}
-                  onPress={() => toggleSit(s.key)}
-                  style={[styles.chip, on && styles.chipOn]}
-                >
-                  <Text style={[styles.chipText, on && styles.chipTextOn]}>{s.emoji} {s.key}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
         </View>
 
         <View style={styles.card}>
