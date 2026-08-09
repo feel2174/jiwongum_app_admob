@@ -21,7 +21,6 @@ import { init as initAds } from './src/lib/adManager';
 import { openContent } from './src/lib/openLink';
 import { getPushPermissionStatus, syncPushPermission } from './src/lib/push';
 
-import OnboardingScreen from './src/screens/OnboardingScreen';
 import DetailScreen from './src/screens/DetailScreen';
 import CollectionScreen from './src/screens/CollectionScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -94,10 +93,16 @@ function Tabs({ initialRouteName = 'Home' }) {
 }
 
 function RootNavigator() {
-  const { profile, ready, settings, setSetting } = useStore();
+  const { profile, ready, settings, setSetting, completeOnboarding } = useStore();
   const t = useTheme();
   const notifOn = !!settings[NOTIFICATION_SETTING_KEY];
   const [initialTab, setInitialTab] = useState(null);
+
+  // 온보딩(혜택 선택) 화면 제거 — 최초 접속도 곧바로 앱으로 들어간다.
+  // 권한 요청 등 onboarded 기반 로직이 계속 동작하도록 조용히 완료 처리한다.
+  useEffect(() => {
+    if (ready && !profile.onboarded) completeOnboarding([], '전국');
+  }, [ready, profile.onboarded, completeOnboarding]);
 
   useEffect(() => {
     if (!ready || !profile.onboarded) return undefined;
@@ -171,19 +176,13 @@ function RootNavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!profile.onboarded ? (
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      ) : (
-        <>
-          <Stack.Screen name="Tabs">
-            {() => <Tabs initialRouteName={initialTab || 'Home'} />}
-          </Stack.Screen>
-          <Stack.Screen name="Detail" component={DetailScreen} />
-          <Stack.Screen name="Collection" component={CollectionScreen} />
-          <Stack.Screen name="Settings" component={SettingsScreen} />
-          <Stack.Screen name="Web" component={WebScreen} />
-        </>
-      )}
+      <Stack.Screen name="Tabs">
+        {() => <Tabs initialRouteName={initialTab || 'Home'} />}
+      </Stack.Screen>
+      <Stack.Screen name="Detail" component={DetailScreen} />
+      <Stack.Screen name="Collection" component={CollectionScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="Web" component={WebScreen} />
     </Stack.Navigator>
   );
 }

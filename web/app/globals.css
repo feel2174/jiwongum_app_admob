@@ -1883,20 +1883,29 @@ button.readButton {
   grid-template-columns: 1fr;
   gap: 12px;
 }
+.askItem { display: grid; gap: 8px; }
 .askButton {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 10px;
   min-height: 64px;
-  padding: 0 20px;
+  padding: 0 18px;
   border-radius: 14px;
   font-size: 21px;
   font-weight: 800;
   color: #3a1d1d;
   background: #fee500; /* 카카오 옐로 — #3a1d1d 텍스트 대비 ≥ 10:1 */
+  white-space: nowrap; /* 아이콘+텍스트 한 줄 고정 (모바일에서 줄바꿈 방지) */
 }
-.askButton .askIcon { font-size: 26px; }
+.askButton .askIcon { font-size: 26px; flex: none; }
+.askButton .askLabel { overflow: hidden; text-overflow: ellipsis; }
 .askButton.kakaoOpen { background: #ffe94d; }
+.askDesc { margin: 0; font-size: 16px; line-height: 1.5; color: #4a5a50; text-align: center; }
+/* 화면이 아주 좁으면 글자만 살짝 줄여 한 줄 유지 */
+@media (max-width: 360px) {
+  .askButton { font-size: 19px; }
+}
 
 /* 검색 페이지 공통 */
 .searchMain { max-width: 720px; margin: 0 auto; padding-bottom: 40px; }
@@ -2031,7 +2040,7 @@ button.readButton {
   cursor: pointer;
 }
 .retryButton { border: none; color: #fffdf8; background: var(--green); margin-top: 10px; }
-.resultCountLine { font-size: 20px; margin: 6px 0 14px; }
+.resultCountLine { font-size: 20px; margin: 6px 0 14px; overflow-wrap: anywhere; word-break: break-word; }
 .resultCountLine strong { color: var(--green); }
 .resultList { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .scrollSentinel { display: flex; justify-content: center; padding: 18px 0; }
@@ -2042,9 +2051,9 @@ button.readButton {
   border-radius: 16px;
   padding: 18px;
 }
-.resultTitle { font-size: 23px; font-weight: 800; margin: 0 0 6px; line-height: 1.35; }
-.resultOrg { font-size: 18px; color: #3a463f; margin: 0 0 6px; }
-.resultMeta { font-size: 17px; color: #3a463f; margin: 0 0 12px; }
+.resultTitle { font-size: 23px; font-weight: 800; margin: 0 0 6px; line-height: 1.35; overflow-wrap: anywhere; word-break: break-word; }
+.resultOrg { font-size: 18px; color: #3a463f; margin: 0 0 6px; overflow-wrap: anywhere; word-break: break-word; }
+.resultMeta { font-size: 17px; color: #3a463f; margin: 0 0 12px; overflow-wrap: anywhere; word-break: break-word; }
 .metaTag {
   display: inline-block;
   background: #eef3ec;
@@ -2105,6 +2114,9 @@ button.readButton {
   font-size: 18px;
   line-height: 1.55;
   color: var(--ink);
+  min-width: 0; /* 그리드 칸이 긴 단어에 밀려 늘어나 화면이 깨지는 것 방지 */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .sumBullets {
   margin: 0;

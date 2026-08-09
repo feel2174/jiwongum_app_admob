@@ -1,19 +1,10 @@
 import FontControls from './FontControls';
 import SearchClient from './search/SearchClient';
 import NotifyCard from './NotifyCard';
-import { seniorArticles } from './seniorArticles';
-import { pickTodaysBenefit } from './todaysBenefit';
-
-// 한국(KST) 기준 오늘 날짜로 '오늘의 혜택' 선택 (서버 타임존이 UTC여도 하루가 밀리지 않게).
-function kstToday() {
-  const now = new Date();
-  return new Date(now.getTime() + (9 * 60 + now.getTimezoneOffset()) * 60 * 1000);
-}
+import NewBenefitCard from './NewBenefitCard';
 
 // 랜딩 = 검색 화면. 들어오자마자 검색이 보이고, 그 아래 오늘의 혜택·문의만 둔다.
 export default function Home() {
-  const todays = pickTodaysBenefit(seniorArticles, kstToday());
-
   return (
     <main className="landingMain">
       <header className="landingBrand">
@@ -22,16 +13,8 @@ export default function Home() {
 
       <SearchClient />
 
-      {todays ? (
-        <section className="landingCard todayCard" aria-label="오늘의 혜택">
-          <p className="eyebrow">오늘의 혜택</p>
-          <h2>{todays.title}</h2>
-          <p className="todaysSummary">{todays.summary}</p>
-          <a className="readButton" href={todays.url && !todays.comingSoon ? todays.url : '#benefitSearch'}>
-            {todays.buttonText || '자세히 보기'}
-          </a>
-        </section>
-      ) : null}
+      {/* 검색창 바로 아래 — 관리자가 올린 새 글(24시간 이내)만 노출, 없으면 자동 숨김 */}
+      <NewBenefitCard />
 
       <NotifyCard />
 

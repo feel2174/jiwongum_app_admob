@@ -19,12 +19,15 @@ export default function AskSection() {
     <div className="askButtons">
       <a className="askButton kakaoChannel" href={KAKAO_CHANNEL}>
         <span className="askIcon" aria-hidden="true">💬</span>
-        카카오톡 채널로 물어보기
+        <span className="askLabel">카카오 채널 문의</span>
       </a>
-      <a className="askButton kakaoOpen" href={KAKAO_OPENCHAT}>
-        <span className="askIcon" aria-hidden="true">🗣️</span>
-        오픈채팅으로 물어보기
-      </a>
+      <div className="askItem">
+        <a className="askButton kakaoOpen" href={KAKAO_OPENCHAT}>
+          <span className="askIcon" aria-hidden="true">🗣️</span>
+          <span className="askLabel">오픈채팅 참여</span>
+        </a>
+        <p className="askDesc">먼저 혜택을 받은 분들과 함께 확인해보세요.</p>
+      </div>
     </div>
   );
 
