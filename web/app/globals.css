@@ -2034,6 +2034,8 @@ button.readButton {
 .resultCountLine { font-size: 20px; margin: 6px 0 14px; }
 .resultCountLine strong { color: var(--green); }
 .resultList { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.scrollSentinel { display: flex; justify-content: center; padding: 18px 0; }
+.scrollSentinel .loadingSpinner { width: 32px; height: 32px; border-width: 4px; }
 .resultCard {
   background: var(--paper);
   border: 1.5px solid var(--line);
@@ -2168,6 +2170,13 @@ button.readButton {
 .disclaimerCard { background: #f4f7f4; }
 .disclaimerCard strong { display: block; color: var(--green); margin-bottom: 6px; }
 .disclaimerCard p { margin: 0; font-size: 16px; line-height: 1.55; color: #41534a; }
+.disclaimerCard p + p { margin-top: 10px; }
+
+/* 앱(웹뷰) 하단 '선발대' 문의 섹션 */
+.pioneerCard { background: #eef4ef; border-color: #cfe0d3; }
+.pioneerCard .eyebrow { color: var(--green); }
+.pioneerCard .pioneerText { margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #3a463f; }
+.pioneerCard .askButtons { margin-top: 16px; }
 
 .landingFooter { margin-top: 24px; }
 

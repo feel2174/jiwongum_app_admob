@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AppState, Text, View, useColorScheme } from 'react-native';
+import { AppState, PermissionsAndroid, Platform, Text, View, useColorScheme } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -30,6 +30,22 @@ import WebScreen from './src/screens/WebScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// 음성 검색용 마이크 권한. Android는 앱에 권한이 있어야 웹뷰가 웹 콘텐츠에 마이크를 허용한다.
+// (iOS는 웹뷰가 실제로 마이크를 쓸 때 OS가 요청 — mediaCapturePermissionGrantType 참고.)
+async function ensureMicPermission() {
+  if (Platform.OS !== 'android') return;
+  try {
+    const has = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+    if (has) return;
+    await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, {
+      title: '마이크 사용 권한',
+      message: '음성으로 지원금을 검색하려면 마이크 권한이 필요해요.',
+      buttonPositive: '허용',
+      buttonNegative: '나중에',
+    });
+  } catch {}
+}
+
 const tabIcon = (emoji) => ({ color }) => <Text style={{ fontSize: 18, color }}>{emoji}</Text>;
 
 function Tabs({ initialRouteName = 'Home' }) {
@@ -57,15 +73,15 @@ function Tabs({ initialRouteName = 'Home' }) {
         options={{ tabBarLabel: '홈', tabBarIcon: tabIcon('🏠') }}
       />
       <Tab.Screen
-        name="Community"
+        name="Ask"
         component={WebScreen}
         initialParams={{
-          url: 'https://www.senior.zucca100.com/community',
-          title: '선발대',
+          url: 'https://www.senior.zucca100.com/help',
+          title: '문의',
           showBack: false,
           showHeader: false,
         }}
-        options={{ tabBarLabel: '선발대', tabBarIcon: tabIcon('✦') }}
+        options={{ tabBarLabel: '문의', tabBarIcon: tabIcon('💬') }}
       />
       <Tab.Screen
         name="SettingsTab"
@@ -101,6 +117,28 @@ function RootNavigator() {
       mounted = false;
     };
   }, [ready, profile.onboarded]);
+
+  // 앱 사용 시 알림·마이크 권한을 확보한다. 알림은 미결정이면 1회 요청, 마이크는 Android에서 요청.
+  useEffect(() => {
+    if (!ready || !profile.onboarded) return undefined;
+
+    let mounted = true;
+
+    (async () => {
+      try {
+        const status = await getPushPermissionStatus();
+        if (status === 'undetermined') {
+          const granted = await syncPushPermission({ requestIfNeeded: true });
+          if (mounted && granted) setSetting(NOTIFICATION_SETTING_KEY, true);
+        }
+      } catch {}
+      await ensureMicPermission();
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [ready, profile.onboarded, setSetting]);
 
   useEffect(() => {
     if (!ready || !profile.onboarded) return undefined;

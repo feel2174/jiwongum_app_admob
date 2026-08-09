@@ -15,6 +15,9 @@ const QUICK = [
   { key: '난방비', icon: '🔥', tone: 'heating' },
 ];
 
+// 한 번에 보여주는 결과 수. 스크롤이 끝에 닿으면 이만큼씩 더 노출(무한스크롤).
+const PAGE_SIZE = 10;
+
 // 결과 상단 안내 문구 (모드별)
 const BANNER = {
   search: (q, n) => `‘${q}’ 검색 결과 ${n}건이에요.`,
@@ -66,7 +69,7 @@ function ResultCard({ item }) {
         <div className="resultActions">
           {/* 앱 내 웹뷰(인앱 브라우저) 현재 탭에서 열리도록 target="_blank" 제외 */}
           <a className="resultButton" href={item.url}>
-            자세히 보기(원문)
+            자세히 보기
           </a>
         </div>
       ) : null}
@@ -83,9 +86,11 @@ export default function SearchClient() {
   const [lastQuery, setLastQuery] = useState('');
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [listening, setListening] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE); // 무한스크롤: 10건씩 노출
   const popularRef = useRef(null);
   const resultsRef = useRef(null);
   const recognitionRef = useRef(null);
+  const sentinelRef = useRef(null);
 
   // 검색을 시작하면 결과 영역으로 부드럽게 스크롤(버튼 클릭 검색 포함).
   const scrollToResults = useCallback(() => {
@@ -182,6 +187,27 @@ export default function SearchClient() {
       setStatus('error');
     }
   }, [draft, ensurePopular, scrollToResults]);
+
+  // 새 결과가 들어오면 다시 처음 10건부터 보여준다.
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [results]);
+
+  // 무한스크롤: 목록 끝 감지용 센티넬이 보이면 10건씩 더 노출.
+  useEffect(() => {
+    if (status !== 'done') return undefined;
+    if (visibleCount >= results.length) return undefined;
+    const el = sentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) {
+        setVisibleCount((c) => Math.min(c + PAGE_SIZE, results.length));
+      }
+    }, { rootMargin: '200px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [status, results, visibleCount]);
 
   // 음성 검색: 말하면 인식된 텍스트로 바로 검색.
   const startVoice = useCallback(() => {
@@ -318,10 +344,15 @@ export default function SearchClient() {
           <>
             <p className="resultCountLine">{bannerText}</p>
             <ul className="resultList">
-              {results.map((item) => (
+              {results.slice(0, visibleCount).map((item) => (
                 <ResultCard key={item.id} item={item} />
               ))}
             </ul>
+            {visibleCount < results.length ? (
+              <div ref={sentinelRef} className="scrollSentinel" aria-hidden="true">
+                <span className="loadingSpinner" />
+              </div>
+            ) : null}
           </>
         ) : null}
       </section>

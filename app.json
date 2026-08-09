@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.jiwongum.app"
+      "bundleIdentifier": "com.jiwongum.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "음성으로 지원금을 검색할 때 마이크를 사용합니다."
+      }
     },
     "android": {
       "package": "com.jiwongum.app",
@@ -22,7 +25,9 @@
       },
       "permissions": [
         "com.google.android.gms.permission.AD_ID",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
     "web": {

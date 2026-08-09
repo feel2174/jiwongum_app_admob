@@ -35,26 +35,16 @@ export default function Home() {
 
       <NotifyCard />
 
-      <section className="landingCard askCard" aria-label="궁금한 점 물어보기">
-        <p className="eyebrow">도움이 필요하면</p>
-        <h2>궁금한 점 물어보기</h2>
-        <div className="askButtons">
-          <a className="askButton kakaoChannel" href="http://pf.kakao.com/_NJYBX">
-            <span className="askIcon" aria-hidden="true">💬</span>
-            카카오톡 채널로 물어보기
-          </a>
-          <a className="askButton kakaoOpen" href="https://open.kakao.com/o/plqZYTHi">
-            <span className="askIcon" aria-hidden="true">🗣️</span>
-            오픈채팅으로 물어보기
-          </a>
-        </div>
-      </section>
-
-      <section className="landingCard disclaimerCard" aria-label="참고자료 안내">
-        <strong>참고자료 안내</strong>
+      <section className="landingCard disclaimerCard" aria-label="면책 조항">
+        <strong>면책 조항</strong>
         <p>
-          검색 결과는 행정안전부 보조금24(공공데이터) 정보를 바탕으로 한 참고용입니다.
-          실제 지원 대상·금액·신청 방법은 각 기관의 최신 공지와 심사 결과에 따라 달라질 수 있습니다.
+          이 서비스는 정부·공공기관이 아닌 민간이 운영하는 참고용 안내 서비스입니다.
+          검색 결과는 행정안전부 보조금24 등 공공데이터를 바탕으로 하며, 실제 지원 대상·금액·
+          신청 방법·기한은 각 기관의 최신 공지와 심사 결과에 따라 달라질 수 있습니다.
+        </p>
+        <p>
+          정확한 내용은 반드시 각 기관의 공식 안내로 확인하시기 바라며, 본 서비스의 정보를 이용해
+          발생한 결정이나 결과에 대해 운영자는 법적 책임을 지지 않습니다.
         </p>
       </section>
 
