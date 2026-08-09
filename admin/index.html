@@ -150,6 +150,21 @@
   .item-link:hover { text-decoration: underline; }
   .add-box { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border); }
 
+  /* ---------- Today's benefit: 2-column layout + live preview ---------- */
+  .today-layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
+  .today-main { min-width: 0; }
+  .today-side { position: sticky; top: 90px; }
+  .preview-reason { font-size: 12.5px; color: var(--muted); margin: 4px 0 0; line-height: 1.5; }
+  .phone {
+    width: 100%; max-width: 340px; margin: 16px auto 12px; border: 9px solid #11151f;
+    border-radius: 36px; overflow: hidden; background: #000; box-shadow: var(--shadow); aspect-ratio: 340 / 680;
+  }
+  .phone iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+  @media (max-width: 1024px) {
+    .today-layout { grid-template-columns: 1fr; }
+    .today-side { position: static; }
+  }
+
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
     background: var(--card); border: 1px solid var(--border); padding: 11px 18px; border-radius: 10px;
@@ -251,6 +266,8 @@
       </section>
 
       <section id="today-tab" hidden>
+       <div class="today-layout">
+        <div class="today-main">
         <div class="card">
           <div class="card-head"><p class="title">노출 설정</p></div>
           <p class="meta">홈 검색창 아래 ‘오늘의 혜택’ 카드로 노출됩니다.</p>
@@ -291,6 +308,26 @@
             <button class="btn-primary" id="add-item-btn">＋ 항목 추가</button>
           </div>
         </div>
+        </div>
+
+        <div class="today-side">
+          <div class="card">
+            <div class="card-head">
+              <p class="title">미리보기</p>
+              <span class="pill draft" id="today-visibility">확인 중…</span>
+            </div>
+            <p class="preview-reason" id="today-visibility-reason"></p>
+            <div class="phone">
+              <iframe id="preview-frame" src="https://senior.zucca100.com/" title="senior.zucca100.com 미리보기" loading="lazy" referrerpolicy="no-referrer"></iframe>
+            </div>
+            <div class="row">
+              <button class="btn-ghost btn-sm" id="preview-refresh">↻ 새로고침</button>
+              <a class="btn-ghost btn-sm" href="https://senior.zucca100.com/" target="_blank" rel="noopener" style="text-decoration:none">새 탭에서 열기</a>
+            </div>
+            <p class="meta" style="margin-top:10px">senior.zucca100.com 실제 홈 화면입니다. 일부 보안 설정에선 빈 화면일 수 있어요 — 그럴 땐 ‘새 탭에서 열기’로 확인하세요.</p>
+          </div>
+        </div>
+       </div>
       </section>
     </main>
   </div>
@@ -303,6 +340,9 @@ const SUPABASE_URL = 'https://oxunynxspkxfkokerftl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_T_IYdewX-mBILr-5hSIUxw_0KC4f3Nh';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const PREVIEW_URL = 'https://senior.zucca100.com/';
 
 const CATEGORIES = ['지원금·수당', '청년', '취업·일자리', '주거·세금', '핫딜'];
 const SITUATIONS = ['청년', '신혼·육아', '구직·취업', '주거', '시니어', '소상공인', '저소득·복지'];
@@ -391,6 +431,7 @@ function switchTab(name) {
   } else {
     actionBtn.hidden = true;
   }
+  if (name === 'today') loadTodaySettings(); // 최신 발행글 기준 노출 여부를 새로 계산
   closeSidebar();
 }
 
@@ -405,6 +446,7 @@ $('#scrim').addEventListener('click', closeSidebar);
 // ---------- '오늘의 혜택' 컴포넌트 설정 (app_settings.todays_benefit) ----------
 // value 스키마: { enabled, note, items: [{ id, title, note, url }] }
 let todayState = { enabled: true, note: '', items: [] };
+let latestPublishedAt = null; // 최신 발행글 시각 — 노출 여부 판정에 사용
 
 async function loadTodaySettings() {
   const status = $('#today-status');
@@ -421,6 +463,40 @@ async function loadTodaySettings() {
   $('#today-enabled').checked = todayState.enabled;
   $('#today-note').value = todayState.note;
   renderTodayItems();
+  await refreshLatestPublished();
+  updateVisibilityBadge();
+}
+
+// 최신 발행글 시각을 가져와 노출 판정에 반영
+async function refreshLatestPublished() {
+  const { data } = await supabase
+    .from('articles').select('created_at').eq('published', true)
+    .order('created_at', { ascending: false }).limit(1).maybeSingle();
+  latestPublishedAt = data?.created_at || null;
+}
+
+// 앱(NewBenefitCard)과 동일한 규칙으로 '오늘의 혜택' 노출 여부를 계산 (저장된 설정 기준)
+function computeTodayVisibility() {
+  if (!todayState.enabled) return { visible: false, reason: '표시가 꺼져 있어요.' };
+  const usable = todayState.items.filter((it) => it && (it.note || it.url));
+  if (usable.length > 0) return { visible: true, reason: `직접 추가한 항목 ${usable.length}개가 노출됩니다.` };
+  if (latestPublishedAt && Date.now() - new Date(latestPublishedAt).getTime() <= DAY_MS) {
+    return { visible: true, reason: '24시간 이내 발행글이 노출됩니다.' };
+  }
+  return { visible: false, reason: '노출할 항목이 없어요. 항목을 추가하거나 최근 24시간 내 발행글이 필요합니다.' };
+}
+
+function updateVisibilityBadge() {
+  const { visible, reason } = computeTodayVisibility();
+  const badge = $('#today-visibility');
+  badge.textContent = visible ? '● 현재 노출 중' : '○ 현재 숨김';
+  badge.className = 'pill ' + (visible ? 'pub' : 'draft');
+  $('#today-visibility-reason').textContent = reason;
+}
+
+function reloadPreview() {
+  const f = $('#preview-frame');
+  if (f) f.src = PREVIEW_URL + '?_=' + Date.now();
 }
 
 function renderTodayItems() {
@@ -458,6 +534,8 @@ async function saveTodaySettings() {
   const error = await persistToday();
   if (error) { toast('저장 실패: ' + error.message); return; }
   toast('저장되었습니다.');
+  updateVisibilityBadge();
+  reloadPreview();
 }
 
 async function addTodayItem() {
@@ -471,6 +549,8 @@ async function addTodayItem() {
   if (error) { todayState.items.pop(); toast('추가 실패: ' + error.message); return; }
   $('#add-title').value = ''; $('#add-note').value = ''; $('#add-url').value = '';
   renderTodayItems();
+  updateVisibilityBadge();
+  reloadPreview();
   toast('항목을 추가했습니다.');
 }
 
@@ -481,6 +561,8 @@ async function removeTodayItem(index) {
   const error = await persistToday();
   if (error) { todayState.items.splice(index, 0, removed); toast('삭제 실패: ' + error.message); return; }
   renderTodayItems();
+  updateVisibilityBadge();
+  reloadPreview();
   toast('항목을 삭제했습니다.');
 }
 
@@ -761,6 +843,7 @@ async function deleteComment(id, body) {
 
 $('#today-save').addEventListener('click', saveTodaySettings);
 $('#add-item-btn').addEventListener('click', addTodayItem);
+$('#preview-refresh').addEventListener('click', reloadPreview);
 
 // 초기 진입 페이지 헤더 세팅
 switchTab('import');
