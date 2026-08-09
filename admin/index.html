@@ -8,130 +8,290 @@
 <style>
   :root {
     color-scheme: light dark;
-    --bg: #0f1420;
+    --bg: #0d1119;
+    --sidebar: #121826;
     --card: #171d2c;
-    --border: #2a3244;
+    --card-2: #1c2334;
+    --border: #283044;
+    --border-soft: #222a3c;
     --ink: #eef1f6;
-    --muted: #98a2b8;
+    --muted: #94a0b8;
+    --muted-2: #6c778f;
     --accent: #4f8cff;
+    --accent-weak: rgba(79,140,255,.14);
     --accent-ink: #ffffff;
     --danger: #ff5d6c;
+    --danger-weak: rgba(255,93,108,.12);
     --ok: #34c77b;
+    --ok-weak: rgba(52,199,123,.15);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.18);
+    --radius: 14px;
   }
   @media (prefers-color-scheme: light) {
-    :root { --bg:#f4f6fb; --card:#ffffff; --border:#dfe4ee; --ink:#171b24; --muted:#5b6376; }
+    :root {
+      --bg:#eef1f7; --sidebar:#ffffff; --card:#ffffff; --card-2:#f6f8fc;
+      --border:#e2e7f0; --border-soft:#eaeef5; --ink:#141922; --muted:#5b6478; --muted-2:#8a93a6;
+      --accent-weak: rgba(79,140,255,.10);
+      --shadow: 0 1px 2px rgba(16,24,40,.06), 0 10px 30px rgba(16,24,40,.06);
+    }
   }
   * { box-sizing: border-box; }
-  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
-  header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); }
-  header h1 { font-size:16px; margin:0; font-weight:700; }
-  main { max-width:880px; margin:0 auto; padding:20px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:14px; }
-  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  label { font-size:12px; color:var(--muted); font-weight:600; display:block; margin-bottom:4px; }
-  input[type=text], input[type=email], input[type=password], input[type=date], textarea, select {
-    width:100%; padding:9px 11px; border-radius:8px; border:1px solid var(--border);
-    background:transparent; color:var(--ink); font-size:14px; font-family:inherit;
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased;
   }
-  textarea { resize:vertical; min-height:56px; }
-  button { cursor:pointer; border:none; border-radius:8px; padding:9px 14px; font-size:13.5px; font-weight:700; }
-  .btn-primary { background:var(--accent); color:var(--accent-ink); }
-  .btn-ghost { background:transparent; color:var(--ink); border:1px solid var(--border); }
-  .btn-danger { background:transparent; color:var(--danger); border:1px solid var(--danger); }
-  .chip { display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:20px; border:1px solid var(--border); font-size:12.5px; cursor:pointer; user-select:none; }
-  .chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
-  .tabs { display:flex; gap:6px; margin-bottom:14px; }
-  .tab { padding:9px 16px; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer; border:1px solid var(--border); }
-  .tab.on { background:var(--accent); color:#fff; border-color:var(--accent); }
-  .field { margin-bottom:10px; }
-  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .title { font-weight:700; font-size:14.5px; margin:0 0 4px; }
-  .meta { font-size:12px; color:var(--muted); margin:0 0 10px; }
-  .pill { font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; }
-  .pill.pub { background:rgba(52,199,123,.15); color:var(--ok); }
-  .pill.draft { background:rgba(152,162,184,.15); color:var(--muted); }
-  .comment-body { margin:8px 0 12px; white-space:pre-wrap; line-height:1.55; font-size:14px; }
-  .comment-grid { display:grid; gap:10px; }
-  .comment-card.is-nested { border-left:4px solid var(--accent); }
-  #login-view { max-width:340px; margin:80px auto; }
-  .empty { text-align:center; color:var(--muted); padding:30px; font-size:13.5px; }
-  .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); padding:10px 18px; border-radius:8px; font-size:13px; }
+  a { color: var(--accent); }
+
+  /* ---------- Form primitives ---------- */
+  label { font-size: 12px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 6px; letter-spacing: .01em; }
+  input[type=text], input[type=email], input[type=password], input[type=url], input[type=date], textarea, select {
+    width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card-2); color: var(--ink); font-size: 14px; font-family: inherit; transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-weak); }
+  textarea { resize: vertical; min-height: 60px; }
+  button { cursor: pointer; border: none; border-radius: 10px; padding: 10px 15px; font-size: 13.5px; font-weight: 700; font-family: inherit; transition: filter .15s, background .15s, border-color .15s; }
+  button:active { transform: translateY(.5px); }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover { filter: brightness(1.06); }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--card-2); }
+  .btn-danger { background: var(--danger-weak); color: var(--danger); border: 1px solid transparent; }
+  .btn-danger:hover { border-color: var(--danger); }
+  .btn-sm { padding: 7px 11px; font-size: 12.5px; }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .spacer { flex: 1; }
+
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 6px 11px; border-radius: 20px; border: 1px solid var(--border); font-size: 12.5px; cursor: pointer; user-select: none; background: var(--card-2); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pill { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .pill.pub { background: var(--ok-weak); color: var(--ok); }
+  .pill.draft { background: rgba(148,160,184,.16); color: var(--muted); }
+
+  /* ---------- Card ---------- */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .card:last-child { margin-bottom: 0; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+  .title { font-weight: 700; font-size: 15px; margin: 0; }
+  .meta { font-size: 12.5px; color: var(--muted); margin: 0; }
+  .card > .meta { margin-bottom: 14px; }
+
+  /* ---------- Login ---------- */
+  #login-view { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+  .login-card { width: 100%; max-width: 360px; }
+  .login-card h2 { margin: 0 0 4px; font-size: 19px; }
+  .login-card .brand-mark { width: 40px; height: 40px; border-radius: 11px; background: var(--accent); display: grid; place-items: center; font-size: 20px; margin-bottom: 14px; }
+
+  /* ---------- App shell ---------- */
+  #app-view { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 244px; flex-shrink: 0; background: var(--sidebar); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; padding: 18px 14px; position: sticky; top: 0; height: 100vh;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 18px; }
+  .brand .brand-mark { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); display: grid; place-items: center; font-size: 17px; flex-shrink: 0; }
+  .brand .brand-text { font-size: 14px; font-weight: 800; line-height: 1.25; }
+  .brand .brand-text span { display: block; font-size: 11px; font-weight: 600; color: var(--muted); }
+
+  .nav { display: flex; flex-direction: column; gap: 3px; }
+  .nav-label { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-2); padding: 6px 10px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 11px; padding: 10px 11px; border-radius: 10px;
+    font-size: 13.5px; font-weight: 600; color: var(--muted); cursor: pointer; user-select: none; transition: background .12s, color .12s;
+  }
+  .nav-item:hover { background: var(--card-2); color: var(--ink); }
+  .nav-item.on { background: var(--accent-weak); color: var(--accent); }
+  .nav-item .ico { width: 20px; text-align: center; font-size: 16px; }
+  .nav-item .badge { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--muted-2); background: var(--card-2); padding: 1px 8px; border-radius: 999px; }
+  .nav-item.on .badge { background: rgba(79,140,255,.2); color: var(--accent); }
+
+  .sidebar-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+  .user-line { font-size: 12px; color: var(--muted); padding: 4px 10px 10px; word-break: break-all; }
+
+  /* ---------- Content ---------- */
+  .content { flex: 1; min-width: 0; }
+  .topbar {
+    position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 12px;
+    padding: 16px clamp(16px, 3vw, 32px); background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-soft);
+  }
+  .topbar h1 { margin: 0; font-size: 18px; font-weight: 800; }
+  .topbar .sub { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+  .menu-btn { display: none; background: transparent; border: 1px solid var(--border); color: var(--ink); padding: 8px 11px; }
+
+  main { padding: 22px clamp(16px, 3vw, 32px) 60px; max-width: 960px; }
+
+  .empty { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 13.5px; border: 1px dashed var(--border); border-radius: var(--radius); }
+
+  /* ---------- Comment cards ---------- */
+  .comment-grid { display: grid; gap: 14px; }
+  .comment-body { margin: 10px 0 14px; white-space: pre-wrap; line-height: 1.6; font-size: 14px; }
+  .comment-card.is-nested { border-left: 3px solid var(--accent); }
+
+  /* ---------- Today's benefit items ---------- */
+  .item-list { display: grid; gap: 10px; }
+  .item {
+    display: flex; align-items: flex-start; gap: 12px; padding: 14px; border: 1px solid var(--border);
+    border-radius: 12px; background: var(--card-2);
+  }
+  .item-main { min-width: 0; flex: 1; }
+  .item-title { font-weight: 700; font-size: 14px; margin: 0 0 3px; }
+  .item-note { font-size: 13px; color: var(--muted); margin: 0 0 6px; white-space: pre-wrap; line-height: 1.5; }
+  .item-link { font-size: 12.5px; color: var(--accent); word-break: break-all; text-decoration: none; }
+  .item-link:hover { text-decoration: underline; }
+  .add-box { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border); }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--card); border: 1px solid var(--border); padding: 11px 18px; border-radius: 10px;
+    font-size: 13px; box-shadow: var(--shadow); z-index: 50;
+  }
+
+  .toggle-row { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 4px 0; }
+  .toggle-row input { width: auto; }
+  .toggle-row .toggle-text { font-size: 13.5px; font-weight: 600; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px) {
+    #app-view { flex-direction: column; }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; z-index: 40; transform: translateX(-100%);
+      transition: transform .2s ease; box-shadow: var(--shadow); width: 260px;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .scrim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 39; }
+    .scrim.open { display: block; }
+    .menu-btn { display: inline-flex; }
+    main { max-width: none; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 
-<div id="login-view" class="card">
-  <h2 style="margin-top:0">지원금 모아보기 — 어드민</h2>
-  <div class="field">
-    <label>이메일</label>
-    <input type="email" id="login-email" autocomplete="username" />
+<div id="login-view">
+  <div class="card login-card">
+    <div class="brand-mark">💰</div>
+    <h2>지원금 모아보기</h2>
+    <p class="meta" style="margin-bottom:18px">어드민 콘솔에 로그인하세요.</p>
+    <div class="field">
+      <label>이메일</label>
+      <input type="email" id="login-email" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label>비밀번호</label>
+      <input type="password" id="login-password" autocomplete="current-password" />
+    </div>
+    <button class="btn-primary" id="login-btn" style="width:100%">로그인</button>
+    <p id="login-error" class="meta" style="color:var(--danger); margin-top:10px"></p>
   </div>
-  <div class="field">
-    <label>비밀번호</label>
-    <input type="password" id="login-password" autocomplete="current-password" />
-  </div>
-  <button class="btn-primary" id="login-btn" style="width:100%">로그인</button>
-  <p id="login-error" class="meta" style="color:var(--danger)"></p>
 </div>
 
 <div id="app-view" hidden>
-  <header>
-    <h1>지원금 모아보기 — 어드민</h1>
-    <button class="btn-ghost" id="logout-btn">로그아웃</button>
-  </header>
-  <main>
-    <div class="tabs">
-      <div class="tab on" data-tab="import">새 글 가져오기</div>
-      <div class="tab" data-tab="manage">글 관리</div>
-      <div class="tab" data-tab="comments">댓글 관리</div>
-      <div class="tab" data-tab="today">오늘의 혜택</div>
+  <div class="scrim" id="scrim"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">💰</div>
+      <div class="brand-text">지원금 모아보기<span>어드민 콘솔</span></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">콘텐츠</div>
+      <div class="nav-item on" data-tab="import"><span class="ico">📥</span> 새 글 가져오기 <span class="badge" id="nav-import-count"></span></div>
+      <div class="nav-item" data-tab="manage"><span class="ico">📄</span> 글 관리 <span class="badge" id="nav-manage-count"></span></div>
+      <div class="nav-item" data-tab="today"><span class="ico">🎁</span> 오늘의 혜택</div>
+      <div class="nav-label">커뮤니티</div>
+      <div class="nav-item" data-tab="comments"><span class="ico">💬</span> 댓글 관리 <span class="badge" id="nav-comments-count"></span></div>
+    </nav>
+    <div class="sidebar-foot">
+      <p class="user-line" id="user-email"></p>
+      <button class="btn-ghost" id="logout-btn" style="width:100%">로그아웃</button>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="topbar">
+      <button class="menu-btn" id="menu-btn">☰</button>
+      <div>
+        <h1 id="page-title">새 글 가져오기</h1>
+        <p class="sub" id="page-sub">워드프레스 글을 검토하고 앱으로 가져옵니다.</p>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn-ghost btn-sm" id="page-action"></button>
     </div>
 
-    <section id="import-tab">
-      <div class="row" style="margin-bottom:12px">
-        <button class="btn-ghost" id="refresh-wp-btn">워드프레스에서 목록 새로고침</button>
-        <span class="meta" id="import-status"></span>
-      </div>
-      <div id="import-list"></div>
-    </section>
-
-    <section id="manage-tab" hidden>
-      <div class="row" style="margin-bottom:12px">
-        <button class="btn-ghost" id="refresh-articles-btn">목록 새로고침</button>
-        <span class="meta" id="manage-status"></span>
-      </div>
-      <div id="manage-list"></div>
-    </section>
-
-    <section id="comments-tab" hidden>
-      <div class="row" style="margin-bottom:12px">
-        <button class="btn-ghost" id="refresh-comments-btn">댓글 새로고침</button>
-        <span class="meta" id="comments-status"></span>
-      </div>
-      <div id="comments-list" class="comment-grid"></div>
-    </section>
-
-    <section id="today-tab" hidden>
-      <div class="card">
-        <p class="title">‘오늘의 혜택’ 컴포넌트</p>
-        <p class="meta">홈 검색창 아래에 노출됩니다. 최근 발행글(24시간 이내)이 있을 때만 표시돼요.</p>
-        <div class="field">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
-            <input type="checkbox" id="today-enabled" style="width:auto" />
-            컴포넌트 표시(켜기)
-          </label>
+    <main>
+      <section id="import-tab">
+        <div class="row" style="margin-bottom:14px">
+          <span class="meta" id="import-status"></span>
         </div>
-        <div class="field">
-          <label>설명 문구 (컴포넌트에 함께 표시)</label>
-          <textarea id="today-note" placeholder="예: 이번 주 새로 올라온 혜택이에요. 확인해 보세요."></textarea>
+        <div id="import-list"></div>
+      </section>
+
+      <section id="manage-tab" hidden>
+        <div class="row" style="margin-bottom:14px">
+          <span class="meta" id="manage-status"></span>
         </div>
-        <div class="row">
-          <button class="btn-primary" id="today-save">저장</button>
-          <span class="meta" id="today-status"></span>
+        <div id="manage-list"></div>
+      </section>
+
+      <section id="comments-tab" hidden>
+        <div class="row" style="margin-bottom:14px">
+          <span class="meta" id="comments-status"></span>
         </div>
-      </div>
-    </section>
-  </main>
+        <div id="comments-list" class="comment-grid"></div>
+      </section>
+
+      <section id="today-tab" hidden>
+        <div class="card">
+          <div class="card-head"><p class="title">노출 설정</p></div>
+          <p class="meta">홈 검색창 아래 ‘오늘의 혜택’ 카드로 노출됩니다.</p>
+          <div class="field">
+            <label class="toggle-row">
+              <input type="checkbox" id="today-enabled" />
+              <span class="toggle-text">컴포넌트 표시(켜기)</span>
+            </label>
+          </div>
+          <div class="field">
+            <label>기본 설명 문구 <span style="font-weight:500;color:var(--muted-2)">(항목이 없을 때 최신 발행글에 함께 표시)</span></label>
+            <textarea id="today-note" placeholder="예: 이번 주 새로 올라온 혜택이에요. 확인해 보세요."></textarea>
+          </div>
+          <div class="row">
+            <button class="btn-primary" id="today-save">저장</button>
+            <span class="meta" id="today-status"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><p class="title">혜택 항목</p></div>
+          <p class="meta">직접 설명과 링크를 넣어 항목을 추가하세요. 항목이 하나라도 있으면 최신 발행글 대신 이 항목들이 노출됩니다.</p>
+          <div class="item-list" id="today-items"></div>
+
+          <div class="add-box">
+            <div class="field">
+              <label>제목 <span style="font-weight:500;color:var(--muted-2)">(선택)</span></label>
+              <input type="text" id="add-title" placeholder="예: 청년 월세 지원 신규 접수" />
+            </div>
+            <div class="field">
+              <label>설명</label>
+              <textarea id="add-note" placeholder="항목에 함께 보여줄 설명을 적어주세요."></textarea>
+            </div>
+            <div class="field">
+              <label>링크(URL)</label>
+              <input type="url" id="add-url" placeholder="https://" />
+            </div>
+            <button class="btn-primary" id="add-item-btn">＋ 항목 추가</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 </div>
 
 <script type="module">
@@ -145,6 +305,13 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const CATEGORIES = ['지원금·수당', '청년', '취업·일자리', '주거·세금', '핫딜'];
 const SITUATIONS = ['청년', '신혼·육아', '구직·취업', '주거', '시니어', '소상공인', '저소득·복지'];
 const REGIONS = ['전국', '서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
+
+const PAGES = {
+  import:   { title: '새 글 가져오기', sub: '워드프레스 글을 검토하고 앱으로 가져옵니다.', action: '워드프레스에서 새로고침', run: () => loadWpPosts() },
+  manage:   { title: '글 관리',        sub: '발행 상태를 바꾸거나 내용을 수정합니다.',      action: '목록 새로고침',        run: () => loadArticles() },
+  today:    { title: '오늘의 혜택',    sub: '홈 상단에 노출할 혜택 항목을 관리합니다.',      action: null,                   run: () => loadTodaySettings() },
+  comments: { title: '댓글 관리',      sub: '커뮤니티에 달린 댓글을 검토·삭제합니다.',      action: '댓글 새로고침',        run: () => loadComments() },
+};
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -185,7 +352,7 @@ function bindChipToggle(root) {
 // ---------- Auth ----------
 async function checkSession() {
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) showApp(); else showLogin();
+  if (session) showApp(session); else showLogin();
 }
 
 function showLogin() {
@@ -193,60 +360,140 @@ function showLogin() {
   $('#app-view').hidden = true;
 }
 
-function showApp() {
+function showApp(session) {
   $('#login-view').hidden = true;
   $('#app-view').hidden = false;
+  if (session?.user?.email) $('#user-email').textContent = session.user.email;
   loadWpPosts();
   loadArticles();
   loadComments();
   loadTodaySettings();
 }
 
+// ---------- Navigation ----------
+function switchTab(name) {
+  $$('.nav-item').forEach((n) => n.classList.toggle('on', n.dataset.tab === name));
+  $('#import-tab').hidden = name !== 'import';
+  $('#manage-tab').hidden = name !== 'manage';
+  $('#comments-tab').hidden = name !== 'comments';
+  $('#today-tab').hidden = name !== 'today';
+
+  const page = PAGES[name];
+  $('#page-title').textContent = page.title;
+  $('#page-sub').textContent = page.sub;
+  const actionBtn = $('#page-action');
+  if (page.action) {
+    actionBtn.hidden = false;
+    actionBtn.textContent = page.action;
+    actionBtn.onclick = page.run;
+  } else {
+    actionBtn.hidden = true;
+  }
+  closeSidebar();
+}
+
+$$('.nav-item').forEach((item) => item.addEventListener('click', () => switchTab(item.dataset.tab)));
+
+// ---------- Mobile sidebar ----------
+function openSidebar() { $('#sidebar').classList.add('open'); $('#scrim').classList.add('open'); }
+function closeSidebar() { $('#sidebar').classList.remove('open'); $('#scrim').classList.remove('open'); }
+$('#menu-btn').addEventListener('click', openSidebar);
+$('#scrim').addEventListener('click', closeSidebar);
+
 // ---------- '오늘의 혜택' 컴포넌트 설정 (app_settings.todays_benefit) ----------
+// value 스키마: { enabled, note, items: [{ id, title, note, url }] }
+let todayState = { enabled: true, note: '', items: [] };
+
 async function loadTodaySettings() {
   const status = $('#today-status');
+  status.textContent = '';
   const { data, error } = await supabase
     .from('app_settings').select('value').eq('key', 'todays_benefit').maybeSingle();
   if (error) { status.textContent = '오류: ' + error.message; return; }
   const v = data?.value || {};
-  $('#today-enabled').checked = v.enabled !== false;
-  $('#today-note').value = v.note || '';
-  status.textContent = '';
+  todayState = {
+    enabled: v.enabled !== false,
+    note: typeof v.note === 'string' ? v.note : '',
+    items: Array.isArray(v.items) ? v.items : [],
+  };
+  $('#today-enabled').checked = todayState.enabled;
+  $('#today-note').value = todayState.note;
+  renderTodayItems();
 }
 
-async function saveTodaySettings() {
-  const value = { enabled: $('#today-enabled').checked, note: $('#today-note').value.trim() };
+function renderTodayItems() {
+  const wrap = $('#today-items');
+  if (!todayState.items.length) {
+    wrap.innerHTML = '<div class="empty">아직 추가한 항목이 없어요. 아래에서 추가해 보세요.</div>';
+    return;
+  }
+  wrap.innerHTML = todayState.items.map((it, i) => `
+    <div class="item">
+      <div class="item-main">
+        <p class="item-title">${escapeHtml(it.title || '(제목 없음)')}</p>
+        ${it.note ? `<p class="item-note">${escapeHtml(it.note)}</p>` : ''}
+        ${it.url ? `<a class="item-link" href="${escapeHtml(it.url)}" target="_blank" rel="noopener">${escapeHtml(it.url)}</a>` : ''}
+      </div>
+      <button class="btn-danger btn-sm" data-del="${i}">삭제</button>
+    </div>
+  `).join('');
+  $$('[data-del]', wrap).forEach((btn) => {
+    btn.addEventListener('click', () => removeTodayItem(Number(btn.dataset.del)));
+  });
+}
+
+async function persistToday() {
+  todayState.enabled = $('#today-enabled').checked;
+  todayState.note = $('#today-note').value.trim();
+  const value = { enabled: todayState.enabled, note: todayState.note, items: todayState.items };
   const { error } = await supabase
     .from('app_settings')
     .upsert({ key: 'todays_benefit', value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  return error;
+}
+
+async function saveTodaySettings() {
+  const error = await persistToday();
   if (error) { toast('저장 실패: ' + error.message); return; }
   toast('저장되었습니다.');
+}
+
+async function addTodayItem() {
+  const title = $('#add-title').value.trim();
+  const note = $('#add-note').value.trim();
+  const url = $('#add-url').value.trim();
+  if (!note && !url) { toast('설명 또는 링크 중 하나는 입력해 주세요.'); return; }
+  if (url && !/^https?:\/\//i.test(url)) { toast('링크는 http:// 또는 https:// 로 시작해야 해요.'); return; }
+  todayState.items.push({ id: (crypto.randomUUID?.() || String(Date.now())), title, note, url });
+  const error = await persistToday();
+  if (error) { todayState.items.pop(); toast('추가 실패: ' + error.message); return; }
+  $('#add-title').value = ''; $('#add-note').value = ''; $('#add-url').value = '';
+  renderTodayItems();
+  toast('항목을 추가했습니다.');
+}
+
+async function removeTodayItem(index) {
+  const removed = todayState.items[index];
+  if (!confirm(`"${removed?.title || removed?.note || '항목'}"을(를) 삭제할까요?`)) return;
+  todayState.items.splice(index, 1);
+  const error = await persistToday();
+  if (error) { todayState.items.splice(index, 0, removed); toast('삭제 실패: ' + error.message); return; }
+  renderTodayItems();
+  toast('항목을 삭제했습니다.');
 }
 
 $('#login-btn').addEventListener('click', async () => {
   const email = $('#login-email').value.trim();
   const password = $('#login-password').value;
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) { $('#login-error').textContent = error.message; return; }
   $('#login-error').textContent = '';
-  showApp();
+  showApp(data.session);
 });
 
 $('#logout-btn').addEventListener('click', async () => {
   await supabase.auth.signOut();
   showLogin();
-});
-
-// ---------- Tabs ----------
-$$('.tab').forEach((tab) => {
-  tab.addEventListener('click', () => {
-    $$('.tab').forEach((t) => t.classList.remove('on'));
-    tab.classList.add('on');
-    $('#import-tab').hidden = tab.dataset.tab !== 'import';
-    $('#manage-tab').hidden = tab.dataset.tab !== 'manage';
-    $('#comments-tab').hidden = tab.dataset.tab !== 'comments';
-    $('#today-tab').hidden = tab.dataset.tab !== 'today';
-  });
 });
 
 // ---------- Import tab (WordPress → articles) ----------
@@ -262,7 +509,8 @@ async function loadWpPosts() {
     });
     const json = await res.json();
     if (json.error) throw new Error(json.error);
-    status.textContent = `${json.posts.length}개 (미가져옴)`;
+    status.textContent = `가져올 수 있는 글 ${json.posts.length}개`;
+    $('#nav-import-count').textContent = json.posts.length || '';
     if (json.posts.length === 0) {
       list.innerHTML = '<div class="empty">새로 가져올 글이 없어요.</div>';
       return;
@@ -283,7 +531,7 @@ function importCard(p, i) {
   return `
     <div class="card" id="import-card-${i}">
       <p class="title">${p.title}</p>
-      <p class="meta">${p.date} · <a href="${p.url}" target="_blank" style="color:var(--muted)">${p.url}</a></p>
+      <p class="meta" style="margin-bottom:14px">${p.date} · <a href="${p.url}" target="_blank" rel="noopener">${p.url}</a></p>
       <div class="field">
         <label>요약</label>
         <textarea id="summary-${i}">${p.summary}</textarea>
@@ -362,6 +610,7 @@ async function loadArticles() {
   const { data, error } = await supabase.from('articles').select('*').order('date', { ascending: false });
   if (error) { status.textContent = '오류: ' + error.message; return; }
   status.textContent = `총 ${data.length}개`;
+  $('#nav-manage-count').textContent = data.length || '';
   if (data.length === 0) { list.innerHTML = '<div class="empty">글이 없어요.</div>'; return; }
   list.innerHTML = data.map((a, i) => manageCard(a, i)).join('');
   data.forEach((a, i) => {
@@ -376,11 +625,11 @@ async function loadArticles() {
 function manageCard(a, i) {
   return `
     <div class="card" id="manage-card-${i}">
-      <div class="row" style="justify-content:space-between">
+      <div class="card-head">
         <p class="title">${a.title}</p>
         <span class="pill ${a.published ? 'pub' : 'draft'}">${a.published ? '발행중' : '초안'}</span>
       </div>
-      <p class="meta">${a.date} · <a href="${a.url}" target="_blank" style="color:var(--muted)">원문</a></p>
+      <p class="meta" style="margin-bottom:14px">${a.date} · <a href="${a.url}" target="_blank" rel="noopener">원문</a></p>
       <div class="field">
         <label>요약</label>
         <textarea id="m-summary-${i}">${a.summary || ''}</textarea>
@@ -408,6 +657,7 @@ function manageCard(a, i) {
       <div class="row">
         <button class="btn-primary" id="update-${i}">저장</button>
         <button class="btn-ghost" id="toggle-pub-${i}">${a.published ? '초안으로 내리기' : '발행하기'}</button>
+        <div class="spacer"></div>
         <button class="btn-danger" id="delete-${i}">삭제</button>
       </div>
     </div>
@@ -464,6 +714,7 @@ async function loadComments() {
   }
 
   status.textContent = `최근 댓글 ${data.length}개`;
+  $('#nav-comments-count').textContent = data.length || '';
   if (data.length === 0) {
     list.innerHTML = '<div class="empty">아직 등록된 댓글이 없어요.</div>';
     return;
@@ -482,7 +733,7 @@ function commentCard(reply, i) {
 
   return `
     <div class="card comment-card ${reply.parent_reply_id ? 'is-nested' : ''}">
-      <div class="row" style="justify-content:space-between">
+      <div class="card-head">
         <p class="title">${escapeHtml(reply.author_label || '익명')} · ${typeLabel}</p>
         <span class="pill draft">${escapeHtml(post.policy || '정책 미확인')}</span>
       </div>
@@ -506,11 +757,11 @@ async function deleteComment(id, body) {
   loadComments();
 }
 
-$('#refresh-wp-btn').addEventListener('click', loadWpPosts);
-$('#refresh-articles-btn').addEventListener('click', loadArticles);
-$('#refresh-comments-btn').addEventListener('click', loadComments);
 $('#today-save').addEventListener('click', saveTodaySettings);
+$('#add-item-btn').addEventListener('click', addTodayItem);
 
+// 초기 진입 페이지 헤더 세팅
+switchTab('import');
 checkSession();
 </script>
 </body>
