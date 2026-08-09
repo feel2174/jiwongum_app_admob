@@ -36,6 +36,8 @@
     }
   }
   * { box-sizing: border-box; }
+  /* hidden 속성이 항상 이기도록 — 로그인 화면과 대시보드가 동시에 뜨는 것을 막는다 */
+  [hidden] { display: none !important; }
   html, body { height: 100%; }
   body {
     margin: 0; background: var(--bg); color: var(--ink);
@@ -83,13 +85,13 @@
   .card > .meta { margin-bottom: 14px; }
 
   /* ---------- Login ---------- */
-  #login-view { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+  #login-view:not([hidden]) { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
   .login-card { width: 100%; max-width: 360px; }
   .login-card h2 { margin: 0 0 4px; font-size: 19px; }
   .login-card .brand-mark { width: 40px; height: 40px; border-radius: 11px; background: var(--accent); display: grid; place-items: center; font-size: 20px; margin-bottom: 14px; }
 
   /* ---------- App shell ---------- */
-  #app-view { display: flex; min-height: 100vh; }
+  #app-view:not([hidden]) { display: flex; min-height: 100vh; }
 
   .sidebar {
     width: 244px; flex-shrink: 0; background: var(--sidebar); border-right: 1px solid var(--border);
