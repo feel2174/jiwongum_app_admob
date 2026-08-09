@@ -43,6 +43,8 @@ export async function requestPushPermission() {
   return status === 'granted';
 }
 
+let tokenInflight = null;
+
 async function getPushToken() {
   await ensureNotificationChannel();
 
@@ -50,8 +52,17 @@ async function getPushToken() {
     throw new Error('EAS projectId is missing');
   }
 
-  const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId: PROJECT_ID });
-  return token;
+  // 여러 곳(앱 시작·포커스·AppState 활성)에서 동시에 호출되면 in-flight 요청을 공유한다.
+  // 중복 호출 시 이전 fetch가 취소되며 "Fetch request has been canceled" 로그가 뜨는 걸 막는다.
+  if (!tokenInflight) {
+    tokenInflight = Notifications.getExpoPushTokenAsync({ projectId: PROJECT_ID })
+      .then(({ data }) => data);
+  }
+  try {
+    return await tokenInflight;
+  } finally {
+    tokenInflight = null;
+  }
 }
 
 export async function registerPushToken({ requestPermission = true } = {}) {

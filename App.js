@@ -22,7 +22,7 @@ import { StoreProvider, useStore } from './src/lib/store';
 import { NOTIFICATION_SETTING_KEY } from './src/lib/storage';
 import { init as initAds } from './src/lib/adManager';
 import { openContent } from './src/lib/openLink';
-import { getPushPermissionStatus, syncPushPermission } from './src/lib/push';
+import { getPushPermissionStatus, requestPushPermission, syncPushPermission } from './src/lib/push';
 
 import DetailScreen from './src/screens/DetailScreen';
 import CollectionScreen from './src/screens/CollectionScreen';
@@ -120,10 +120,11 @@ function RootNavigator() {
     (async () => {
       try {
         const status = await getPushPermissionStatus();
+        // 권한 요청/확인만 하고, 토큰 등록(getExpoPushTokenAsync)은 아래 sync effect 한 곳에서만 수행한다.
         if (status === 'granted') {
           if (mounted) setSetting(NOTIFICATION_SETTING_KEY, true);
         } else if (status === 'undetermined') {
-          const granted = await syncPushPermission({ requestIfNeeded: true });
+          const granted = await requestPushPermission();
           if (mounted && granted) setSetting(NOTIFICATION_SETTING_KEY, true);
         }
       } catch {}
