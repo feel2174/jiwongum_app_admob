@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.senior.zucca100.com/sitemap.xml
+
+#DaumWebMasterTool:3cf26635f2812e7ca1b4eee6c4c8d15527523484122cd1084bb25d81e3f900bc:X2qp369fn7NJYpFDxkUL7Q==
