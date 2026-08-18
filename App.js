@@ -20,14 +20,18 @@ import AppSplash from './src/components/AppSplash';
 import { useTheme } from './src/theme';
 import { StoreProvider, useStore } from './src/lib/store';
 import { NOTIFICATION_SETTING_KEY } from './src/lib/storage';
-import { init as initAds } from './src/lib/adManager';
+import { init as initAds, setAdsEnabled } from './src/lib/adManager';
+import { checkIntegrity, adsAllowedByIntegrity } from './src/lib/integrity';
+import { loadRemoteConfig, refreshRemoteConfig, DEFAULTS as REMOTE_DEFAULTS } from './src/lib/remoteConfig';
 import { openContent } from './src/lib/openLink';
 import { getPushPermissionStatus, requestPushPermission, syncPushPermission } from './src/lib/push';
 
 import DetailScreen from './src/screens/DetailScreen';
 import CollectionScreen from './src/screens/CollectionScreen';
+import SavedScreen from './src/screens/SavedScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import WebScreen from './src/screens/WebScreen';
+import RemoteNotices from './src/components/RemoteNotices';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -76,6 +80,11 @@ function Tabs({ initialRouteName = 'Home' }) {
           showHeader: false,
         }}
         options={{ tabBarLabel: '홈', tabBarIcon: tabIcon('🏠') }}
+      />
+      <Tab.Screen
+        name="Saved"
+        component={SavedScreen}
+        options={{ tabBarLabel: '저장함', tabBarIcon: tabIcon('⭐') }}
       />
       <Tab.Screen
         name="Ask"
@@ -182,6 +191,7 @@ export default function App() {
   const navRef = useNavigationContainerRef();
   const scheme = useColorScheme();
   const [showSplash, setShowSplash] = useState(true);
+  const [remoteCfg, setRemoteCfg] = useState(REMOTE_DEFAULTS);
 
   // 네이티브 스플래시를 감추고, 코드로 그린 스플래시(노란 배경 + Senior Support)를 잠깐 보여준다.
   useEffect(() => {
@@ -195,6 +205,18 @@ export default function App() {
       try { await requestTrackingPermissionsAsync(); } catch {}
       try { await mobileAds().initialize(); } catch {}
       initAds();
+
+      // 원격설정(킬 스위치) + 무결성 소프트 게이트로 광고 on/off 결정.
+      // 콜드 스타트 1회. 실패해도 안전한 기본값(광고 on, 콘텐츠 정상)으로 폴백.
+      try {
+        const cached = await loadRemoteConfig(); // 캐시 즉시 반영(오프라인 대비)
+        setRemoteCfg(cached);
+        const [verdict, cfg] = await Promise.all([checkIntegrity(), refreshRemoteConfig()]);
+        setRemoteCfg(cfg);
+        setAdsEnabled(cfg.adsEnabled !== false && adsAllowedByIntegrity(verdict));
+      } catch {
+        setAdsEnabled(true);
+      }
     })();
   }, []);
 
@@ -214,6 +236,7 @@ export default function App() {
         <NavigationContainer ref={navRef} theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
           <RootNavigator />
         </NavigationContainer>
+        <RemoteNotices cfg={remoteCfg} />
         <StatusBar style="auto" />
       </StoreProvider>
       {showSplash ? <AppSplash /> : null}

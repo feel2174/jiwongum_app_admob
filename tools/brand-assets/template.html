@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root {
+    --navy: #154c76;
+    --navy-deep: #0f3a5a;
+    --navy-ink: #10334f;
+    --yellow: #ffd200;
+    --yellow-soft: #ffdf4d;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; }
+  body {
+    font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .stage { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+  /* 원화 마크 */
+  .won { font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+
+  /* 배지(원형 디스크) */
+  .disc {
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+  }
+
+  /* ====================== 정사각 아이콘류 ====================== */
+  body.square .stage { background: transparent; }
+
+  /* icon: 네이비 배경 + 노랑 디스크 + 네이비 원화 */
+  body.icon .stage { background: linear-gradient(150deg, #1a5989, #133f63); }
+  body.icon .disc { width: 62vmin; height: 62vmin; background: var(--yellow);
+    box-shadow: inset 0 0 0 4vmin rgba(255,255,255,0.14), 0 6vmin 12vmin rgba(0,0,0,0.22); }
+  body.icon .won { font-size: 40vmin; color: var(--navy-ink); }
+
+  /* foreground: 투명 배경 + 노랑 디스크(어댑티브 안전영역) */
+  body.foreground .stage { background: transparent; }
+  body.foreground .disc { width: 56vmin; height: 56vmin; background: var(--yellow);
+    box-shadow: inset 0 0 0 3.5vmin rgba(255,255,255,0.16); }
+  body.foreground .won { font-size: 36vmin; color: var(--navy-ink); }
+
+  /* background: 단색 네이비 */
+  body.background .stage { background: linear-gradient(150deg, #1a5989, #133f63); }
+
+  /* mono / notification: 흰색 원화 실루엣, 투명 배경 */
+  body.mono .stage, body.notification .stage { background: transparent; }
+  body.mono .won, body.notification .won { font-size: 62vmin; color: #ffffff; }
+
+  /* splash: 투명 배경 + 네이비 디스크 + 흰 원화 (노란 스플래시 배경 위에서 대비) */
+  body.splash .stage { background: transparent; }
+  body.splash .disc { width: 68vmin; height: 68vmin; background: var(--navy);
+    box-shadow: 0 4vmin 10vmin rgba(0,0,0,0.18); }
+  body.splash .won { font-size: 40vmin; color: var(--yellow); }
+
+  /* ====================== 가로형(피처그래픽 / OG) ====================== */
+  body.wide .stage { background: radial-gradient(120% 140% at 18% 20%, #1e6499 0%, #133f63 62%, #0e3350 100%); }
+  .wideWrap { display: flex; align-items: center; gap: 6.5vh; padding: 0 8vh; }
+  .wideDisc { flex: none; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--yellow); }
+  .wideDisc .won { color: var(--navy-ink); }
+  .wideText { display: flex; flex-direction: column; }
+  .wideBrand { color: #fff; font-weight: 900; letter-spacing: -0.03em; line-height: 1.05; }
+  .wideTagline { color: var(--yellow-soft); font-weight: 700; }
+  .wideDomain { color: rgba(255,255,255,0.72); font-weight: 600; }
+
+  body.feature .wideDisc { width: 34vh; height: 34vh; }
+  body.feature .wideDisc .won { font-size: 22vh; }
+  body.feature .wideBrand { font-size: 20vh; }
+  body.feature .wideTagline { font-size: 8.4vh; margin-top: 2.4vh; }
+
+  body.og .wideDisc { width: 30vh; height: 30vh; }
+  body.og .wideDisc .won { font-size: 19vh; }
+  body.og .wideBrand { font-size: 17vh; }
+  body.og .wideTagline { font-size: 7.2vh; margin-top: 2.2vh; }
+  body.og .wideDomain { font-size: 4.6vh; margin-top: 3.2vh; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <!-- 정사각/스플래시: 마크만 -->
+    <div class="markSlot">
+      <div class="disc"><span class="won">₩</span></div>
+    </div>
+
+    <!-- 가로형: 마크 + 워드마크 -->
+    <div class="wideWrap" hidden>
+      <div class="wideDisc"><span class="won">₩</span></div>
+      <div class="wideText">
+        <div class="wideBrand">어르신 지원금</div>
+        <div class="wideTagline">단어 하나로 찾는 정부 지원금</div>
+        <div class="wideDomain">senior.zucca100.com</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const v = new URLSearchParams(location.search).get('v') || 'icon';
+  const wide = (v === 'feature' || v === 'og');
+  const square = !wide;
+  document.body.classList.add(v);
+  document.body.classList.add(wide ? 'wide' : 'square');
+
+  const markSlot = document.querySelector('.markSlot');
+  const wideWrap = document.querySelector('.wideWrap');
+  // [hidden] 는 .wideWrap{display:flex} 에 밀리므로 display 를 직접 제어한다.
+  markSlot.style.display = wide ? 'none' : 'flex';
+  wideWrap.style.display = wide ? 'flex' : 'none';
+
+  // background 변형은 마크 없이 단색만
+  if (v === 'background') markSlot.style.display = 'none';
+  // OG 는 도메인 표시, feature 는 숨김
+  if (v === 'feature') document.querySelector('.wideDomain').style.display = 'none';
+</script>
+</body>
+</html>

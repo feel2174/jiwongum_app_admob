@@ -38,6 +38,16 @@ const s = { views: 0, count: 0, lastTime: 0 };
 let ad = null;
 let loaded = false;
 
+// 원격설정 + 무결성 소프트 게이트가 제어하는 광고 on/off 스위치.
+// 기본 true(현행 유지). App 부팅 시 remoteConfig·integrity 결과로 설정한다.
+let adsEnabled = true;
+export function setAdsEnabled(v) {
+  adsEnabled = !!v;
+}
+export function areAdsEnabled() {
+  return adsEnabled;
+}
+
 function build() {
   ad = InterstitialAd.createForAdRequest(INTERSTITIAL_UNIT, {
     requestNonPersonalizedAdsOnly: true,
@@ -70,6 +80,7 @@ export function recordDetailView() {
 export function gateThenOpen(openFn) {
   const now = Date.now();
   const capsOk =
+    adsEnabled &&
     s.views >= CAPS.VIEW_MIN &&
     (!s.lastTime || now - s.lastTime >= CAPS.INTERVAL_MS) &&
     s.count < CAPS.SESSION_CAP;

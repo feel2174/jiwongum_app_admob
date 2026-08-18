@@ -246,7 +246,8 @@ h1 {
 .floatingFontControls {
   position: fixed;
   right: 16px;
-  bottom: 16px;
+  /* 하위호환: 구버전 앱의 하단 탭바/홈 인디케이터 위로 띄운다(릴리스 계획 §1.2) */
+  bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 20;
   box-shadow: 0 14px 36px rgba(31, 42, 36, 0.18);
 }
@@ -1908,7 +1909,8 @@ button.readButton {
 }
 
 /* 검색 페이지 공통 */
-.searchMain { max-width: 720px; margin: 0 auto; padding-bottom: 40px; }
+/* 하위호환: 구버전 앱의 하단 탭바에 본문이 가리지 않도록 여백 확보(릴리스 계획 §1.2) */
+.searchMain { max-width: 720px; margin: 0 auto; padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
 .searchHeader {
   display: flex;
   align-items: center;
@@ -2145,7 +2147,8 @@ button.readButton {
 /* ============================================================
    랜딩 = 검색 화면 (심플, 스크롤 최소화)
    ============================================================ */
-.landingMain { max-width: 720px; margin: 0 auto; padding-bottom: 40px; }
+/* 하위호환: 구버전 앱의 하단 탭바에 본문이 가리지 않도록 여백 확보(릴리스 계획 §1.2) */
+.landingMain { max-width: 720px; margin: 0 auto; padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
 .landingBrand {
   padding: 14px clamp(16px, 4vw, 28px);
   background: var(--green-dark);

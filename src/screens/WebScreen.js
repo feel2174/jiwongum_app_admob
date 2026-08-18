@@ -1,10 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, View, Text, Pressable, StyleSheet, BackHandler, Platform } from 'react-native';
+import { ActivityIndicator, View, Text, Pressable, StyleSheet, BackHandler, Platform, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '../theme';
 import { registerWebViewForAds } from '../lib/webviewAds';
+import { areAdsEnabled } from '../lib/adManager';
 import Header, { HeaderButton } from '../components/Header';
 
 // 인앱 웹 화면 — zucca100.com 콘텐츠를 WebView API for Ads로 로드.
@@ -26,7 +27,10 @@ export default function WebScreen({ route, navigation }) {
       webRef.current = ref;
       if (!ref || registeredRef.current) return;
       registeredRef.current = true;
-      await registerWebViewForAds(); // 마운트된 WebView를 뷰 트리에서 찾아 등록. 실패해도 콘텐츠는 정상 로드
+      // 광고 소프트 게이트: 광고가 꺼져 있으면 웹뷰를 광고 SDK에 등록하지 않는다(콘텐츠는 그대로 로드).
+      if (areAdsEnabled()) {
+        await registerWebViewForAds(); // 마운트된 WebView를 뷰 트리에서 찾아 등록. 실패해도 콘텐츠는 정상 로드
+      }
       setSourceUri(url);
     },
     [url],
@@ -80,6 +84,15 @@ export default function WebScreen({ route, navigation }) {
         // ──────────────────────────────
         setSupportMultipleWindows={false}
         startInLoadingState
+        // tel:/sms:/mailto: 는 웹뷰가 처리하지 못하므로 OS 다이얼러/앱으로 넘긴다(§Phase2 tel: 처리).
+        onShouldStartLoadWithRequest={(req) => {
+          const u = req?.url || '';
+          if (/^(tel:|sms:|mailto:)/i.test(u)) {
+            Linking.openURL(u).catch(() => {});
+            return false;
+          }
+          return true;
+        }}
         onNavigationStateChange={(navState) => {
           canGoBackRef.current = navState.canGoBack;
         }}
