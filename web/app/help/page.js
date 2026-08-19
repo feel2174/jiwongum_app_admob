@@ -1,4 +1,3 @@
-import FontControls from '../FontControls';
 import AskSection from '../AskSection';
 
 export const metadata = {
@@ -16,8 +15,6 @@ export default function HelpPage() {
       </header>
 
       <AskSection />
-
-      <FontControls />
     </main>
   );
 }

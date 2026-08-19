@@ -1,4 +1,3 @@
-import FontControls from './FontControls';
 import SearchClient from './search/SearchClient';
 import NotifyCard from './NotifyCard';
 import NewBenefitCard from './NewBenefitCard';
@@ -43,7 +42,6 @@ export default function Home() {
           <a href="https://www.nhis.or.kr">건강보험공단</a>
         </nav>
       </footer>
-      <FontControls />
     </main>
   );
 }
