@@ -323,7 +323,7 @@ export default function SearchClient() {
             <option key={r} value={r}>{r}</option>
           ))}
         </select>
-        <span className="regionHint">지역을 정하면 다음에도 기억해요.</span>
+        <span className="regionHint">지역을 정해두면 다음엔 자동으로 골라드려요.</span>
       </div>
 
       <section className="results" aria-live="polite" ref={resultsRef}>
@@ -349,8 +349,8 @@ export default function SearchClient() {
               ))}
             </ul>
             {visibleCount < results.length ? (
-              <div ref={sentinelRef} className="scrollSentinel" aria-hidden="true">
-                <span className="loadingSpinner" />
+              <div ref={sentinelRef} className="scrollSentinel">
+                <span className="scrollHint" aria-hidden="true">아래로 더 있어요 ↓</span>
               </div>
             ) : null}
           </>

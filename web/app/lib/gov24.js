@@ -109,6 +109,26 @@ export async function getServiceIndex() {
 
 const norm = (s) => (s || '').toLowerCase().replace(/\s+/g, '');
 
+// 실제 공공데이터는 같은 개념도 "지원금"/"보조금"/"지원비"로 제각각 쓴다.
+// 사용자가 어느 쪽으로 검색해도 같은 결과가 나오도록 동의어 그룹을 두고,
+// 쿼리에 포함된 동의어를 다른 동의어로도 바꿔치기한 변형들을 함께 검색한다.
+const SYNONYM_GROUPS = [
+  ['지원금', '보조금', '지원비'],
+];
+
+function expandQueryVariants(q) {
+  const variants = new Set([q]);
+  for (const group of SYNONYM_GROUPS) {
+    const hit = group.find((term) => q.includes(term));
+    if (!hit) continue;
+    for (const alt of group) {
+      if (alt === hit) continue;
+      variants.add(q.split(hit).join(alt));
+    }
+  }
+  return [...variants];
+}
+
 // 지역 토큰이 소관기관명에 포함되는지(지자체 서비스 매칭용). '전국'/중앙행정기관은 항상 포함.
 function matchesRegion(item, region) {
   if (!region || region === '전국') return true;
@@ -121,6 +141,7 @@ function matchesRegion(item, region) {
 export async function searchServices(query, { region = '', limit = 40 } = {}) {
   const q = norm(query);
   if (!q) return [];
+  const variants = expandQueryVariants(q);
 
   const index = await getServiceIndex();
   const scored = [];
@@ -129,14 +150,23 @@ export async function searchServices(query, { region = '', limit = 40 } = {}) {
     if (!matchesRegion(item, region)) continue;
     const name = norm(item.name);
     const summary = norm(item.summary);
-    const inName = name.includes(q);
-    const inSummary = summary.includes(q);
-    if (!inName && !inSummary) continue;
+
     // 정확 일치 > 시작 일치 > 이름 포함 > 요약 포함. (조회수는 동점 tiebreaker)
+    // 동의어 변형 중 가장 점수가 높은 매칭을 채택한다. 요약에만 걸리면 점수는 0이어도 매칭으로 친다.
+    let matched = false;
     let score = 0;
-    if (name === q) score += 5;
-    else if (name.startsWith(q)) score += 3;
-    if (inName) score += 2;
+    for (const v of variants) {
+      const inName = name.includes(v);
+      const inSummary = summary.includes(v);
+      if (!inName && !inSummary) continue;
+      matched = true;
+      let vScore = 0;
+      if (name === v) vScore += 5;
+      else if (name.startsWith(v)) vScore += 3;
+      if (inName) vScore += 2;
+      if (vScore > score) score = vScore;
+    }
+    if (!matched) continue;
     scored.push({ item, score });
   }
 

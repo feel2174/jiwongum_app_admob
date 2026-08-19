@@ -1934,6 +1934,8 @@ button.readButton {
 .resultList { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .scrollSentinel { display: flex; justify-content: center; padding: 18px 0; }
 .scrollSentinel .loadingSpinner { width: 32px; height: 32px; border-width: 4px; }
+/* 더 내려도 되는지 스스로 알아채기 어려운 사용자를 위한 명시적 신호(시니어 UX: 스크롤 힌트) */
+.scrollHint { font-size: 17px; font-weight: 700; color: var(--muted); }
 .resultCard {
   background: var(--paper);
   border: 1.5px solid var(--line);
@@ -1953,7 +1955,9 @@ button.readButton {
   margin-right: 6px;
 }
 .resultActions { display: flex; flex-wrap: wrap; gap: 10px; }
-.resultButton { color: #fffdf8; background: var(--green); border: none; }
+/* 전화(telButton)가 1순위 행동, "자세히 보기"는 부가 탐색이라 위계를 낮춰
+   전화 버튼과 눈에 띄는 정도 차이를 분명히 둔다(시니어 UX: 버튼 위계 명확화). */
+.resultButton { color: var(--green); background: transparent; border: 2px solid var(--green); }
 .resultPhone { color: var(--green); background: #eef3ec; border: none; }
 
 @media (max-width: 380px) {
