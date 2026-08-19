@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="ad.size" content="width=480,height=320">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:480px; height:320px; overflow:hidden; font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif; }
+  .ad {
+    width:480px; height:320px; position:relative; cursor:pointer; overflow:hidden;
+    background: radial-gradient(120% 140% at 10% 0%, #37795d 0%, #2f6d54 45%, #133326 100%);
+    display:flex; align-items:center; gap:22px; padding:0 26px; color:#fff;
+  }
+  .glow { position:absolute; width:260px; height:260px; border-radius:50%;
+    background: radial-gradient(circle, rgba(255,210,0,0.32), transparent 70%); top:-110px; right:60px; }
+
+  .left { position:relative; z-index:1; flex:0 0 220px; }
+  .badge { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.16); border-radius:999px;
+    padding:6px 14px 6px 6px; font-size:12px; font-weight:700; color:#ffdf4d; margin-bottom:16px; }
+  .badge i { width:20px; height:20px; border-radius:50%; background:#ffd200; color:#173c2d; font-weight:900; font-size:11px;
+    display:flex; align-items:center; justify-content:center; }
+  h1 { font-size:26px; font-weight:800; line-height:1.28; text-shadow:0 2px 10px rgba(0,0,0,0.15); }
+  p { margin-top:10px; font-size:13px; color:rgba(255,255,255,0.85); line-height:1.5; }
+  .cta { display:inline-block; margin-top:18px; background:#ffd200; color:#173c2d; font-weight:800; font-size:14px;
+    padding:11px 20px; border-radius:999px; box-shadow:0 10px 22px rgba(0,0,0,0.25);
+    animation:pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.05); } }
+
+  .right { position:relative; z-index:1; flex:1; display:flex; align-items:center; justify-content:center; }
+  .card { width:100%; max-width:210px; background:#fffdf8; border-radius:20px; padding:20px;
+    box-shadow:0 24px 50px rgba(0,0,0,0.28); }
+  .voiceBar { display:flex; align-items:center; gap:10px; background:#f6f2ea; border:2px solid #295f48;
+    border-radius:999px; padding:11px 14px; }
+  .voiceBar .mic { width:32px; height:32px; border-radius:50%; background:#295f48; flex:none;
+    display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .voiceBar .txt { font-size:12px; color:#56645a; font-weight:600; }
+  .waves { display:flex; align-items:flex-end; gap:5px; margin-top:14px; justify-content:center; height:34px; }
+  .waves i { width:6px; border-radius:3px; background:linear-gradient(180deg,#ffd200,#ffdf4d); display:block; }
+</style>
+</head>
+<body>
+  <script>var clickTag = "https://play.google.com/store/apps/details?id=com.jiwongum.app";</script>
+  <div class="ad" onclick="window.open(clickTag, '_blank')">
+    <div class="glow"></div>
+    <div class="left">
+      <div class="badge"><i>₩</i>지원금 살펴줌</div>
+      <h1>말 한마디로 찾는<br>정부 지원금</h1>
+      <p>기초연금부터 난방비까지 대신 살펴드려요</p>
+      <div class="cta">무료로 확인하기</div>
+    </div>
+    <div class="right">
+      <div class="card">
+        <div class="voiceBar"><span class="mic">🎤</span><span class="txt">"틀니 지원금 알려줘"</span></div>
+        <div class="waves">
+          <i style="height:10px"></i><i style="height:22px"></i><i style="height:32px"></i>
+          <i style="height:18px"></i><i style="height:28px"></i><i style="height:14px"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
