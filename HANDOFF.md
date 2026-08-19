@@ -46,14 +46,21 @@
 
 ## 2. ⚠️ 아직 안 된 것 / 미검증 (재개 시 최우선)
 
+### Phase 1(웹) — 라이브 반영 확인됨 (2026-08-19)
+`senior.zucca100.com`을 직접 확인한 결과, 이 문서의 이전 버전이 "아직 어느 것도 배포 안 됨"이라 적었던 것과 달리 **Phase 1 웹 개편은 이미 프로덕션에 배포되어 있다.** 이 저장소는 `main` push 시 Vercel이 자동 배포하는 구조이며, 이전 세션에서 `b81eb7b`를 push한 시점에 실배포된 것으로 보인다.
+- `<title>어르신 지원금</title>`, `/og.png`·`/icon.png`(200), `robots.txt` 라이브 확인
+- `/community` → 308 리다이렉트(신규 `legacyRedirects`, `permanent:true`) 라이브 확인
+- CSS `padding-bottom:calc(100px + env(safe-area-inset-bottom))` 라이브 확인(§1.2 하위호환 핫픽스)
+
 ### 검증되지 않은 것
 - [ ] **네이티브 빌드·실기기 테스트 전무.** 이 환경엔 Android SDK가 없어 JS 번들 export만 검증됨. RN 변경(4탭/tel:/스플래시/광고게이트)은 **실기기·에뮬레이터에서 미확인.**
 - [ ] `RELEASE-APP.md` 하단 "테스트 체크리스트" 8항목 전부 미수행.
+- [ ] 구버전 앱(현재 프로덕션 빌드) 실기기에서 새 웹이 §1.2 규칙대로 정상 동작하는지 — 웹 자체는 라이브지만 구버전 앱 셸과의 조합은 미확인.
 
 ### 채워 넣어야 완료되는 것 (플레이스홀더/스텁)
 - [ ] **Play Integrity 네이티브 모듈 없음.** `src/lib/integrity.js`의 `runNativeIntegrity()`는 현재 `'unavailable'`(광고 허용측) 고정 반환 — **라이브 수익 보호용 스텁.** 실제 모듈 연결 시 `PLAY_RECOGNIZED+MEETS_DEVICE_INTEGRITY→'ok'`, 그 외/오류→`'failed'` 매핑.
 - [ ] **리다이렉트 맵 미완성.** `web/next.config.mjs`의 `legacyRedirects`는 `/community`만 확정. **Search Console/애널리틱스에서 실제 옛 URL을 수집**해 채우고 **404 0건** 확인. (추측 금지 — 잘못된 301은 캐시됨)
-- [ ] **Supabase 마이그레이션 미적용.** `20260818000100_add_app_config.sql`을 실제 DB에 실행해야 원격설정 동작.
+- [x] ~~Supabase 마이그레이션 미적용~~ → 대신 어드민 콘솔(`admin/index.html`)에 "앱 설정" 탭을 추가(`9fed562`). anon key는 RLS로 쓰기가 막혀 있어 마이그레이션 SQL을 직접 실행할 수 없었음 — 운영자가 어드민에 로그인해 저장하면 upsert로 `app_config` 행이 즉시 생성된다. **아직 실제로 한 번 저장은 안 해봄 — 로그인 가능한 사람이 어드민 "앱 설정" 탭에서 저장 1회 필요.**
 
 ### Phase 0 미착수 항목 (jiwongum.md §3 Phase 0)
 - [ ] 프로덕션 지표 스냅샷(DAU·리텐션·체류·AdMob CTR/노출·평점) — **개편 전 기준선.** 안 찍으면 개선/개악 판단 불가.
