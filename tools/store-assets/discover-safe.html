@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700;800;900&display=swap">
+<style>
+  :root {
+    --green: #295f48; --green-deep: #133326; --green-mid: #2f6d54; --green-ink: #173c2d;
+    --yellow: #ffd200; --yellow-soft: #ffdf4d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; }
+
+  .stage {
+    position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(140% 120% at 25% 20%, #3f8264 0%, var(--green-mid) 45%, var(--green-deep) 100%);
+    overflow: hidden;
+  }
+  .ring { position: absolute; border-radius: 50%; }
+  .ring-1 { width: 70vmin; height: 70vmin; border: 1.6vmin solid rgba(255,255,255,0.08); top: -18vmin; right: -14vmin; }
+  .ring-2 { width: 46vmin; height: 46vmin; border: 1.2vmin solid rgba(255,210,0,0.16); bottom: -16vmin; left: -10vmin; }
+  .glow { position: absolute; width: 60vmin; height: 60vmin; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,210,0,0.34), transparent 70%); top: -10vmin; left: 8vmin; }
+
+  .center { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+  .coin {
+    width: 30vmin; height: 30vmin; border-radius: 50%; background: var(--yellow);
+    box-shadow: 0 3vmin 6vmin rgba(0,0,0,0.28), inset 0 0 0 0.7vmin rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .coin span { color: var(--green-ink); font-size: 15vmin; font-weight: 900; }
+  .word { margin-top: 3.4vmin; color: #fff; font-size: 6vmin; font-weight: 800; letter-spacing: -0.01em;
+    text-shadow: 0 0.4vmin 2vmin rgba(0,0,0,0.2); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="glow"></div>
+    <div class="center">
+      <div class="coin"><span>₩</span></div>
+      <div class="word">지원금 살펴줌</div>
+    </div>
+  </div>
+</body>
+</html>
