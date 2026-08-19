@@ -8,7 +8,7 @@
 - **스택**: Expo SDK 57 / React Native, WebView 래퍼(`senior.zucca100.com`), Supabase, AdMob
 - **현재 브랜드(프로덕션 앱)**: `지원금 모아보기` → 후보 `지원금 살펴줌`
   - **웹(라이브)**: 2026-08-19부터 `지원금 살펴줌`으로 교체 완료(타이틀/OG/파비콘 포함). 사용자 확정 지시로 진행 — **KIPRIS 상표 검색은 아직 전이라 앱스토어 등록명 기준으로는 최종 확정 아님.**
-  - **앱(네이티브, 스테이징만·미출시)**: `app.config.js`의 dev/preview 빌드도 동일하게 `지원금 살펴줌`. **production 프로파일은 여전히 `지원금 모아보기` 유지** — Phase 3 승인 전까지 실사용자에게 영향 없음.
+  - **앱(네이티브)**: 2026-08-19, `eas.json`의 `production` 프로파일에 `EXPO_PUBLIC_REBRAND=1`을 추가해 **production 빌드도 `지원금 살펴줌`으로 전환함(사용자 지시)**. 같은 날 `eas build --profile production`으로 **versionCode 9 AAB를 실제로 빌드·다운로드 완료**(`outputs/build/jiwongum-v9-release.aab`, 기존 서명 자격증명 재사용 확인, 아직 Play Console에 업로드는 안 함). **아직 카카오 D-7/D-1 사전 공지를 안 보낸 상태라, 이 AAB로 단계적 출시를 시작하면 jiwongum.md §4가 경고하는 "편도" 전환이 사전 공지 없이 실행되는 것** — 업로드 전에 §4 공지를 먼저 보낼지 확인 필요.
 - **기준 커밋**: 이 문서를 포함한 커밋 (아래 "커밋에 포함된 변경" 참조)
 - ⚠️ **불변 제약**: 패키지명 `com.jiwongum.app`·서명키 변경 금지 / localStorage 키·Supabase 푸시 토큰 보존 / 브랜드 전환은 **편도(되돌릴 수 없음)**
 
