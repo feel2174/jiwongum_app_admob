@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="ad.size" content="width=320,height=50">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:320px; height:50px; overflow:hidden; font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif; }
+  .ad {
+    width:320px; height:50px; position:relative; cursor:pointer; overflow:hidden;
+    background: linear-gradient(100deg, #2f6d54, #173c2d 85%);
+    display:flex; align-items:center; gap:10px; padding:0 12px; color:#fff;
+  }
+  .glow { position:absolute; width:120px; height:120px; border-radius:50%;
+    background: radial-gradient(circle, rgba(255,210,0,0.30), transparent 70%); top:-40px; left:60px; }
+  .coin { width:32px; height:32px; border-radius:50%; background:#ffd200; flex:none;
+    display:flex; align-items:center; justify-content:center; position:relative; z-index:1; }
+  .coin span { color:#173c2d; font-size:16px; font-weight:900; }
+  .txt { flex:1; position:relative; z-index:1; }
+  .txt b { display:block; font-size:13px; font-weight:800; line-height:1.2; }
+  .txt span { font-size:10.5px; color:rgba(255,255,255,0.8); }
+  .cta { background:#ffd200; color:#173c2d; font-weight:800; font-size:11.5px; padding:7px 14px; border-radius:999px;
+    flex:none; position:relative; z-index:1; white-space:nowrap; }
+</style>
+</head>
+<body>
+  <script>var clickTag = "https://play.google.com/store/apps/details?id=com.jiwongum.app";</script>
+  <div class="ad" onclick="window.open(clickTag, '_blank')">
+    <div class="glow"></div>
+    <div class="coin"><span>₩</span></div>
+    <div class="txt"><b>말 한마디로 찾는 정부 지원금</b><span>지원금 살펴줌</span></div>
+    <div class="cta">확인하기</div>
+  </div>
+</body>
+</html>

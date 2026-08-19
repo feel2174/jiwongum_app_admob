@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="ad.size" content="width=728,height=90">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:728px; height:90px; overflow:hidden; font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif; }
+  .ad {
+    width:728px; height:90px; position:relative; cursor:pointer; overflow:hidden;
+    background: linear-gradient(100deg, #37795d, #2f6d54 55%, #173c2d 100%);
+    display:flex; align-items:center; gap:18px; padding:0 26px; color:#fff;
+  }
+  .glow { position:absolute; width:260px; height:260px; border-radius:50%;
+    background: radial-gradient(circle, rgba(255,210,0,0.30), transparent 70%); top:-110px; left:220px; }
+  .badge { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.14); border-radius:999px;
+    padding:6px 16px 6px 6px; font-size:13px; font-weight:700; color:#ffdf4d; flex:none; position:relative; z-index:1; }
+  .badge i { width:26px; height:26px; border-radius:50%; background:#ffd200; color:#173c2d; font-weight:900; font-size:14px;
+    display:flex; align-items:center; justify-content:center; }
+  .txt { flex:1; position:relative; z-index:1; }
+  .txt b { display:block; font-size:24px; font-weight:800; line-height:1.25; }
+  .txt span { font-size:13px; color:rgba(255,255,255,0.82); }
+  .cta { background:#ffd200; color:#173c2d; font-weight:800; font-size:16px; padding:13px 26px; border-radius:999px;
+    box-shadow:0 8px 18px rgba(0,0,0,0.22); flex:none; position:relative; z-index:1; white-space:nowrap; }
+</style>
+</head>
+<body>
+  <script>var clickTag = "https://play.google.com/store/apps/details?id=com.jiwongum.app";</script>
+  <div class="ad" onclick="window.open(clickTag, '_blank')">
+    <div class="glow"></div>
+    <div class="badge"><i>₩</i>지원금 살펴줌</div>
+    <div class="txt"><b>말 한마디로 찾는 정부 지원금</b><span>기초연금부터 난방비까지, 전화번호까지 바로 알려드려요</span></div>
+    <div class="cta">무료로 확인하기</div>
+  </div>
+</body>
+</html>

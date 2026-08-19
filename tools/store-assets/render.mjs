@@ -1,4 +1,4 @@
-// 스토어 리스팅용 기능 소개 슬라이드 HTML → PNG (Chrome 헤드리스)
+// 스토어/광고용 기능 소개 슬라이드 HTML → PNG (Chrome 헤드리스)
 // 사용:  CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" node tools/store-assets/render.mjs
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, existsSync } from 'node:fs';
@@ -7,7 +7,6 @@ import { dirname, resolve, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..', '..');
-const template = join(here, 'feature-slides.html');
 
 const CHROME_CANDIDATES = [
   process.env.CHROME,
@@ -21,21 +20,26 @@ if (!chrome) {
 }
 
 const SLIDES = ['voice', 'call', 'region', 'fields', 'trust'];
-const outDir = join(repo, 'store', 'rebrand', 'screenshots');
-mkdirSync(outDir, { recursive: true });
 
-for (const slide of SLIDES) {
-  const outPath = join(outDir, `${slide}.png`);
-  const url = `${pathToFileURL(template).href}?slide=${slide}`;
-  execFileSync(chrome, [
-    '--headless=new',
-    '--disable-gpu',
-    '--hide-scrollbars',
-    '--force-device-scale-factor=1',
-    '--window-size=1080,1920',
-    `--screenshot=${outPath}`,
-    url,
-  ], { stdio: 'ignore' });
-  console.log(`✓ store/rebrand/screenshots/${slide}.png`);
+function renderSet(template, w, h, outDir, prefix) {
+  mkdirSync(outDir, { recursive: true });
+  for (const slide of SLIDES) {
+    const outPath = join(outDir, `${prefix}${slide}.png`);
+    const url = `${pathToFileURL(template).href}?slide=${slide}`;
+    execFileSync(chrome, [
+      '--headless=new',
+      '--disable-gpu',
+      '--hide-scrollbars',
+      '--force-device-scale-factor=1',
+      `--window-size=${w},${h}`,
+      `--screenshot=${outPath}`,
+      url,
+    ], { stdio: 'ignore' });
+    console.log(`✓ ${outPath.replace(repo + '/', '')}`);
+  }
 }
+
+renderSet(join(here, 'feature-slides.html'), 1080, 1920, join(repo, 'store', 'rebrand', 'screenshots'), '');
+renderSet(join(here, 'feature-slides-landscape.html'), 1920, 1080, join(repo, 'store', 'rebrand', 'screenshots-landscape'), '');
+
 console.log('\n완료.');

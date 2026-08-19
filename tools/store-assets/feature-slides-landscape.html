@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700;800;900&display=swap">
+<style>
+  :root {
+    --green: #295f48;
+    --green-deep: #133326;
+    --green-mid: #2f6d54;
+    --green-ink: #173c2d;
+    --yellow: #ffd200;
+    --yellow-soft: #ffdf4d;
+    --paper: #fffdf8;
+    --bg: #f6f2ea;
+    --ink: #1f2a24;
+    --muted: #56645a;
+    --line: #e4ddc9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(160deg, #37795d 0%, var(--green-mid) 46%, var(--green-deep) 100%);
+  }
+  .stage { width: 1920px; height: 1080px; position: relative; display: flex; align-items: center; padding: 0 130px; gap: 100px; overflow: hidden; }
+
+  .glow-1 { position: absolute; width: 620px; height: 620px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,210,0,0.30), transparent 68%); top: -220px; right: 260px; filter: blur(4px); }
+  .glow-2 { position: absolute; width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.10), transparent 70%); bottom: -160px; left: 420px; }
+
+  .left { position: relative; flex: 0 0 780px; color: #fff; z-index: 1; }
+  .badge { display: inline-flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.16); backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.22); border-radius: 999px;
+    padding: 12px 26px 12px 12px; font-size: 28px; font-weight: 700; color: var(--yellow-soft); margin-bottom: 40px; }
+  .badge .dot { width: 40px; height: 40px; border-radius: 50%; background: var(--yellow);
+    box-shadow: 0 0 0 7px rgba(255,210,0,0.18);
+    display: flex; align-items: center; justify-content: center; color: var(--green-ink); font-weight: 900; font-size: 22px; }
+  h1 { font-size: 70px; line-height: 1.28; font-weight: 800; letter-spacing: -0.015em; text-shadow: 0 2px 18px rgba(0,0,0,0.14); }
+  .sub { margin-top: 30px; font-size: 32px; line-height: 1.6; color: rgba(255,255,255,0.88); font-weight: 500; }
+  .foot { margin-top: 56px; display: flex; align-items: center; gap: 18px; }
+  .coin { width: 60px; height: 60px; border-radius: 50%; background: var(--yellow);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center; flex: none; }
+  .coin span { color: var(--green-ink); font-size: 30px; font-weight: 900; }
+  .foot b { font-size: 30px; color: #fff; font-weight: 700; }
+
+  .right { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; z-index: 1; }
+  .mockWrap { width: 100%; max-width: 760px; position: relative; }
+  .mockWrap::before {
+    content: ''; position: absolute; inset: 16px -16px -26px 16px; border-radius: 36px;
+    background: linear-gradient(160deg, var(--yellow-soft), transparent 60%); opacity: 0.45; filter: blur(2px);
+  }
+  .mock { position: relative; background: var(--paper); border: 1px solid rgba(23,60,45,0.08); border-radius: 32px;
+    padding: 64px; box-shadow: 0 20px 40px rgba(0,0,0,0.22), 0 60px 100px -20px rgba(0,0,0,0.35); }
+
+  .voiceBar { display: flex; align-items: center; gap: 26px; background: var(--bg); border: 3px solid var(--green);
+    border-radius: 999px; padding: 34px 44px; }
+  .voiceBar .mic { width: 92px; height: 92px; border-radius: 50%; background: var(--green); flex: none;
+    box-shadow: 0 8px 20px rgba(41,95,72,0.32);
+    display: flex; align-items: center; justify-content: center; font-size: 46px; }
+  .voiceBar .txt { font-size: 42px; color: var(--muted); font-weight: 600; }
+  .waves { display: flex; align-items: flex-end; gap: 12px; margin-top: 56px; justify-content: center; height: 130px; }
+  .waves i { width: 22px; border-radius: 11px; background: linear-gradient(180deg, var(--yellow), var(--yellow-soft)); display: block;
+    box-shadow: 0 4px 10px rgba(255,210,0,0.35); }
+
+  .callRow { display: flex; flex-direction: column; gap: 30px; }
+  .callLabel { font-size: 32px; font-weight: 800; color: var(--green); }
+  .callBtn { display: flex; align-items: center; gap: 22px; background: linear-gradient(135deg, #2f6d54, var(--green)); color: #fff;
+    border-radius: 20px; padding: 38px 44px; font-size: 46px; font-weight: 800; box-shadow: 0 14px 30px rgba(41,95,72,0.3); }
+
+  .regionChip { display: inline-flex; align-items: center; gap: 22px; border: 3px solid var(--line);
+    border-radius: 20px; padding: 30px 44px; font-size: 42px; font-weight: 700; color: var(--ink); background: #fff;
+    box-shadow: 0 6px 16px rgba(23,60,45,0.06); }
+  .regionNote { margin-top: 42px; font-size: 34px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 18px; }
+  .checkDot { width: 48px; height: 48px; border-radius: 50%; background: var(--green); color: #fff; flex: none;
+    box-shadow: 0 6px 14px rgba(41,95,72,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; }
+
+  .sumRow { padding: 30px 0; border-bottom: 2px solid var(--line); }
+  .sumRow:last-child { border-bottom: none; }
+  .sumLabel { font-size: 32px; font-weight: 800; color: var(--green); margin-bottom: 10px; display: block; }
+  .sumValue { font-size: 34px; color: var(--ink); line-height: 1.5; }
+
+  .trustGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  .trustChip { border: 2px solid var(--line); border-radius: 18px; padding: 34px 30px; text-align: center;
+    font-size: 32px; font-weight: 700; color: var(--green-ink); background: linear-gradient(160deg, #fbf9f2, #f3efe0);
+    box-shadow: 0 6px 16px rgba(23,60,45,0.05); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+    <div class="left">
+      <div class="badge"><span class="dot">₩</span>지원금 살펴줌</div>
+      <h1 id="headline"></h1>
+      <p class="sub" id="subtext"></p>
+      <div class="foot"><div class="coin"><span>₩</span></div><b>단어 하나로 찾는 정부 지원금</b></div>
+    </div>
+    <div class="right"><div class="mockWrap"><div class="mock" id="mock"></div></div></div>
+  </div>
+
+<script>
+  const SLIDES = {
+    voice: {
+      headline: '말 한마디면\n충분해요',
+      subtext: '타이핑이 어려우시면 말로 물어보세요.',
+      mock: () => `
+        <div class="voiceBar"><span class="mic">🎤</span><span class="txt">"틀니 지원금 알려줘"</span></div>
+        <div class="waves">
+          <i style="height:36px"></i><i style="height:76px"></i><i style="height:112px"></i>
+          <i style="height:64px"></i><i style="height:96px"></i><i style="height:44px"></i><i style="height:80px"></i>
+        </div>`,
+    },
+    call: {
+      headline: '전화번호까지\n바로 보여드려요',
+      subtext: '눌러서 바로 통화하세요.',
+      mock: () => `
+        <div class="callRow"><span class="callLabel">신청처</span>
+        <div class="callBtn"><span>📞</span>055-831-2653 전화</div></div>`,
+    },
+    region: {
+      headline: '내 지역, 한 번만\n정하면 끝',
+      subtext: '다음엔 자동으로 골라드려요.',
+      mock: () => `
+        <span style="font-size:32px;font-weight:800;color:var(--green)">내 지역</span>
+        <div style="margin-top:22px"><span class="regionChip">경기도 ▾</span></div>
+        <div class="regionNote"><span class="checkDot">✓</span>자동으로 기억해요</div>`,
+    },
+    fields: {
+      headline: '복잡한 공고문,\n보기 쉽게 정리',
+      subtext: '대상, 금액, 신청방법 순서로.',
+      mock: () => `
+        <div class="sumRow"><span class="sumLabel">대상</span><div class="sumValue">65세 이상 기초연금수급자</div></div>
+        <div class="sumRow"><span class="sumLabel">금액</span><div class="sumValue">월 최대 20만원</div></div>
+        <div class="sumRow"><span class="sumLabel">신청방법</span><div class="sumValue">방문신청 또는 온라인신청</div></div>`,
+    },
+    trust: {
+      headline: '정부 공공데이터 기반,\n믿을 수 있어요',
+      subtext: '보조금24 등 공식 데이터 기반.',
+      mock: () => `
+        <div class="trustGrid">
+          <div class="trustChip">정부24</div><div class="trustChip">복지로</div>
+          <div class="trustChip">보조금24</div><div class="trustChip">국민연금공단</div>
+        </div>`,
+    },
+  };
+  const key = new URLSearchParams(location.search).get('slide') || 'voice';
+  const s = SLIDES[key];
+  document.getElementById('headline').innerHTML = s.headline.replace(/\n/g, '<br>');
+  document.getElementById('subtext').textContent = s.subtext;
+  document.getElementById('mock').innerHTML = s.mock();
+</script>
+</body>
+</html>

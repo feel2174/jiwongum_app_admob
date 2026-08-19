@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="ad.size" content="width=300,height=250">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:300px; height:250px; overflow:hidden; font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif; }
+  .ad {
+    width:300px; height:250px; position:relative; cursor:pointer;
+    background: radial-gradient(120% 140% at 15% 0%, #37795d 0%, #2f6d54 45%, #133326 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; color:#fff;
+  }
+  .glow { position:absolute; width:220px; height:220px; border-radius:50%;
+    background: radial-gradient(circle, rgba(255,210,0,0.35), transparent 70%);
+    top:-90px; right:-70px; }
+  .coin { width:64px; height:64px; border-radius:50%; background:#ffd200; box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 12px; animation:pulse 2.2s ease-in-out infinite; }
+  .coin span { color:#173c2d; font-size:32px; font-weight:900; }
+  h1 { font-size:22px; font-weight:800; line-height:1.35; margin:0 10px 8px; position:relative; z-index:1; }
+  p { font-size:13px; color:rgba(255,255,255,0.85); margin:0 16px 16px; line-height:1.5; position:relative; z-index:1; }
+  .cta { background:#ffd200; color:#173c2d; font-weight:800; font-size:14px; padding:10px 22px; border-radius:999px;
+    box-shadow:0 8px 18px rgba(0,0,0,0.22); position:relative; z-index:1; }
+  @keyframes pulse { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+  .badge { position:absolute; top:10px; left:10px; font-size:11px; font-weight:700; color:#ffdf4d;
+    background:rgba(255,255,255,0.14); border-radius:999px; padding:4px 10px 4px 6px; display:flex; align-items:center; gap:5px; z-index:1; }
+  .badge i { width:16px; height:16px; border-radius:50%; background:#ffd200; color:#173c2d; font-weight:900; font-size:10px;
+    display:flex; align-items:center; justify-content:center; }
+</style>
+</head>
+<body>
+  <script>var clickTag = "https://play.google.com/store/apps/details?id=com.jiwongum.app";</script>
+  <div class="ad" onclick="window.open(clickTag, '_blank')">
+    <div class="glow"></div>
+    <div class="badge"><i>₩</i>지원금 살펴줌</div>
+    <div class="coin"><span>₩</span></div>
+    <h1>말 한마디로 찾는<br>정부 지원금</h1>
+    <p>기초연금부터 난방비까지, 대신 살펴드려요</p>
+    <div class="cta">무료로 확인하기</div>
+  </div>
+</body>
+</html>
