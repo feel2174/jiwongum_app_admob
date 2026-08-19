@@ -41,5 +41,6 @@ function renderSet(template, w, h, outDir, prefix) {
 
 renderSet(join(here, 'feature-slides.html'), 1080, 1920, join(repo, 'store', 'rebrand', 'screenshots'), '');
 renderSet(join(here, 'feature-slides-landscape.html'), 1920, 1080, join(repo, 'store', 'rebrand', 'screenshots-landscape'), '');
+renderSet(join(here, 'feature-slides-square.html'), 1080, 1080, join(repo, 'store', 'rebrand', 'screenshots-square'), '');
 
 console.log('\n완료.');
