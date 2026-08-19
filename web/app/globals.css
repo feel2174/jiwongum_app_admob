@@ -2101,9 +2101,9 @@ button.readButton {
   border-top: 1.5px solid var(--line);
 }
 .sumRow {
-  display: grid;
-  grid-template-columns: 84px 1fr;
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 12px 0;
   border-bottom: 1.5px solid var(--line);
 }
@@ -2138,10 +2138,6 @@ button.readButton {
   color: #fffdf8;
   font-size: 19px;
   font-weight: 800;
-}
-
-@media (max-width: 380px) {
-  .sumRow { grid-template-columns: 1fr; gap: 2px; }
 }
 
 /* ============================================================
