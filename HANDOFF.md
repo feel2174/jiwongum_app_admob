@@ -53,9 +53,9 @@
 - CSS `padding-bottom:calc(100px + env(safe-area-inset-bottom))` 라이브 확인(§1.2 하위호환 핫픽스)
 
 ### 검증되지 않은 것
-- [ ] **네이티브 빌드·실기기 테스트 전무.** 이 환경엔 Android SDK가 없어 JS 번들 export만 검증됨. RN 변경(4탭/tel:/스플래시/광고게이트)은 **실기기·에뮬레이터에서 미확인.**
-- [ ] `RELEASE-APP.md` 하단 "테스트 체크리스트" 8항목 전부 미수행.
-- [ ] 구버전 앱(현재 프로덕션 빌드) 실기기에서 새 웹이 §1.2 규칙대로 정상 동작하는지 — 웹 자체는 라이브지만 구버전 앱 셸과의 조합은 미확인.
+- [x] **네이티브 빌드·에뮬레이터 테스트** — 2026-08-19 이 macOS 환경에 Android SDK·에뮬레이터를 새로 세팅해 `app-debug.apk` 빌드·설치·실행 확인함(세팅 방법·필수 Gradle/JDK 우회는 §4.2 참조). 에뮬레이터라 실기기 자체는 아님. 확인됨: 4탭 전환, 홈/문의 웹뷰 로드, `tel:` → OS 다이얼러, dev 브랜드 게이트. 미확인: 비행기 모드, `app_config` 원격설정 반영, Play Integrity.
+- [ ] `RELEASE-APP.md` 하단 "테스트 체크리스트" 8항목 중 미확인 항목(비행기 모드, `app_config.adsEnabled=false`/`transitionNotice`/`maintenance` 반영) 남음 — §2 어드민 "앱 설정" 저장 1회가 선행되어야 함.
+- [ ] 구버전 앱(현재 프로덕션 빌드) 실기기에서 새 웹이 §1.2 규칙대로 정상 동작하는지 — 웹 자체는 라이브지만 구버전 앱 셸과의 조합, 그리고 **실제 물리 기기**는 여전히 미확인(에뮬레이터만 확인).
 
 ### 채워 넣어야 완료되는 것 (플레이스홀더/스텁)
 - [ ] **Play Integrity 네이티브 모듈 없음.** `src/lib/integrity.js`의 `runNativeIntegrity()`는 현재 `'unavailable'`(광고 허용측) 고정 반환 — **라이브 수익 보호용 스텁.** 실제 모듈 연결 시 `PLAY_RECOGNIZED+MEETS_DEVICE_INTEGRITY→'ok'`, 그 외/오류→`'failed'` 매핑.
@@ -101,8 +101,35 @@ cd web && npm install  # 웹(Next.js)은 별도
 ### 4.2 필요한 환경 (이 저장소에 커밋되지 않는 것)
 - **Supabase 자격증명**: `src/lib/supabase.js`가 참조하는 URL/anon key (`.env` 또는 app 설정). 없으면 원격설정은 안전 기본값으로만 동작.
 - **AdMob 광고 단위 ID**: `src/lib/adManager.js` 참조.
-- **Android SDK / Xcode**: 네이티브 빌드·실기기 테스트에 필수 (이 개발 환경엔 없음).
+- **Android SDK / Xcode**: 네이티브 빌드·실기기 테스트에 필수.
 - **EAS 계정**: `eas build` 사용 시.
+
+#### Android 에뮬레이터 로컬 세팅 (2026-08-19 이 macOS 환경에서 검증됨)
+Android Studio "Standard" 설치는 SDK(`~/Library/Android/sdk`)만 깔고 `sdkmanager`/`avdmanager` 커맨드라인 도구는 포함하지 않는다. 아래 순서로 채워야 한다.
+```bash
+brew install --cask android-commandlinetools   # sdkmanager/avdmanager 바이너리만 목적
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+# 홈브류 cmdline-tools는 자기 자신 기준 상대경로로 SDK 루트를 찾으므로,
+# Studio가 깐 SDK 루트에 "제대로 자리잡은" cmdline-tools를 다시 설치해야 avdmanager가 시스템 이미지를 찾는다.
+sdkmanager --sdk_root="$ANDROID_HOME" "cmdline-tools;latest" "system-images;android-36;google_apis;arm64-v8a" "platforms;android-36"
+export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+avdmanager create avd -n jiwongum_test -k "system-images;android-36;google_apis;arm64-v8a" -d "pixel_7" -f
+emulator -avd jiwongum_test
+```
+
+⚠️ **`npx expo run:android` 첫 빌드는 이대로 실패한다.** 원인과 조치:
+1. `expo prebuild`가 생성하는 `android/gradle/wrapper/gradle-wrapper.properties`가 **Gradle 9.3.1**을 받아오는데, `android/settings.gradle`이 `react-native-gradle-plugin`을 소스 기준 composite build로 포함하고 그 `gradle/libs.versions.toml`은 **AGP 8.12.0**에 고정돼 있다. Gradle 9.x는 AGP 8.12.0이 참조하는 `JvmVendorSpec.IBM_SEMERU` 필드를 제거해 `Class ... does not have member field 'IBM_SEMERU'`로 빌드가 즉시 죽는다.
+   → `android/gradle/wrapper/gradle-wrapper.properties`의 `distributionUrl`을 `gradle-8.13-bin.zip`으로 수동 변경.
+2. Gradle 8.13은 Android Studio가 번들한 JBR(JDK 25)에서 못 돈다(`Unsupported class file major version 69`).
+   → `brew install openjdk@17`(sudo 불필요, cask 아님) 후 `JAVA_HOME=/opt/homebrew/opt/openjdk@17`로 빌드.
+3. **`android/`는 `.gitignore`돼 있어 이 두 수정은 커밋되지 않는다.** `expo prebuild`를 다시 돌리면(또는 android 폴더를 지우고 `expo run:android`를 다시 돌리면) 매번 위 두 가지를 재적용해야 한다.
+
+이 조합(Gradle 8.13 + JDK 17)으로 `app-debug.apk` 빌드·설치·실행까지 확인됨. 확인된 항목(§2 테스트 체크리스트 중):
+- [x] 하단 4탭(홈/저장함/문의/설정) 표시 및 탭 전환 정상
+- [x] 홈/문의 웹뷰 로드 정상
+- [x] 전화번호 링크 탭 → OS 다이얼러에 번호 정확히 전달(`tel:`)
+- [x] dev 빌드가 새 브랜드(`어르신 지원금`)로 표시됨 — `app.config.js`의 dev/preview 브랜드 게이트 정상 동작
+- [ ] 비행기 모드 웹뷰 오류/재시도, `app_config` 토글 반영(광고 on/off·점검배너·전환안내), Play Integrity 관련은 미확인
 
 ### 4.3 실행/검증 명령
 ```bash
@@ -112,8 +139,11 @@ cd web && npm run dev
 # 앱 JS 번들 검증(네이티브 없이 가능)
 npx expo export --platform android
 
-# 앱 네이티브 빌드(SDK 있는 기기에서)
-npx expo run:android            # 로컬 SDK
+# 앱 네이티브 빌드 (§4.2의 Gradle/JDK 조치 선적용 필요)
+export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$JAVA_HOME/bin:$PATH"
+npx expo run:android
 # 또는
 eas build --profile development --platform android
 
