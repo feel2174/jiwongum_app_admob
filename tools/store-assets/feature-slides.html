@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root {
+    --green: #295f48;
+    --green-deep: #173c2d;
+    --green-ink: #173c2d;
+    --yellow: #ffd200;
+    --yellow-soft: #ffdf4d;
+    --paper: #fffdf8;
+    --bg: #f6f2ea;
+    --ink: #1f2a24;
+    --muted: #59665c;
+    --line: #ded8cc;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+  }
+
+  .stage { width: 1080px; height: 1920px; display: flex; flex-direction: column; }
+
+  /* 상단 그린 헤더 밴드 */
+  .head {
+    background: linear-gradient(150deg, #2f6d54, var(--green-deep));
+    padding: 96px 72px 72px;
+    color: #fff;
+    position: relative;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.14); border-radius: 999px;
+    padding: 10px 22px; font-size: 26px; font-weight: 700;
+    color: var(--yellow-soft); margin-bottom: 36px;
+  }
+  .badge .dot { width: 34px; height: 34px; border-radius: 50%; background: var(--yellow);
+    display: flex; align-items: center; justify-content: center; color: var(--green-ink); font-weight: 900; font-size: 20px; }
+  h1 { font-size: 64px; line-height: 1.32; font-weight: 800; letter-spacing: -0.01em; }
+  .sub { margin-top: 24px; font-size: 30px; line-height: 1.6; color: rgba(255,255,255,0.86); font-weight: 500; max-width: 820px; }
+
+  /* 본문 일러스트 카드 영역 */
+  .body-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 72px; }
+  .mock { width: 100%; background: var(--paper); border: 2px solid var(--line); border-radius: 32px;
+    padding: 56px; box-shadow: 0 40px 90px rgba(23,60,45,0.16); }
+
+  /* 하단 워드마크 */
+  .foot { padding: 0 72px 88px; display: flex; align-items: center; gap: 18px; }
+  .coin { width: 64px; height: 64px; border-radius: 50%; background: var(--green);
+    display: flex; align-items: center; justify-content: center; flex: none; }
+  .coin span { color: var(--yellow); font-size: 34px; font-weight: 900; }
+  .foot b { font-size: 34px; color: var(--green-ink); font-weight: 800; }
+
+  /* ===== 슬라이드별 목업 ===== */
+
+  /* 1: 음성 검색 */
+  .voiceBar { display: flex; align-items: center; gap: 24px; background: var(--bg); border: 3px solid var(--green);
+    border-radius: 999px; padding: 32px 40px; }
+  .voiceBar .mic { width: 88px; height: 88px; border-radius: 50%; background: var(--green); flex: none;
+    display: flex; align-items: center; justify-content: center; font-size: 44px; }
+  .voiceBar .txt { font-size: 40px; color: var(--muted); font-weight: 600; }
+  .waves { display: flex; align-items: flex-end; gap: 10px; margin-top: 56px; justify-content: center; height: 120px; }
+  .waves i { width: 20px; border-radius: 10px; background: var(--yellow); display: block; }
+
+  /* 2: 전화 연결 */
+  .callRow { display: flex; flex-direction: column; gap: 28px; }
+  .callLabel { font-size: 30px; font-weight: 800; color: var(--green); }
+  .callBtn { display: flex; align-items: center; gap: 20px; background: var(--green); color: #fff;
+    border-radius: 20px; padding: 36px 40px; font-size: 44px; font-weight: 800; }
+  .callBtn .ico { font-size: 44px; }
+
+  /* 3: 지역 저장 */
+  .regionChip { display: inline-flex; align-items: center; gap: 20px; border: 3px solid var(--line);
+    border-radius: 20px; padding: 28px 40px; font-size: 40px; font-weight: 700; color: var(--ink); background: #fff; }
+  .regionNote { margin-top: 40px; font-size: 32px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 16px; }
+  .checkDot { width: 44px; height: 44px; border-radius: 50%; background: var(--green); color: #fff; flex: none;
+    display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; }
+
+  /* 4: 정리된 필드 */
+  .sumRow { padding: 28px 0; border-bottom: 2px solid var(--line); }
+  .sumRow:last-child { border-bottom: none; }
+  .sumLabel { font-size: 30px; font-weight: 800; color: var(--green); margin-bottom: 10px; display: block; }
+  .sumValue { font-size: 32px; color: var(--ink); line-height: 1.5; }
+
+  /* 5: 공공데이터 신뢰 */
+  .trustGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .trustChip { border: 2px solid var(--line); border-radius: 18px; padding: 32px 28px; text-align: center;
+    font-size: 30px; font-weight: 700; color: var(--green-ink); background: #fbf9f2; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="head">
+      <div class="badge"><span class="dot">₩</span>지원금 살펴줌</div>
+      <h1 id="headline"></h1>
+      <p class="sub" id="subtext"></p>
+    </div>
+    <div class="body-area">
+      <div class="mock" id="mock"></div>
+    </div>
+    <div class="foot">
+      <div class="coin"><span>₩</span></div>
+      <b>단어 하나로 찾는 정부 지원금</b>
+    </div>
+  </div>
+
+<script>
+  const SLIDES = {
+    voice: {
+      headline: '말 한마디면 충분해요',
+      subtext: '타이핑이 어려우시면 말로 물어보세요. 원하시는 지원금을 바로 찾아드려요.',
+      mock: () => `
+        <div class="voiceBar"><span class="mic">🎤</span><span class="txt">"틀니 지원금 알려줘"</span></div>
+        <div class="waves">
+          <i style="height:36px"></i><i style="height:76px"></i><i style="height:112px"></i>
+          <i style="height:64px"></i><i style="height:96px"></i><i style="height:44px"></i><i style="height:80px"></i>
+        </div>`,
+    },
+    call: {
+      headline: '전화번호까지\n바로 보여드려요',
+      subtext: '신청처 전화번호를 그대로 알려드려요. 눌러서 바로 통화하세요.',
+      mock: () => `
+        <div class="callRow">
+          <span class="callLabel">신청처</span>
+          <div class="callBtn"><span class="ico">📞</span>055-831-2653 전화</div>
+        </div>`,
+    },
+    region: {
+      headline: '내 지역, 한 번만\n정하면 끝',
+      subtext: '다음에 들어오셔도 우리 지역 지원금부터 자동으로 보여드려요.',
+      mock: () => `
+        <span class="regionLabel" style="font-size:30px;font-weight:800;color:var(--green)">내 지역</span>
+        <div style="margin-top:20px"><span class="regionChip">경기도 ▾</span></div>
+        <div class="regionNote"><span class="checkDot">✓</span>지역을 정해두면 다음엔 자동으로 골라드려요</div>`,
+    },
+    fields: {
+      headline: '복잡한 공고문,\n보기 쉽게 정리',
+      subtext: '대상, 금액, 신청방법을 순서대로 딱 정리해드려요.',
+      mock: () => `
+        <div class="sumRow"><span class="sumLabel">대상</span><div class="sumValue">65세 이상 기초연금수급자</div></div>
+        <div class="sumRow"><span class="sumLabel">금액</span><div class="sumValue">월 최대 20만원</div></div>
+        <div class="sumRow"><span class="sumLabel">신청방법</span><div class="sumValue">방문신청 또는 온라인신청</div></div>`,
+    },
+    trust: {
+      headline: '정부 공공데이터 기반,\n믿을 수 있어요',
+      subtext: '행정안전부 보조금24 등 공식 데이터를 바탕으로 안내합니다.',
+      mock: () => `
+        <div class="trustGrid">
+          <div class="trustChip">정부24</div>
+          <div class="trustChip">복지로</div>
+          <div class="trustChip">보조금24</div>
+          <div class="trustChip">국민연금공단</div>
+        </div>`,
+    },
+  };
+
+  const key = new URLSearchParams(location.search).get('slide') || 'voice';
+  const s = SLIDES[key];
+  document.getElementById('headline').innerHTML = s.headline.replace(/\n/g, '<br>');
+  document.getElementById('subtext').textContent = s.subtext;
+  document.getElementById('mock').innerHTML = s.mock();
+</script>
+</body>
+</html>

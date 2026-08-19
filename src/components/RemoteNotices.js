@@ -57,7 +57,7 @@ export default function RemoteNotices({ cfg }) {
             <Text style={[styles.title, { color: t.ink }]}>곧 앱 이름이 바뀝니다</Text>
             <Text style={[styles.body, { color: t.muted }]}>
               <Text style={{ fontWeight: '800', color: t.ink }}>‘지원금 모아보기’</Text>가{'\n'}
-              <Text style={{ fontWeight: '800', color: t.accent }}>‘어르신 지원금’</Text>이 됩니다.
+              <Text style={{ fontWeight: '800', color: t.accent }}>‘지원금 살펴줌’</Text>이 됩니다.
             </Text>
             <Text style={[styles.body, { color: t.muted }]}>
               앱을 지우지 않으셔도 됩니다.{'\n'}저장하신 지원금도 그대로 있습니다.
