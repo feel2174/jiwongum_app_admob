@@ -4,16 +4,16 @@ import './globals.css';
 export const metadata = {
   metadataBase: new URL('https://senior.zucca100.com'),
   title: {
-    default: '어르신 지원금',
-    template: '%s | 어르신 지원금',
+    default: '지원금 살펴줌',
+    template: '%s | 지원금 살펴줌',
   },
-  description: '기초연금, 의료비, 주거, 노인일자리, 난방비까지 — 단어 하나로 어르신 지원금을 바로 찾아드립니다.',
+  description: '기초연금, 의료비, 주거, 노인일자리, 난방비까지 — 단어 하나로 정부 지원금을 대신 살펴드립니다.',
   openGraph: {
-    title: '어르신 지원금',
-    description: '단어 하나만 입력하면 관련 지원금을 바로 찾아드립니다. 어르신 지원금.',
+    title: '지원금 살펴줌',
+    description: '단어 하나만 입력하면 관련 지원금을 대신 살펴드립니다. 지원금 살펴줌.',
     type: 'website',
     locale: 'ko_KR',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: '어르신 지원금' }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: '지원금 살펴줌' }],
   },
   robots: {
     index: true,

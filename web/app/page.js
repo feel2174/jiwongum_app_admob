@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <main className="landingMain">
       <header className="landingBrand">
-        <p className="brandKicker">어르신 지원금</p>
+        <p className="brandKicker">지원금 살펴줌</p>
       </header>
 
       <SearchClient />
@@ -31,7 +31,7 @@ export default function Home() {
       </section>
 
       <footer className="footer landingFooter">
-        <strong>어르신 지원금</strong>
+        <strong>지원금 살펴줌</strong>
         <span>공식 기관이 아닌 참고용 안내 서비스입니다.</span>
         <nav className="footerSources" aria-label="공식 정부 출처">
           <span className="footerSourcesLabel">공식 출처</span>
