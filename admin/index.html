@@ -225,6 +225,8 @@
       <div class="nav-item" data-tab="today"><span class="ico">🎁</span> 오늘의 혜택</div>
       <div class="nav-label">커뮤니티</div>
       <div class="nav-item" data-tab="comments"><span class="ico">💬</span> 댓글 관리 <span class="badge" id="nav-comments-count"></span></div>
+      <div class="nav-label">앱 운영</div>
+      <div class="nav-item" data-tab="appconfig"><span class="ico">⚙️</span> 앱 설정</div>
     </nav>
     <div class="sidebar-foot">
       <p class="user-line" id="user-email"></p>
@@ -329,6 +331,54 @@
         </div>
        </div>
       </section>
+
+      <section id="appconfig-tab" hidden>
+        <div class="card">
+          <div class="card-head"><p class="title">광고 노출</p></div>
+          <p class="meta">앱 부팅 시 조회됩니다. Play Integrity 판정과 별개로, 여기서 끄면 배포 없이 즉시 광고가 꺼집니다.</p>
+          <div class="field">
+            <label class="toggle-row">
+              <input type="checkbox" id="cfg-ads-enabled" />
+              <span class="toggle-text">광고 노출(켜기)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><p class="title">점검 공지</p></div>
+          <p class="meta">켜면 앱 상단에 점검 배너가 노출됩니다. 콘텐츠는 계속 정상 제공됩니다.</p>
+          <div class="field">
+            <label class="toggle-row">
+              <input type="checkbox" id="cfg-maintenance-enabled" />
+              <span class="toggle-text">점검 배너 표시</span>
+            </label>
+          </div>
+          <div class="field">
+            <label>제목</label>
+            <input type="text" id="cfg-maintenance-title" placeholder="예: 점검 중" />
+          </div>
+          <div class="field">
+            <label>안내 문구</label>
+            <textarea id="cfg-maintenance-message" placeholder="예: 잠시 뒤 다시 열어보세요"></textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><p class="title">브랜드 전환 안내</p></div>
+          <p class="meta">Phase 3(이름·아이콘 전환) 시점에만 켭니다. 첫 실행 1회만 인앱 모달로 노출됩니다.</p>
+          <div class="field">
+            <label class="toggle-row">
+              <input type="checkbox" id="cfg-transition-notice" />
+              <span class="toggle-text">전환 안내 모달 노출</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn-primary" id="appconfig-save">저장</button>
+          <span class="meta" id="appconfig-status"></span>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -353,6 +403,7 @@ const PAGES = {
   manage:   { title: '글 관리',        sub: '발행 상태를 바꾸거나 내용을 수정합니다.',      action: '목록 새로고침',        run: () => loadArticles() },
   today:    { title: '오늘의 혜택',    sub: '홈 상단에 노출할 혜택 항목을 관리합니다.',      action: null,                   run: () => loadTodaySettings() },
   comments: { title: '댓글 관리',      sub: '커뮤니티에 달린 댓글을 검토·삭제합니다.',      action: '댓글 새로고침',        run: () => loadComments() },
+  appconfig:{ title: '앱 설정',        sub: '앱 부팅 시 조회하는 원격 설정입니다. 배포 없이 즉시 반영됩니다.', action: null,   run: () => loadAppConfigSettings() },
 };
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -419,6 +470,7 @@ function switchTab(name) {
   $('#manage-tab').hidden = name !== 'manage';
   $('#comments-tab').hidden = name !== 'comments';
   $('#today-tab').hidden = name !== 'today';
+  $('#appconfig-tab').hidden = name !== 'appconfig';
 
   const page = PAGES[name];
   $('#page-title').textContent = page.title;
@@ -432,6 +484,7 @@ function switchTab(name) {
     actionBtn.hidden = true;
   }
   if (name === 'today') loadTodaySettings(); // 최신 발행글 기준 노출 여부를 새로 계산
+  if (name === 'appconfig') loadAppConfigSettings();
   closeSidebar();
 }
 
@@ -536,6 +589,38 @@ async function saveTodaySettings() {
   toast('저장되었습니다.');
   updateVisibilityBadge();
   reloadPreview();
+}
+
+// ---------- 앱 설정 / 킬 스위치 (app_settings.app_config) ----------
+// value 스키마: { adsEnabled, maintenance: {title,message}|null, transitionNotice }
+async function loadAppConfigSettings() {
+  const status = $('#appconfig-status');
+  status.textContent = '';
+  const { data, error } = await supabase
+    .from('app_settings').select('value').eq('key', 'app_config').maybeSingle();
+  if (error) { status.textContent = '오류: ' + error.message; return; }
+  const v = data?.value || {};
+  $('#cfg-ads-enabled').checked = v.adsEnabled !== false;
+  $('#cfg-maintenance-enabled').checked = !!v.maintenance;
+  $('#cfg-maintenance-title').value = v.maintenance?.title || '';
+  $('#cfg-maintenance-message').value = v.maintenance?.message || '';
+  $('#cfg-transition-notice').checked = !!v.transitionNotice;
+}
+
+async function saveAppConfigSettings() {
+  const maintenanceOn = $('#cfg-maintenance-enabled').checked;
+  const value = {
+    adsEnabled: $('#cfg-ads-enabled').checked,
+    maintenance: maintenanceOn
+      ? { title: $('#cfg-maintenance-title').value.trim(), message: $('#cfg-maintenance-message').value.trim() }
+      : null,
+    transitionNotice: $('#cfg-transition-notice').checked,
+  };
+  const { error } = await supabase
+    .from('app_settings')
+    .upsert({ key: 'app_config', value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  if (error) { toast('저장 실패: ' + error.message); return; }
+  toast('저장되었습니다. 앱 재실행 시 반영됩니다.');
 }
 
 async function addTodayItem() {
@@ -844,6 +929,7 @@ async function deleteComment(id, body) {
 $('#today-save').addEventListener('click', saveTodaySettings);
 $('#add-item-btn').addEventListener('click', addTodayItem);
 $('#preview-refresh').addEventListener('click', reloadPreview);
+$('#appconfig-save').addEventListener('click', saveAppConfigSettings);
 
 // 초기 진입 페이지 헤더 세팅
 switchTab('import');
