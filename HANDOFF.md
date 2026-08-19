@@ -6,7 +6,9 @@
 
 - **대상 앱**: `com.jiwongum.app` — Google Play / App Store **라이브** 앱의 대규모 리브랜딩 업데이트
 - **스택**: Expo SDK 57 / React Native, WebView 래퍼(`senior.zucca100.com`), Supabase, AdMob
-- **현재 브랜드(프로덕션)**: `지원금 모아보기` → 목표 브랜드 `어르신 지원금`
+- **현재 브랜드(프로덕션)**: `지원금 모아보기` → 목표 브랜드는 검토 중
+  - **웹(Phase 1, 이미 라이브)**: `어르신 지원금` — 변경 없음, 그대로 유지
+  - **앱 아이콘/스플래시 스테이징(Phase 3, 미출시)**: 2026-08-19부터 `지원금 살펴줌`으로 후보 전환해 탐색 중(§2 "브랜드 재정의" 참고). **KIPRIS 상표 검색 전이라 최종 확정 아님.** 웹과 앱 후보 이름이 지금 서로 다른 상태 — Phase 3 최종 확정 시 웹도 같이 맞출지 결정 필요.
 - **기준 커밋**: 이 문서를 포함한 커밋 (아래 "커밋에 포함된 변경" 참조)
 - ⚠️ **불변 제약**: 패키지명 `com.jiwongum.app`·서명키 변경 금지 / localStorage 키·Supabase 푸시 토큰 보존 / 브랜드 전환은 **편도(되돌릴 수 없음)**
 
@@ -33,10 +35,10 @@
 
 ### Phase 3 준비물 (스테이징만, 프로덕션 미반영)
 - **동적 Expo 설정** `app.config.js` (신규): EAS 프로파일별 `skipIntegrity` 주입 + 브랜드 게이트.
-  - dev/preview → 새 브랜드(`어르신 지원금`, `assets/rebrand/*`) + `skipIntegrity=true`
+  - dev/preview → 새 브랜드 후보(`지원금 살펴줌`, `assets/rebrand/*`) + `skipIntegrity=true`
   - **production → 구브랜드 유지** + `skipIntegrity=false`. 새 브랜드 강제 시 `EXPO_PUBLIC_REBRAND=1`
-- **코드 스플래시** `src/components/AppSplash.js`: 네이비 코인(₩) + `어르신 지원금` (노란 배경 유지)
-- **브랜드 에셋 생성기** `tools/brand-assets/`(`render.mjs`+`template.html`, Chrome 헤드리스)
+- **코드 스플래시** `src/components/AppSplash.js`: 이제 `extra.rebrand` 플래그로 게이팅됨(이전엔 무조건 렌더 — 프로덕션에도 새 이름이 새어나갈 수 있던 버그를 같이 고침). rebrand=true일 때만 그린 코인(₩) + `지원금 살펴줌` 렌더, false면 `null`(네이티브 구브랜드 스플래시에 위임).
+- **브랜드 에셋 생성기** `tools/brand-assets/`(`render.mjs`+`template.html`, Chrome 헤드리스). 2026-08-19: 팔레트를 남색→그린/골드로 전환(시니어는 청색 계열 지각이 먼저 떨어짐), 워드마크를 `지원금 살펴줌`으로 교체. **`render.mjs`는 `web/public/og.png`·`web/app/icon.png`(라이브 웹 자산)도 같이 재생성하므로, 실행 후 그 두 파일은 `git checkout`으로 되돌려야 라이브 웹 브랜드가 그대로 유지된다.**
 - **에셋 스테이징**: `assets/rebrand/*`(앱 아이콘/스플래시/알림/파비콘), `store/rebrand/*`(스토어 아이콘·피처그래픽) — **app.json 미반영**
 
 ### 문서

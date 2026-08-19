@@ -4,9 +4,10 @@
 <meta charset="utf-8" />
 <style>
   :root {
-    --navy: #154c76;
-    --navy-deep: #0f3a5a;
-    --navy-ink: #10334f;
+    /* 시니어 색채지각 리서치: 청색 계열은 노화로 가장 먼저 흐려짐 → 남색 대신 난색(그린+옐로) 조합으로 교체 */
+    --green: #295f48;
+    --green-deep: #173c2d;
+    --green-ink: #173c2d;
     --yellow: #ffd200;
     --yellow-soft: #ffdf4d;
     --white: #ffffff;
@@ -32,37 +33,37 @@
   /* ====================== 정사각 아이콘류 ====================== */
   body.square .stage { background: transparent; }
 
-  /* icon: 네이비 배경 + 노랑 디스크 + 네이비 원화 */
-  body.icon .stage { background: linear-gradient(150deg, #1a5989, #133f63); }
+  /* icon: 그린 배경 + 노랑 디스크 + 그린 원화 */
+  body.icon .stage { background: linear-gradient(150deg, #2f6d54, var(--green-deep)); }
   body.icon .disc { width: 62vmin; height: 62vmin; background: var(--yellow);
     box-shadow: inset 0 0 0 4vmin rgba(255,255,255,0.14), 0 6vmin 12vmin rgba(0,0,0,0.22); }
-  body.icon .won { font-size: 40vmin; color: var(--navy-ink); }
+  body.icon .won { font-size: 40vmin; color: var(--green-ink); }
 
   /* foreground: 투명 배경 + 노랑 디스크(어댑티브 안전영역) */
   body.foreground .stage { background: transparent; }
   body.foreground .disc { width: 56vmin; height: 56vmin; background: var(--yellow);
     box-shadow: inset 0 0 0 3.5vmin rgba(255,255,255,0.16); }
-  body.foreground .won { font-size: 36vmin; color: var(--navy-ink); }
+  body.foreground .won { font-size: 36vmin; color: var(--green-ink); }
 
-  /* background: 단색 네이비 */
-  body.background .stage { background: linear-gradient(150deg, #1a5989, #133f63); }
+  /* background: 단색 그린 */
+  body.background .stage { background: linear-gradient(150deg, #2f6d54, var(--green-deep)); }
 
   /* mono / notification: 흰색 원화 실루엣, 투명 배경 */
   body.mono .stage, body.notification .stage { background: transparent; }
   body.mono .won, body.notification .won { font-size: 62vmin; color: #ffffff; }
 
-  /* splash: 투명 배경 + 네이비 디스크 + 흰 원화 (노란 스플래시 배경 위에서 대비) */
+  /* splash: 투명 배경 + 그린 디스크 + 노랑 원화 (노란 스플래시 배경 위에서 대비) */
   body.splash .stage { background: transparent; }
-  body.splash .disc { width: 68vmin; height: 68vmin; background: var(--navy);
+  body.splash .disc { width: 68vmin; height: 68vmin; background: var(--green);
     box-shadow: 0 4vmin 10vmin rgba(0,0,0,0.18); }
   body.splash .won { font-size: 40vmin; color: var(--yellow); }
 
   /* ====================== 가로형(피처그래픽 / OG) ====================== */
-  body.wide .stage { background: radial-gradient(120% 140% at 18% 20%, #1e6499 0%, #133f63 62%, #0e3350 100%); }
+  body.wide .stage { background: radial-gradient(120% 140% at 18% 20%, #2f6d54 0%, var(--green-deep) 62%, #0f2b20 100%); }
   .wideWrap { display: flex; align-items: center; gap: 6.5vh; padding: 0 8vh; }
   .wideDisc { flex: none; display: flex; align-items: center; justify-content: center;
     border-radius: 50%; background: var(--yellow); }
-  .wideDisc .won { color: var(--navy-ink); }
+  .wideDisc .won { color: var(--green-ink); }
   .wideText { display: flex; flex-direction: column; }
   .wideBrand { color: #fff; font-weight: 900; letter-spacing: -0.03em; line-height: 1.05; }
   .wideTagline { color: var(--yellow-soft); font-weight: 700; }
@@ -91,7 +92,7 @@
     <div class="wideWrap" hidden>
       <div class="wideDisc"><span class="won">₩</span></div>
       <div class="wideText">
-        <div class="wideBrand">어르신 지원금</div>
+        <div class="wideBrand">지원금 살펴줌</div>
         <div class="wideTagline">단어 하나로 찾는 정부 지원금</div>
         <div class="wideDomain">senior.zucca100.com</div>
       </div>

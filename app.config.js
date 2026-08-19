@@ -32,7 +32,7 @@ module.exports = ({ config }) => {
 
   return {
     ...config,
-    name: rebrand ? '어르신 지원금' : config.name,
+    name: rebrand ? '지원금 살펴줌' : config.name,
     icon: rebrand ? './assets/rebrand/icon.png' : config.icon,
     android: {
       ...config.android,
