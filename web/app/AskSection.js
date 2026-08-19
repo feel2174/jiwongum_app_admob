@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
-const KAKAO_CHANNEL = 'http://pf.kakao.com/_NJYBX';
+// 채널 홈(/_NJYBX)은 로그인 없이도 프로필이 그대로 보여 "이미 문의 가능한 상태"처럼 보인다.
+// /chat 으로 바로 들어가면 1:1 채팅 화면이라 카카오 로그인이 안 돼 있으면 즉시 로그인부터 요구한다.
+const KAKAO_CHANNEL = 'http://pf.kakao.com/_NJYBX/chat';
 const KAKAO_OPENCHAT = 'https://open.kakao.com/o/plqZYTHi';
 
 // 문의 섹션.

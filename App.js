@@ -55,10 +55,30 @@ async function ensureMicPermission() {
   } catch {}
 }
 
-const tabIcon = (emoji) => ({ color }) => <Text style={{ fontSize: 18, color }}>{emoji}</Text>;
-
 function Tabs({ initialRouteName = 'Home' }) {
   const t = useTheme();
+
+  // 현재 탭을 아이콘 뒤 알약형 배경 + 굵은 글자로 부각한다.
+  // (반투명 블러는 저시력 사용자에게 대비가 낮아지므로, 대비가 뚜렷한 단색 하이라이트를 쓴다.)
+  const tabIcon = (emoji) => ({ color, focused }) => (
+    <View
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: focused ? t.accentSoft : 'transparent',
+      }}
+    >
+      <Text style={{ fontSize: 18, color }}>{emoji}</Text>
+    </View>
+  );
+  const tabLabel = (label) => ({ color, focused }) => (
+    <Text style={{ fontSize: 12, color, fontWeight: focused ? '800' : '500', marginTop: 2 }}>
+      {label}
+    </Text>
+  );
 
   return (
     <Tab.Navigator
@@ -79,12 +99,12 @@ function Tabs({ initialRouteName = 'Home' }) {
           showBack: false,
           showHeader: false,
         }}
-        options={{ tabBarLabel: '홈', tabBarIcon: tabIcon('🏠') }}
+        options={{ tabBarLabel: tabLabel('홈'), tabBarIcon: tabIcon('🏠') }}
       />
       <Tab.Screen
         name="Saved"
         component={SavedScreen}
-        options={{ tabBarLabel: '저장함', tabBarIcon: tabIcon('⭐') }}
+        options={{ tabBarLabel: tabLabel('저장함'), tabBarIcon: tabIcon('⭐') }}
       />
       <Tab.Screen
         name="Ask"
@@ -95,13 +115,13 @@ function Tabs({ initialRouteName = 'Home' }) {
           showBack: false,
           showHeader: false,
         }}
-        options={{ tabBarLabel: '문의', tabBarIcon: tabIcon('💬') }}
+        options={{ tabBarLabel: tabLabel('문의'), tabBarIcon: tabIcon('💬') }}
       />
       <Tab.Screen
         name="SettingsTab"
         component={SettingsScreen}
         initialParams={{ showBack: false }}
-        options={{ tabBarLabel: '설정', tabBarIcon: tabIcon('⚙') }}
+        options={{ tabBarLabel: tabLabel('설정'), tabBarIcon: tabIcon('⚙') }}
       />
     </Tab.Navigator>
   );
